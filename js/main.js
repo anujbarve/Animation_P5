@@ -4,57 +4,6 @@ let animAPI;
 
 // Add to the setup function
 function setup() {
-<<<<<<< HEAD
-  // Create canvas and add it to container
-  const canvasContainer = document.getElementById("canvas-container");
-
-  // Get container dimensions
-  const containerWidth = canvasContainer.clientWidth;
-  const containerHeight = canvasContainer.clientHeight;
-
-  // Create canvas with container dimensions
-  const canvas = createCanvas(containerWidth, containerHeight);
-  canvas.parent("canvas-container");
-
-  // Update engine canvas dimensions
-  engine = new AnimationEngine();
-  engine.canvasWidth = containerWidth;
-  engine.canvasHeight = containerHeight;
-  engine.initialize();
-
-  // Initialize UI manager
-  uiManager = new UIManager(engine);
-  engine.uiManager = uiManager;
-  uiManager.initialize();
-
-  // Initialize Animation API
-  animAPI = new AnimationAPI(engine);
-
-  // Initialize VS Code-like UI
-  vsCodeUI = new VSCodeUI(engine);
-  vsCodeUI.initialize();
-
-  // Initialize Code Editor
-  const codeEditor = new CodeEditorPanel(engine);
-  codeEditor.initialize();
-  vsCodeUI.codeEditorPanel = codeEditor;
-
-  // Set framerate
-  frameRate(60);
-
-  // Initial resize to ensure everything fits
-  windowResized();
-
-  const resizeObserver = new ResizeObserver((entries) => {
-    for (const entry of entries) {
-      if (entry.target === canvasContainer) {
-        windowResized();
-      }
-    }
-  });
-
-  resizeObserver.observe(canvasContainer);
-=======
     // Create canvas and add it to container
     const canvasContainer = document.getElementById('canvas-container');
     const canvas = createCanvas(800, 600);
@@ -78,7 +27,6 @@ function setup() {
     
     // Set framerate
     frameRate(60);
->>>>>>> parent of 4885e6c (vscode style UI)
 }
 
 function draw() {
