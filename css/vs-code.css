@@ -86,7 +86,7 @@ body {
     display: flex;
     flex-direction: column;
     height: 100%;
-    overflow: hidden;
+    position: relative;
 }
 
 /* Canvas area */
@@ -94,8 +94,6 @@ body {
     flex: 1;
     position: relative;
     overflow: hidden;
-    width: 100%;
-    height: 100%;
 }
 
 /* Timeline panel - collapsible */
@@ -307,14 +305,4 @@ body {
 /* Keyframe editor styling */
 .keyframe-button {
     color: var(--vscode-accent) !important;
-}
-
-
-#canvas-container {
-    width: 100%;
-    height: 100%;
-}
-
-canvas {
-    display: block;
 }

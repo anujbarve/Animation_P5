@@ -1,9 +1,10 @@
 let engine;
 let uiManager;
 let animAPI;
-let vsCodeUI;
 
+// Add to the setup function
 function setup() {
+<<<<<<< HEAD
   // Create canvas and add it to container
   const canvasContainer = document.getElementById("canvas-container");
 
@@ -53,91 +54,95 @@ function setup() {
   });
 
   resizeObserver.observe(canvasContainer);
+=======
+    // Create canvas and add it to container
+    const canvasContainer = document.getElementById('canvas-container');
+    const canvas = createCanvas(800, 600);
+    canvas.parent('canvas-container');
+    
+    // Initialize animation engine
+    engine = new AnimationEngine();
+    engine.initialize();
+    
+    // Initialize UI manager
+    uiManager = new UIManager(engine);
+    engine.uiManager = uiManager;
+    uiManager.initialize();
+    
+    // Initialize Animation API
+    animAPI = new AnimationAPI(engine);
+    
+    // Initialize Code Editor
+    const codeEditor = new CodeEditorPanel(engine);
+    codeEditor.initialize();
+    
+    // Set framerate
+    frameRate(60);
+>>>>>>> parent of 4885e6c (vscode style UI)
 }
 
 function draw() {
-  // Update engine and UI
-  engine.update();
-  engine.render();
-  uiManager.update();
+    // Update engine and UI
+    engine.update();
+    engine.render();
+    uiManager.update();
 }
 
+function createSampleObjects() {
+    // Add a few sample shapes
+    const circle = new Circle(200, 300, 80);
+    circle.fill = color(255, 100, 100);
+    circle.name = "Red Circle";
+    engine.addObject(circle);
+    
+    // Add animation to circle
+    circle.addKeyframe('x', 0, 200, 'easeInOutCubic');
+    circle.addKeyframe('x', 120, 600, 'easeInOutCubic');
+    circle.addKeyframe('x', 240, 200, 'easeInOutCubic');
+    
+    circle.addKeyframe('y', 0, 300);
+    circle.addKeyframe('y', 60, 200);
+    circle.addKeyframe('y', 180, 400);
+    circle.addKeyframe('y', 240, 300);
+    
+    const rect = new Rectangle(400, 300, 120, 80);
+    rect.fill = color(100, 200, 255);
+    rect.cornerRadius = 15;
+    rect.name = "Blue Rectangle";
+    engine.addObject(rect);
+    
+    // Add animation to rectangle
+    rect.addKeyframe('rotation', 0, 0, 'easeInOutQuad');
+    rect.addKeyframe('rotation', 120, 180, 'easeInOutQuad');
+    rect.addKeyframe('rotation', 240, 360, 'easeInOutQuad');
+    rect.addKeyframe('rotation', 360, 270, 'easeInOutQuad');
+    
+    const text = new Text(400, 150, "Animated Text");
+    text.fontSize = 32;
+    text.fill = color(255, 255, 100);
+    text.name = "Title Text";
+    engine.addObject(text);
+    
+    // Add animation to text
+    text.addKeyframe('opacity', 0, 0, 'easeOutCubic');
+    text.addKeyframe('opacity', 30, 255, 'easeOutCubic');
+    text.addKeyframe('opacity', 210, 255, 'easeInCubic');
+    text.addKeyframe('opacity', 240, 0, 'easeInCubic');
+    
+    // Select the circle to start
+    engine.selectObject(circle);
+}
+
+// Optional: Handle window resize
 function windowResized() {
-  // Get the container
-  const container = document.getElementById("canvas-container");
-
-  // Calculate available space
-  const availableWidth = container.clientWidth;
-  const availableHeight = container.clientHeight;
-
-  // Resize canvas
-  resizeCanvas(availableWidth, availableHeight);
-
-  // Update engine dimensions
-  engine.canvasWidth = availableWidth;
-  engine.canvasHeight = availableHeight;
-
-  // Center objects if needed (optional)
-  centerAnimationObjects();
+    // This can be optionally implemented to make the canvas responsive
+    // You would need to update the canvas and engine dimensions
 }
 
-function centerAnimationObjects() {
-  // This function centers all objects when the canvas is resized
-  // Only run this if you want objects to reposition when window changes
-
-  // Skip if no engine or objects
-  if (!engine || !engine.objects.length) return;
-
-  // Calculate center offset
-  const centerX = engine.canvasWidth / 2;
-  const centerY = engine.canvasHeight / 2;
-
-  // Only center if this is a dramatic change in canvas size
-  // to avoid disrupting existing animations
-  const sizeDifference =
-    Math.abs(800 - engine.canvasWidth) + Math.abs(600 - engine.canvasHeight);
-  if (sizeDifference > 400) {
-    // Only center if big change
-    // Center all objects relative to new canvas center
-    for (const obj of engine.objects) {
-      // Skip background objects
-      if (obj.name === "Background") continue;
-
-      // Adjust positions to maintain relative placement to center
-      if (engine.canvasWidth > 800) {
-        const offsetX = (obj.x - 400) / 400; // -1 to 1 range
-        obj.x = centerX + offsetX * centerX;
-      }
-
-      if (engine.canvasHeight > 600) {
-        const offsetY = (obj.y - 300) / 300; // -1 to 1 range
-        obj.y = centerY + offsetY * centerY;
-      }
+// Prevent default behavior for some keyboard events
+function keyPressed() {
+    // Space bar
+    if (keyCode === 32) {
+        return false;
     }
-  }
-}
-
-// Optional: Create custom animation templates that can be called from the UI
-function createBounceAnimation() {
-  if (vsCodeUI) {
-    vsCodeUI.createBounceAnimation();
-  }
-}
-
-function createTypingAnimation() {
-  if (vsCodeUI) {
-    vsCodeUI.createTypingAnimation();
-  }
-}
-
-function createWaveAnimation() {
-  if (vsCodeUI) {
-    vsCodeUI.createWaveAnimation();
-  }
-}
-
-function createParticleAnimation() {
-  if (vsCodeUI) {
-    vsCodeUI.createParticleAnimation();
-  }
 }

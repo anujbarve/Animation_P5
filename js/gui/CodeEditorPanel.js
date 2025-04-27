@@ -1,9 +1,6 @@
 class CodeEditorPanel {
     constructor(engine) {
         this.engine = engine;
-        this.editorContainer = null;
-        this.codeTextarea = null;
-        this.isVisible = false;
     }
     
     initialize() {
@@ -15,88 +12,92 @@ class CodeEditorPanel {
     }
     
     createEditorDOM() {
+        // Create a button to show/hide editor
+        const editorButton = document.createElement('button');
+        editorButton.textContent = 'Animation Script Editor';
+        editorButton.className = 'button primary';
+        editorButton.style.position = 'absolute';
+        editorButton.style.bottom = '10px';
+        editorButton.style.left = '10px';
+        editorButton.style.zIndex = '100';
+        
+        editorButton.addEventListener('click', () => {
+            this.toggleEditor();
+        });
+        
+        document.body.appendChild(editorButton);
+        
         // Create editor container
         this.editorContainer = document.createElement('div');
-        this.editorContainer.className = 'panel code-editor-panel';
-        this.editorContainer.id = 'code-editor-panel';
-        this.editorContainer.style.position = 'absolute';
+        this.editorContainer.className = 'code-editor-container';
+        this.editorContainer.style.position = 'fixed';
         this.editorContainer.style.left = '50%';
         this.editorContainer.style.top = '50%';
         this.editorContainer.style.transform = 'translate(-50%, -50%)';
         this.editorContainer.style.width = '600px';
         this.editorContainer.style.height = '400px';
-        this.editorContainer.style.backgroundColor = 'var(--vscode-panel-bg)';
-        this.editorContainer.style.border = '1px solid var(--vscode-panel-border)';
+        this.editorContainer.style.backgroundColor = '#1e1e1e';
+        this.editorContainer.style.border = '1px solid #444';
         this.editorContainer.style.boxShadow = '0 0 20px rgba(0,0,0,0.5)';
         this.editorContainer.style.zIndex = '1000';
         this.editorContainer.style.display = 'none';
         this.editorContainer.style.flexDirection = 'column';
-        this.editorContainer.style.borderRadius = '3px';
-        this.editorContainer.style.overflow = 'hidden';
+        this.editorContainer.style.padding = '10px';
         
         // Editor header
         const header = document.createElement('div');
-        header.className = 'panel-header';
         header.style.display = 'flex';
         header.style.justifyContent = 'space-between';
         header.style.alignItems = 'center';
-        header.style.padding = '6px 10px';
-        header.style.backgroundColor = 'var(--vscode-toolbar)';
-        header.style.cursor = 'move';
+        header.style.marginBottom = '10px';
         
         const title = document.createElement('h3');
-        title.className = 'panel-title';
         title.textContent = 'Animation Script Editor';
+        title.style.margin = '0';
         
         const closeBtn = document.createElement('button');
-        closeBtn.className = 'panel-close';
-        closeBtn.innerHTML = '&times;';
+        closeBtn.textContent = '×';
+        closeBtn.style.background = 'none';
+        closeBtn.style.border = 'none';
+        closeBtn.style.color = '#aaa';
+        closeBtn.style.fontSize = '20px';
+        closeBtn.style.cursor = 'pointer';
         closeBtn.addEventListener('click', () => {
-            this.hide();
+            this.toggleEditor();
         });
         
         header.appendChild(title);
         header.appendChild(closeBtn);
         
-        // Editor content
-        const content = document.createElement('div');
-        content.className = 'panel-content';
-        content.style.height = 'calc(100% - 30px)';
-        content.style.display = 'flex';
-        content.style.flexDirection = 'column';
-        content.style.padding = '0';
-        
         // Editor textarea
         this.codeTextarea = document.createElement('textarea');
         this.codeTextarea.style.width = '100%';
-        this.codeTextarea.style.height = 'calc(100% - 40px)';
-        this.codeTextarea.style.backgroundColor = 'var(--vscode-bg)';
-        this.codeTextarea.style.color = 'var(--vscode-text)';
-        this.codeTextarea.style.border = 'none';
+        this.codeTextarea.style.height = 'calc(100% - 80px)';
+        this.codeTextarea.style.backgroundColor = '#252525';
+        this.codeTextarea.style.color = '#eee';
+        this.codeTextarea.style.border = '1px solid #333';
         this.codeTextarea.style.padding = '10px';
         this.codeTextarea.style.fontFamily = 'monospace';
         this.codeTextarea.style.fontSize = '14px';
         this.codeTextarea.style.resize = 'none';
-        this.codeTextarea.style.outline = 'none';
         
         // Button controls
         const controls = document.createElement('div');
         controls.style.display = 'flex';
         controls.style.justifyContent = 'space-between';
-        controls.style.padding = '8px';
-        controls.style.backgroundColor = 'var(--vscode-panel-bg)';
+        controls.style.marginTop = '10px';
         
         const runButton = document.createElement('button');
         runButton.textContent = 'Run Animation';
-        runButton.className = 'vscode-button primary';
+        runButton.className = 'button primary';
         runButton.addEventListener('click', () => {
             this.runCode();
         });
         
         const sampleMenu = document.createElement('select');
-        sampleMenu.style.backgroundColor = 'var(--vscode-bg)';
-        sampleMenu.style.color = 'var(--vscode-text)';
-        sampleMenu.style.border = '1px solid var(--vscode-border)';
+        sampleMenu.style.backgroundColor = '#333';
+        sampleMenu.style.color = '#fff';
+        sampleMenu.style.border = '1px solid #555';
         sampleMenu.style.padding = '5px';
         
         const samples = {
@@ -122,48 +123,11 @@ class CodeEditorPanel {
         controls.appendChild(runButton);
         
         // Add everything to the container
-        content.appendChild(this.codeTextarea);
-        content.appendChild(controls);
-        
         this.editorContainer.appendChild(header);
-        this.editorContainer.appendChild(content);
-        
-        // Make panel draggable
-        this.makeDraggable(this.editorContainer, header);
+        this.editorContainer.appendChild(this.codeTextarea);
+        this.editorContainer.appendChild(controls);
         
         document.body.appendChild(this.editorContainer);
-    }
-    
-    makeDraggable(element, handle) {
-        let isDragging = false;
-        let offsetX, offsetY;
-        
-        handle.addEventListener('mousedown', (e) => {
-            isDragging = true;
-            offsetX = e.clientX - element.getBoundingClientRect().left;
-            offsetY = e.clientY - element.getBoundingClientRect().top;
-            
-            element.style.userSelect = 'none';
-        });
-        
-        document.addEventListener('mousemove', (e) => {
-            if (!isDragging) return;
-            
-            const x = e.clientX - offsetX;
-            const y = e.clientY - offsetY;
-            
-            // Keep within window bounds
-            const maxX = window.innerWidth - element.offsetWidth;
-            const maxY = window.innerHeight - element.offsetHeight;
-            
-            element.style.left = `${Math.max(0, Math.min(x, maxX))}px`;
-            element.style.top = `${Math.max(0, Math.min(y, maxY))}px`;
-        });
-        
-        document.addEventListener('mouseup', () => {
-            isDragging = false;
-            element.style.userSelect = '';
-        });
     }
     
     setupEditor() {
@@ -171,21 +135,11 @@ class CodeEditorPanel {
         this.loadSample('default');
     }
     
-    show() {
-        this.editorContainer.style.display = 'flex';
-        this.isVisible = true;
-    }
-    
-    hide() {
-        this.editorContainer.style.display = 'none';
-        this.isVisible = false;
-    }
-    
-    toggle() {
-        if (this.isVisible) {
-            this.hide();
+    toggleEditor() {
+        if (this.editorContainer.style.display === 'none') {
+            this.editorContainer.style.display = 'flex';
         } else {
-            this.show();
+            this.editorContainer.style.display = 'none';
         }
     }
     
