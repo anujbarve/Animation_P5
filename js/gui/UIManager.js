@@ -6,6 +6,7 @@ class UIManager {
         this.propertiesPanel = null;
         this.toolbarPanel = null;
         this.keyframeManager = new KeyframeManager();
+        this.timelinePanel = null;
         
         this.isDragging = false;
         this.dragTarget = null;
