@@ -12,13 +12,22 @@ class TimelinePanel {
     this.currentTimeDisplay = null;
   }
 
-  initialize() {
-    this.pixelsPerFrame = 5; // Default value - add this as a class property
+// In TimelinePanel.js's initialize method
+initialize() {
+    this.pixelsPerFrame = 5; // Default value
+    
+    // Check if we're using the VS Code UI
+    const timelinePanelContent = document.querySelector('.timeline-panel-content');
+    if (timelinePanelContent) {
+        timelinePanelContent.id = 'timeline-container'; // Ensure ID is set
+        this.timelineContainer = timelinePanelContent;
+    }
+    
     this.createTimelineDOM();
     this.setupTimelineEvents();
-    this.createZoomControls(); // Add this line
-    this.fitTimelineToWindow(); // Add this line to auto-fit on initialization
-  }
+    this.createZoomControls();
+    this.fitTimelineToWindow();
+}
 
   createTimelineDOM() {
     // Get the container

@@ -219,55 +219,58 @@ class PropertiesPanel {
         this.controllers.animation.editEasing = this.animationFolder.add(animationActions, 'editEasing').name('Edit Easing');
     }
     
-    addKeyframeButtonsToFolder(folder, controllers) {
-        // For each controller, add a keyframe button next to it
-        for (const propName in controllers) {
-            const controller = controllers[propName];
+// In addKeyframeButtonsToFolder method of PropertiesPanel.js
+addKeyframeButtonsToFolder(folder, controllers) {
+    // For each controller, add a keyframe button next to it
+    for (const propName in controllers) {
+        const controller = controllers[propName];
+        
+        // Only add keyframe buttons to numeric properties
+        if (typeof this.engine.selectedObject[propName] === 'number') {
+            const keyframeButton = document.createElement('button');
+            keyframeButton.innerHTML = '⬤';
+            keyframeButton.title = 'Add keyframe';
+            keyframeButton.className = 'keyframe-button';
+            keyframeButton.style.marginLeft = '5px';
+            keyframeButton.style.background = 'none';
+            keyframeButton.style.border = 'none';
+            keyframeButton.style.color = 'var(--vscode-accent)';
+            keyframeButton.style.cursor = 'pointer';
+            keyframeButton.style.fontSize = '12px';
+            keyframeButton.style.opacity = '0.5';
             
-            // Only add keyframe buttons to numeric properties
-            if (typeof this.engine.selectedObject[propName] === 'number') {
-                const keyframeButton = document.createElement('button');
-                keyframeButton.innerHTML = '⬤';
-                keyframeButton.title = 'Add keyframe';
-                keyframeButton.className = 'keyframe-button';
-                keyframeButton.style.marginLeft = '5px';
-                keyframeButton.style.background = 'none';
-                keyframeButton.style.border = 'none';
-                keyframeButton.style.color = '#ffcc00';
-                keyframeButton.style.cursor = 'pointer';
-                keyframeButton.style.fontSize = '12px';
-                keyframeButton.style.opacity = '0.5';
+            // Store property name in data attribute
+            keyframeButton.dataset.property = propName;
+            
+            // Update button appearance if there's a keyframe at current frame
+            this.updateKeyframeButtonState(keyframeButton, propName);
+            
+            // Add click handler
+            keyframeButton.addEventListener('click', () => {
+                const obj = this.engine.selectedObject;
+                const property = propName;
+                const currentFrame = this.engine.timeline.currentFrame;
                 
-                // Store the property name directly on the button
-                keyframeButton.dataset.property = propName;
-                
-                // Update button appearance if there's a keyframe at current frame
-                this.updateKeyframeButtonState(keyframeButton, propName);
-                
-                // Add click handler
-                keyframeButton.addEventListener('click', () => {
-                    const obj = this.engine.selectedObject;
-                    const property = propName;
-                    const currentFrame = this.engine.timeline.currentFrame;
-                    
-                    if (this.keyframeManager.hasKeyframeAt(obj, property, currentFrame)) {
-                        // Remove keyframe if it exists
-                        this.keyframeManager.removeKeyframeForCurrentSelection(this.engine, property);
-                        keyframeButton.style.opacity = '0.5';
-                    } else {
-                        // Add keyframe
-                        this.keyframeManager.createKeyframeForCurrentSelection(this.engine, property);
-                        keyframeButton.style.opacity = '1';
-                    }
-                });
-                
-                // Add button next to the controller
-                const controllerElement = controller.__li;
+                if (this.keyframeManager.hasKeyframeAt(obj, property, currentFrame)) {
+                    // Remove keyframe if it exists
+                    this.keyframeManager.removeKeyframeForCurrentSelection(this.engine, property);
+                    keyframeButton.style.opacity = '0.5';
+                } else {
+                    // Add keyframe
+                    this.keyframeManager.createKeyframeForCurrentSelection(this.engine, property);
+                    keyframeButton.style.opacity = '1';
+                }
+            });
+            
+            // Add button next to the controller
+            const controllerElement = controller.__li;
+            if (controllerElement) {
                 controllerElement.style.position = 'relative';
                 controllerElement.appendChild(keyframeButton);
             }
         }
     }
+}
     
     updateKeyframeButtonState(button, property) {
         const obj = this.engine.selectedObject;

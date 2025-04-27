@@ -14,45 +14,43 @@ class UIManager {
         this.copyBuffer = null;
     }
     
-    initialize() {
-        this.gui = new dat.GUI({ autoPlace: false, width: 300 });
-        
-        // Place the GUI in a custom container
-        const guiContainer = document.createElement('div');
-        guiContainer.id = 'gui-container';
-        guiContainer.style.position = 'absolute';
-        guiContainer.style.top = '10px';
-        guiContainer.style.right = '10px';
-        guiContainer.style.maxHeight = '90vh';
-        guiContainer.style.overflowY = 'auto';
-        document.body.appendChild(guiContainer);
-        guiContainer.appendChild(this.gui.domElement);
-        
-        // Add responsive handling
-        window.addEventListener('resize', () => {
-            // Adjust GUI width on small screens
-            if (window.innerWidth < 1000) {
-                guiContainer.style.width = '250px';
-                this.gui.width = 250;
-            } else {
-                guiContainer.style.width = '300px';
-                this.gui.width = 300;
-            }
-        });
-        
-        // Initialize panel components
-        this.timelinePanel = new TimelinePanel(this.engine, this.keyframeManager);
-        this.propertiesPanel = new PropertiesPanel(this.engine, this.gui, this.keyframeManager);
-        this.toolbarPanel = new ToolbarPanel(this.engine, this.gui);
-        
-        // Initialize each panel
-        this.timelinePanel.initialize();
-        this.propertiesPanel.initialize();
-        this.toolbarPanel.initialize();
-        
-        // Setup input event handlers
-        this.setupEventListeners();
+    // In UIManager.js
+initialize() {
+    // We still need the dat.GUI for property editing
+    this.gui = new dat.GUI({ autoPlace: false, width: 300 });
+    this.gui.domElement.style.display = 'none'; // Hide by default
+    document.body.appendChild(this.gui.domElement);
+    
+    // Initialize panel components
+    this.timelinePanel = new TimelinePanel(this.engine, this.keyframeManager);
+    this.propertiesPanel = new PropertiesPanel(this.engine, this.gui, this.keyframeManager);
+    this.toolbarPanel = new ToolbarPanel(this.engine, this.gui);
+    
+    // Initialize each panel
+    this.timelinePanel.initialize();
+    this.propertiesPanel.initialize();
+    this.toolbarPanel.initialize();
+    
+    // Set up integration with VS Code UI
+    this.setupVSCodeUIIntegration();
+    
+    // Setup input event handlers
+    this.setupEventListeners();
+}
+
+setupVSCodeUIIntegration() {
+    // Add the GUI to the properties panel in VS Code UI
+    if (vsCodeUI && vsCodeUI.panels && vsCodeUI.panels['properties-panel']) {
+        const propertiesContent = vsCodeUI.panels['properties-panel'].querySelector('.panel-content');
+        if (propertiesContent) {
+            propertiesContent.appendChild(this.gui.domElement);
+            this.gui.domElement.style.display = 'block';
+            
+            // Make the GUI fit the panel
+            this.gui.width = propertiesContent.offsetWidth - 20;
+        }
     }
+}
     
     setupEventListeners() {
         // Mouse pressed event

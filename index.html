@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Animation Platform</title>
+    <title>Animation Platform</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/vs-code.css">
+    
     <!-- External Libraries -->
     <script src="libs/p5.min.js"></script>
     <script src="libs/p5.sound.min.js"></script>
@@ -33,12 +35,13 @@
     <script src="js/gui/TimelinePanel.js"></script>
     <script src="js/gui/Properties.js"></script>
     <script src="js/gui/ToolbarPanel.js"></script>
+    <script src="js/gui/VSCodeUI.js"></script>
     
     <!-- Storage & Export -->
     <script src="js/storage/ProjectManager.js"></script>
     <script src="js/storage/ExportManager.js"></script>
-
-        <!-- Animation API -->
+    
+    <!-- Animation API -->
     <script src="js/api/AnimationAPI.js"></script>
     <script src="js/gui/CodeEditorPanel.js"></script>
     
@@ -46,12 +49,39 @@
     <script src="js/main.js"></script>
 </head>
 <body>
-    <header>
-        <h1>Animation Platform</h1>
-    </header>
-    <div id="app-container">
-        <div id="canvas-container"></div>
-        <div id="timeline-container"></div>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-icons">
+                <!-- Will be populated by JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Canvas Container -->
+            <div class="canvas-area" id="canvas-container"></div>
+            
+            <!-- Timeline Panel -->
+            <div class="timeline-panel">
+                <div class="timeline-panel-header">
+                    <span>Timeline</span>
+                    <button class="timeline-collapse-btn">▲</button>
+                </div>
+                <div class="timeline-panel-content" id="timeline-container"></div>
+            </div>
+            
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <div class="status-item" id="position-info">X: 0, Y: 0</div>
+                <div class="status-item" id="object-count">Objects: 0</div>
+                <div class="status-item" id="frame-info">Frame: 0/240</div>
+                <div class="status-item" id="fps-info">FPS: 0</div>
+            </div>
+        </div>
     </div>
+    
+    <!-- Toggle Buttons -->
+    <button class="toggle-btn presentation-toggle" title="Toggle Presentation Mode">👁️</button>
 </body>
 </html>

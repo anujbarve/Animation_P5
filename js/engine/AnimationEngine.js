@@ -134,10 +134,13 @@ class AnimationEngine {
         this.timeline.currentFrame = 0;
         this.objects.forEach(obj => obj.updateToFrame(0));
     }
-
-    setCanvasSize(width, height) {
-        this.canvasWidth = width;
-        this.canvasHeight = height;
-        resizeCanvas(width, height);
-    }
+// Add or modify this method in AnimationEngine class
+setCanvasSize(width, height) {
+    this.canvasWidth = width;
+    this.canvasHeight = height;
+    resizeCanvas(width, height);
+    
+    // Update grid scaling for visual consistency
+    this.gridSize = Math.max(10, Math.min(30, Math.floor(width / 40)));
+}
 }
