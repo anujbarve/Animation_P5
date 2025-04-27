@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Animation Platform</title>
+    <link rel="stylesheet" href="css/style.css">
+    <!-- External Libraries -->
+    <script src="libs/p5.min.js"></script>
+    <script src="libs/p5.sound.min.js"></script>
+    <script src="libs/dat.gui.min.js"></script>
+    <script src="libs/CCapture.all.min.js"></script>
+    
+    <!-- Engine Core -->
+    <script src="js/engine/AnimationEngine.js"></script>
+    <script src="js/engine/Timeline.js"></script>
+    <script src="js/engine/Recorder.js"></script>
+    
+    <!-- Shape Classes -->
+    <script src="js/shapes/BaseShape.js"></script>
+    <script src="js/shapes/Circle.js"></script>
+    <script src="js/shapes/Rectangle.js"></script>
+    <script src="js/shapes/Path.js"></script>
+    <script src="js/shapes/Text.js"></script>
+    
+    <!-- Animation Classes -->
+    <script src="js/animation/KeyFrameManager.js"></script>
+    <script src="js/animation/Interpolation.js"></script>
+    <script src="js/animation/EasingFunctions.js"></script>
+    
+    <!-- GUI Components -->
+    <script src="js/gui/UIManager.js"></script>
+    <script src="js/gui/TimelinePanel.js"></script>
+    <script src="js/gui/Properties.js"></script>
+    <script src="js/gui/ToolbarPanel.js"></script>
+    
+    <!-- Storage & Export -->
+    <script src="js/storage/ProjectManager.js"></script>
+    <script src="js/storage/ExportManager.js"></script>
+
+        <!-- Animation API -->
+    <script src="js/api/AnimationAPI.js"></script>
+    <script src="js/gui/CodeEditorPanel.js"></script>
+    
+    <!-- Main Application -->
+    <script src="js/main.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Animation Platform</h1>
+    </header>
+    <div id="app-container">
+        <div id="canvas-container"></div>
+        <div id="timeline-container"></div>
+    </div>
+</body>
+</html>

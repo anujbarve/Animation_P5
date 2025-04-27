@@ -1,0 +1,308 @@
+:root {
+    --vscode-bg: #1e1e1e;
+    --vscode-sidebar: #252526;
+    --vscode-toolbar: #333333;
+    --vscode-accent: #007acc;
+    --vscode-text: #cccccc;
+    --vscode-border: #474747;
+    --vscode-hover: #2a2d2e;
+    --vscode-selection: #264f78;
+    --vscode-panel-bg: #252526;
+    --vscode-panel-border: #474747;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--vscode-bg);
+    color: var(--vscode-text);
+    overflow: hidden;
+    height: 100vh;
+}
+
+/* Main app layout */
+.app-container {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 48px;
+    height: 100%;
+    background-color: var(--vscode-sidebar);
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--vscode-border);
+    transition: width 0.2s ease;
+    overflow: hidden;
+}
+
+.sidebar.expanded {
+    width: 220px;
+}
+
+.sidebar-icons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 10px;
+}
+
+.sidebar-icons button {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 10px;
+    background-color: transparent;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    color: var(--vscode-text);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.sidebar-icons button:hover {
+    background-color: var(--vscode-hover);
+}
+
+.sidebar-icons button.active {
+    color: var(--vscode-accent);
+    border-left: 2px solid var(--vscode-accent);
+}
+
+.sidebar-icons button svg {
+    width: 24px;
+    height: 24px;
+}
+
+/* Main content */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    position: relative;
+}
+
+/* Canvas area */
+.canvas-area {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Timeline panel - collapsible */
+.timeline-panel {
+    height: 150px;
+    background-color: var(--vscode-panel-bg);
+    border-top: 1px solid var(--vscode-panel-border);
+    position: relative;
+    transition: height 0.3s ease;
+    overflow: hidden;
+}
+
+.timeline-panel.collapsed {
+    height: 25px;
+}
+
+.timeline-panel-header {
+    height: 25px;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    background-color: var(--vscode-toolbar);
+    justify-content: space-between;
+    cursor: pointer;
+}
+
+.timeline-panel-content {
+    height: calc(100% - 25px);
+    overflow: auto;
+}
+
+/* Panels */
+.panel {
+    position: absolute;
+    background-color: var(--vscode-panel-bg);
+    border: 1px solid var(--vscode-panel-border);
+    border-radius: 3px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    z-index: 100;
+}
+
+.panel.hidden {
+    transform: translateX(100%);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.panel-header {
+    padding: 6px 10px;
+    background-color: var(--vscode-toolbar);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: move;
+}
+
+.panel-title {
+    font-size: 12px;
+    font-weight: 500;
+    margin: 0;
+}
+
+.panel-close {
+    background: none;
+    border: none;
+    color: var(--vscode-text);
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.panel-content {
+    padding: 10px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+/* Properties panel */
+.properties-panel {
+    width: 300px;
+    right: 10px;
+    top: 10px;
+}
+
+/* Button styles */
+.vscode-button {
+    background-color: var(--vscode-toolbar);
+    color: var(--vscode-text);
+    border: 1px solid var(--vscode-border);
+    border-radius: 2px;
+    padding: 4px 8px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.vscode-button:hover {
+    background-color: var(--vscode-hover);
+}
+
+.vscode-button.primary {
+    background-color: var(--vscode-accent);
+    color: white;
+}
+
+/* Timeline improvements */
+.timeline-tracks {
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.timeline-ruler {
+    height: 20px;
+    background-color: var(--vscode-toolbar);
+}
+
+/* Presentation mode */
+.presentation-mode .sidebar {
+    width: 0;
+    border: none;
+}
+
+.presentation-mode .panel {
+    display: none;
+}
+
+.presentation-mode .timeline-panel {
+    height: 0;
+    border: none;
+}
+
+/* Status bar */
+.status-bar {
+    height: 22px;
+    background-color: var(--vscode-toolbar);
+    border-top: 1px solid var(--vscode-border);
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    font-size: 12px;
+    color: var(--vscode-text);
+}
+
+.status-item {
+    margin-right: 15px;
+}
+
+/* Dat.GUI customization */
+.dg.main {
+    margin-right: 0 !important;
+    background-color: var(--vscode-panel-bg) !important;
+    color: var(--vscode-text) !important;
+}
+
+.dg.main .close-button {
+    background-color: var(--vscode-toolbar) !important;
+}
+
+.dg.main .close-button:hover {
+    background-color: var(--vscode-hover) !important;
+}
+
+.dg li:not(.folder) {
+    background: var(--vscode-panel-bg) !important;
+    border-bottom: 1px solid var(--vscode-border) !important;
+}
+
+.dg .c input[type=text] {
+    background-color: var(--vscode-bg) !important;
+    color: var(--vscode-text) !important;
+}
+
+/* Toggle buttons */
+.toggle-btn {
+    position: absolute;
+    z-index: 101;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: var(--vscode-accent);
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.toggle-btn:hover {
+    background-color: #0066aa;
+}
+
+.presentation-toggle {
+    bottom: 20px;
+    right: 20px;
+}
+
+.properties-toggle {
+    top: 10px;
+    right: 10px;
+}
+
+.timeline-toggle {
+    bottom: 160px;
+    right: 20px;
+}
+
+/* Keyframe editor styling */
+.keyframe-button {
+    color: var(--vscode-accent) !important;
+}

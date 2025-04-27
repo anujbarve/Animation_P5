@@ -1,0 +1,158 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    background-color: #1e1e1e;
+    color: #f0f0f0;
+    overflow: hidden;
+}
+
+header {
+    background-color: #333;
+    padding: 10px 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+header h1 {
+    margin: 0;
+    font-size: 20px;
+}
+
+#app-container {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 50px);
+}
+
+#canvas-container {
+    flex: 1;
+    position: relative;
+}
+
+#timeline-container {
+    height: 150px;
+    background-color: #2a2a2a;
+    border-top: 1px solid #444;
+    position: relative;
+}
+
+canvas {
+    display: block;
+}
+
+.dg.ac {
+    z-index: 1000 !important;
+}
+
+.button {
+    background: #4a4a4a;
+    color: #f0f0f0;
+    border: none;
+    padding: 8px 12px;
+    margin: 4px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.button:hover {
+    background: #5a5a5a;
+}
+
+.button.primary {
+    background: #4a80f0;
+}
+
+.button.primary:hover {
+    background: #5a90ff;
+}
+
+.panel {
+    background: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 3px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Add to style.css */
+#timeline-container {
+    height: 150px;
+    background-color: #2a2a2a;
+    border-top: 1px solid #444;
+    position: relative;
+    overflow: hidden; /* Prevent overflow */
+}
+
+.timeline-tracks {
+    position: relative;
+    overflow-x: auto; /* Allow horizontal scrolling within tracks */
+    overflow-y: hidden;
+    height: calc(100% - 60px);
+}
+
+/* Add zoom controls */
+.timeline-zoom-controls {
+    position: absolute;
+    right: 10px;
+    top: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.timeline-zoom-controls button {
+    background: #444;
+    color: #fff;
+    border: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 3px;
+    margin-left: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.timeline-zoom-controls button:hover {
+    background: #555;
+}
+
+/* Improve scrubber visibility */
+.timeline-scrubber {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 2px;
+    background-color: red;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.timeline-scrubber::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -4px;
+    width: 10px;
+    height: 10px;
+    background-color: red;
+    border-radius: 50%;
+}
+
+/* Make dat.GUI more compact */
+.dg.main {
+    max-height: 85vh;
+    overflow-y: auto;
+}
+
+/* Add responsive layout for small screens */
+@media (max-width: 1000px) {
+    #gui-container {
+        width: 250px !important;
+    }
+    
+    .dg.main {
+        width: 250px !important;
+    }
+}
