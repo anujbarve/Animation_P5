@@ -48,7 +48,7 @@ class AnimationEngine {
     }
 
     drawGrid() {
-        stroke(60);
+        stroke(40);
         strokeWeight(1);
         
         for (let x = 0; x < this.canvasWidth; x += this.gridSize) {

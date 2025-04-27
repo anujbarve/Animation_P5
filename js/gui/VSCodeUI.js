@@ -5,10 +5,6 @@ class VSCodeUI {
         this.panels = {};
         this.activePanelId = null;
         this.isPresentationMode = false;
-        
-        // Reference to other UI components
-        this.timelinePanel = null;
-        this.propertiesPanel = null;
         this.codeEditorPanel = null;
     }
     
@@ -22,8 +18,6 @@ class VSCodeUI {
         // Initialize all toggle buttons
         this.initializeToggleButtons();
         
-        // Set up timeline panel collapsing
-        this.setupTimelineCollapse();
         
         // Initialize panels (but keep them hidden)
         this.initializePanels();
@@ -72,15 +66,6 @@ class VSCodeUI {
         });
     }
     
-    setupTimelineCollapse() {
-        const timelinePanel = document.querySelector('.timeline-panel');
-        const collapseBtn = document.querySelector('.timeline-collapse-btn');
-        
-        collapseBtn.addEventListener('click', () => {
-            timelinePanel.classList.toggle('collapsed');
-            collapseBtn.textContent = timelinePanel.classList.contains('collapsed') ? '▼' : '▲';
-        });
-    }
     
     initializePanels() {
         // Create panel containers
@@ -1038,54 +1023,36 @@ class VSCodeUI {
     }
     
     createParticleAnimation() {
-        const animAPI = new AnimationAPI(this.engine);
-        
-        // Clear existing objects
         animAPI.clearAll();
+        animAPI.setFPS(30);
+        animAPI.setDuration(4);
         
-        // Create background
-        animAPI.createShape('rectangle', {
-            x: 400,
-            y: 300,
-            width: 800,
-            height: 600,
-            fill: color(20, 20, 40),
-            name: "Background"
-        });
-        
-        // Create particle explosion
+        // Create particle system
         animAPI.createParticleSystem(400, 300, 50, {
             type: 'circle',
             size: 15,
-            color: [255, 200, 100],
-            duration: 120,
+            color: [255, 0, 0],
+            duration: 90,
             spread: 300,
             easing: 'easeOutCubic',
             scaleDown: true
         });
         
-        // Add a title
+        // Add title that scales up
         const title = animAPI.createShape('text', {
             x: 400,
-            y: 200,
-            text: "PARTICLES!",
-            fontSize: 48,
-            fill: color(255, 150, 50),
-            name: "Title"
+            y: 300,
+            text: "BOOM!",
+            fontSize: 10,
+            fill: color(0, 100, 50)
         });
         
         // Animate title
         animAPI.animate(title, 'fontSize', [
-            {frame: 0, value: 0, easing: 'easeOutElastic'},
-            {frame: 30, value: 64, easing: 'easeOutElastic'}
+            {frame: 0, value: 10, easing: 'easeOutElastic'},
+            {frame: 20, value: 72, easing: 'easeOutElastic'}
         ]);
         
-        // Update objects list
-        if (this.updateObjectsList) {
-            this.updateObjectsList();
-        }
-        
-        // Play the animation
         animAPI.play();
     }
 }

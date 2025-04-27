@@ -39,7 +39,7 @@ function setup() {
   vsCodeUI.codeEditorPanel = codeEditor;
 
   // Set framerate
-  frameRate(120);
+  frameRate(60);
 
   // Initial resize to ensure everything fits
   windowResized();
