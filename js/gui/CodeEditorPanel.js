@@ -1,219 +1,361 @@
 class CodeEditorPanel {
-    constructor(engine) {
-        this.engine = engine;
+  constructor(engine) {
+    this.engine = engine;
+    this.editorContainer = null;
+    this.codeTextarea = null;
+    this.isVisible = false;
+  }
+
+  initialize() {
+    // Create editor container
+    this.createEditorDOM();
+
+    // Set up the editor with sample code
+    this.setupEditor();
+  }
+
+  createEditorDOM() {
+    // Create editor container
+    this.editorContainer = document.createElement("div");
+    this.editorContainer.className = "code-editor-container panel-container";
+    this.editorContainer.style.position = "fixed";
+    this.editorContainer.style.left = "50%";
+    this.editorContainer.style.top = "50%";
+    this.editorContainer.style.transform = "translate(-50%, -50%)";
+    this.editorContainer.style.width = "700px";
+    this.editorContainer.style.height = "500px";
+    this.editorContainer.style.zIndex = "1000";
+    this.editorContainer.style.display = "none";
+    this.editorContainer.style.flexDirection = "column";
+    this.editorContainer.style.padding = "0";
+    this.editorContainer.style.overflow = "hidden";
+
+    // Editor header
+    const header = document.createElement("div");
+    header.className = "editor-header";
+    header.style.display = "flex";
+    header.style.justifyContent = "space-between";
+    header.style.alignItems = "center";
+    header.style.padding = "10px 15px";
+    header.style.borderBottom = "1px solid var(--border-color)";
+    header.style.backgroundColor = "#1a1a1a";
+
+    const title = document.createElement("h3");
+    title.textContent = "Animation Script Editor";
+    title.style.margin = "0";
+    title.style.fontSize = "16px";
+    title.style.cursor = "move"; // Indicate draggable
+
+    const headerActions = document.createElement("div");
+    headerActions.style.display = "flex";
+    headerActions.style.gap = "10px";
+
+    const closeBtn = document.createElement("button");
+    closeBtn.className = "button";
+    closeBtn.innerHTML = "×";
+    closeBtn.style.width = "28px";
+    closeBtn.style.height = "28px";
+    closeBtn.style.padding = "0";
+    closeBtn.style.fontSize = "20px";
+    closeBtn.style.fontWeight = "bold";
+    closeBtn.style.display = "flex";
+    closeBtn.style.justifyContent = "center";
+    closeBtn.style.alignItems = "center";
+    closeBtn.addEventListener("click", () => {
+      this.toggleEditor(false);
+    });
+
+    headerActions.appendChild(closeBtn);
+    header.appendChild(title);
+    header.appendChild(headerActions);
+
+    // Editor content area
+    const contentArea = document.createElement("div");
+    contentArea.className = "editor-content";
+    contentArea.style.display = "flex";
+    contentArea.style.flexDirection = "column";
+    contentArea.style.height = "calc(100% - 50px)";
+    contentArea.style.padding = "10px";
+
+    // Editor textarea
+    this.codeTextarea = document.createElement("textarea");
+    this.codeTextarea.className = "code-textarea";
+    this.codeTextarea.style.width = "100%";
+    this.codeTextarea.style.height = "calc(100% - 50px)";
+    this.codeTextarea.style.backgroundColor = "#222";
+    this.codeTextarea.style.color = "#eee";
+    this.codeTextarea.style.border = "1px solid #333";
+    this.codeTextarea.style.padding = "10px";
+    this.codeTextarea.style.fontFamily = "monospace";
+    this.codeTextarea.style.fontSize = "14px";
+    this.codeTextarea.style.resize = "none";
+    this.codeTextarea.style.lineHeight = "1.4";
+    this.codeTextarea.style.tabSize = "2";
+
+    // Button controls
+    const controls = document.createElement("div");
+    controls.className = "editor-controls";
+    controls.style.display = "flex";
+    controls.style.justifyContent = "space-between";
+    controls.style.marginTop = "10px";
+    controls.style.padding = "10px 0";
+
+    const runButton = document.createElement("button");
+    runButton.className = "button primary";
+    runButton.textContent = "Run Animation";
+    runButton.addEventListener("click", () => {
+      this.runCode();
+    });
+
+    const samplesWrapper = document.createElement("div");
+    samplesWrapper.style.display = "flex";
+    samplesWrapper.style.alignItems = "center";
+    samplesWrapper.style.gap = "10px";
+
+    const samplesLabel = document.createElement("span");
+    samplesLabel.textContent = "Examples:";
+    samplesLabel.style.fontSize = "14px";
+
+    const sampleMenu = document.createElement("select");
+    sampleMenu.className = "sample-menu";
+    sampleMenu.style.backgroundColor = "#333";
+    sampleMenu.style.color = "#fff";
+    sampleMenu.style.border = "1px solid #555";
+    sampleMenu.style.padding = "5px 10px";
+    sampleMenu.style.borderRadius = "3px";
+
+    const samples = {
+      default: "Basic Animation",
+      particles: "Particle System",
+      typing: "Text Typing",
+      path: "Path Animation",
+      wave: "Wave Effect",
+    };
+
+    for (const [key, label] of Object.entries(samples)) {
+      const option = document.createElement("option");
+      option.value = key;
+      option.textContent = label;
+      sampleMenu.appendChild(option);
     }
-    
-    initialize() {
-        // Create editor container
-        this.createEditorDOM();
-        
-        // Set up the editor with sample code
-        this.setupEditor();
+
+    sampleMenu.addEventListener("change", () => {
+      this.loadSample(sampleMenu.value);
+    });
+
+    samplesWrapper.appendChild(samplesLabel);
+    samplesWrapper.appendChild(sampleMenu);
+
+    controls.appendChild(samplesWrapper);
+    controls.appendChild(runButton);
+
+    // Add everything to the container
+    contentArea.appendChild(this.codeTextarea);
+    contentArea.appendChild(controls);
+
+    this.editorContainer.appendChild(header);
+    this.editorContainer.appendChild(contentArea);
+
+    document.body.appendChild(this.editorContainer);
+
+    // Make editor draggable
+    this.makeEditorDraggable(header);
+
+    // Improve textarea with line numbers and syntax highlighting if the full implementation
+    this.enhanceEditorIfPossible();
+  }
+
+  makeEditorDraggable(dragHandle) {
+    let isDragging = false;
+    let offsetX = 0,
+      offsetY = 0;
+
+    dragHandle.addEventListener("mousedown", (e) => {
+      // Only handle left mouse button
+      if (e.button !== 0) return;
+
+      isDragging = true;
+      const rect = this.editorContainer.getBoundingClientRect();
+      offsetX = e.clientX - rect.left;
+      offsetY = e.clientY - rect.top;
+
+      // Prevent text selection during drag
+      e.preventDefault();
+    });
+
+    document.addEventListener("mousemove", (e) => {
+      if (!isDragging) return;
+
+      const x = e.clientX - offsetX;
+      const y = e.clientY - offsetY;
+
+      this.editorContainer.style.left = `${x}px`;
+      this.editorContainer.style.top = `${y}px`;
+      this.editorContainer.style.transform = "none";
+    });
+
+    document.addEventListener("mouseup", () => {
+      isDragging = false;
+    });
+  }
+
+  enhanceEditorIfPossible() {
+    // In a full implementation, this would integrate CodeMirror or Monaco Editor
+    // For this demo, we'll just add some basic improvements
+
+    // Add line numbers with a simple approach
+    const lineNumbers = document.createElement("div");
+    lineNumbers.className = "line-numbers";
+    lineNumbers.style.position = "absolute";
+    lineNumbers.style.left = "0";
+    lineNumbers.style.top = "0";
+    lineNumbers.style.width = "30px";
+    lineNumbers.style.height = "100%";
+    lineNumbers.style.backgroundColor = "#1a1a1a";
+    lineNumbers.style.color = "#666";
+    lineNumbers.style.fontFamily = "monospace";
+    lineNumbers.style.fontSize = "14px";
+    lineNumbers.style.textAlign = "right";
+    lineNumbers.style.paddingRight = "5px";
+    lineNumbers.style.overflowY = "hidden";
+
+    // In full implementation, this would be more sophisticated
+    this.codeTextarea.style.paddingLeft = "35px";
+
+    // Handle tab key properly
+    this.codeTextarea.addEventListener("keydown", (e) => {
+      if (e.key === "Tab") {
+        e.preventDefault();
+
+        // Insert 2 spaces at cursor position
+        const start = this.codeTextarea.selectionStart;
+        const end = this.codeTextarea.selectionEnd;
+
+        this.codeTextarea.value =
+          this.codeTextarea.value.substring(0, start) +
+          "  " +
+          this.codeTextarea.value.substring(end);
+
+        // Move cursor position
+        this.codeTextarea.selectionStart = this.codeTextarea.selectionEnd =
+          start + 2;
+      }
+    });
+  }
+
+  setupEditor() {
+    // Set default code
+    this.loadSample("default");
+  }
+
+  toggleEditor(show = null) {
+    // If show is null, toggle based on current state
+    const newState = show === null ? !this.isVisible : show;
+    this.isVisible = newState;
+
+    this.editorContainer.style.display = this.isVisible ? "flex" : "none";
+
+    // Update toggle button state if there is one
+    const button = document.querySelector(".code-editor-toggle");
+    if (button) {
+      button.classList.toggle("active", this.isVisible);
     }
-    
-    createEditorDOM() {
-        // Create a button to show/hide editor
-        const editorButton = document.createElement('button');
-        editorButton.textContent = 'Animation Script Editor';
-        editorButton.className = 'button primary';
-        editorButton.style.position = 'absolute';
-        editorButton.style.bottom = '10px';
-        editorButton.style.left = '10px';
-        editorButton.style.zIndex = '100';
-        
-        editorButton.addEventListener('click', () => {
-            this.toggleEditor();
-        });
-        
-        document.body.appendChild(editorButton);
-        
-        // Create editor container
-        this.editorContainer = document.createElement('div');
-        this.editorContainer.className = 'code-editor-container';
-        this.editorContainer.style.position = 'fixed';
-        this.editorContainer.style.left = '50%';
-        this.editorContainer.style.top = '50%';
-        this.editorContainer.style.transform = 'translate(-50%, -50%)';
-        this.editorContainer.style.width = '600px';
-        this.editorContainer.style.height = '400px';
-        this.editorContainer.style.backgroundColor = '#1e1e1e';
-        this.editorContainer.style.border = '1px solid #444';
-        this.editorContainer.style.boxShadow = '0 0 20px rgba(0,0,0,0.5)';
-        this.editorContainer.style.zIndex = '1000';
-        this.editorContainer.style.display = 'none';
-        this.editorContainer.style.flexDirection = 'column';
-        this.editorContainer.style.padding = '10px';
-        
-        // Editor header
-        const header = document.createElement('div');
-        header.style.display = 'flex';
-        header.style.justifyContent = 'space-between';
-        header.style.alignItems = 'center';
-        header.style.marginBottom = '10px';
-        
-        const title = document.createElement('h3');
-        title.textContent = 'Animation Script Editor';
-        title.style.margin = '0';
-        
-        const closeBtn = document.createElement('button');
-        closeBtn.textContent = '×';
-        closeBtn.style.background = 'none';
-        closeBtn.style.border = 'none';
-        closeBtn.style.color = '#aaa';
-        closeBtn.style.fontSize = '20px';
-        closeBtn.style.cursor = 'pointer';
-        closeBtn.addEventListener('click', () => {
-            this.toggleEditor();
-        });
-        
-        header.appendChild(title);
-        header.appendChild(closeBtn);
-        
-        // Editor textarea
-        this.codeTextarea = document.createElement('textarea');
-        this.codeTextarea.style.width = '100%';
-        this.codeTextarea.style.height = 'calc(100% - 80px)';
-        this.codeTextarea.style.backgroundColor = '#252525';
-        this.codeTextarea.style.color = '#eee';
-        this.codeTextarea.style.border = '1px solid #333';
-        this.codeTextarea.style.padding = '10px';
-        this.codeTextarea.style.fontFamily = 'monospace';
-        this.codeTextarea.style.fontSize = '14px';
-        this.codeTextarea.style.resize = 'none';
-        
-        // Button controls
-        const controls = document.createElement('div');
-        controls.style.display = 'flex';
-        controls.style.justifyContent = 'space-between';
-        controls.style.marginTop = '10px';
-        
-        const runButton = document.createElement('button');
-        runButton.textContent = 'Run Animation';
-        runButton.className = 'button primary';
-        runButton.addEventListener('click', () => {
-            this.runCode();
-        });
-        
-        const sampleMenu = document.createElement('select');
-        sampleMenu.style.backgroundColor = '#333';
-        sampleMenu.style.color = '#fff';
-        sampleMenu.style.border = '1px solid #555';
-        sampleMenu.style.padding = '5px';
-        
-        const samples = {
-            'default': 'Basic Animation',
-            'particles': 'Particle System',
-            'typing': 'Text Typing',
-            'path': 'Path Animation',
-            'wave': 'Wave Effect'
-        };
-        
-        for (const [key, label] of Object.entries(samples)) {
-            const option = document.createElement('option');
-            option.value = key;
-            option.textContent = label;
-            sampleMenu.appendChild(option);
-        }
-        
-        sampleMenu.addEventListener('change', () => {
-            this.loadSample(sampleMenu.value);
-        });
-        
-        controls.appendChild(sampleMenu);
-        controls.appendChild(runButton);
-        
-        // Add everything to the container
-        this.editorContainer.appendChild(header);
-        this.editorContainer.appendChild(this.codeTextarea);
-        this.editorContainer.appendChild(controls);
-        
-        document.body.appendChild(this.editorContainer);
+  }
+
+  // In CodeEditorPanel.js
+  runCode() {
+    try {
+      // Get the code
+      const code = this.codeTextarea.value;
+
+      // Create a function from the code
+      const fn = new Function("engine", "animAPI", code);
+
+      // Create an AnimationAPI instance with the engine
+      const animAPI = new AnimationAPI(this.engine);
+
+      // Run the function
+      fn(this.engine, animAPI);
+
+      // Show success message
+      this.showNotification(
+        "Animation script executed successfully!",
+        "success"
+      );
+    } catch (error) {
+      console.error("Error running animation code:", error);
+      this.showNotification(`Error: ${error.message}`, "error");
     }
-    
-    setupEditor() {
-        // Set default code
-        this.loadSample('default');
+  }
+
+  loadSample(sampleName) {
+    switch (sampleName) {
+      case "default":
+        this.codeTextarea.value = this.getDefaultSample();
+        break;
+      case "particles":
+        this.codeTextarea.value = this.getParticlesSample();
+        break;
+      case "typing":
+        this.codeTextarea.value = this.getTypingSample();
+        break;
+      case "path":
+        this.codeTextarea.value = this.getPathSample();
+        break;
+      case "wave":
+        this.codeTextarea.value = this.getWaveSample();
+        break;
     }
-    
-    toggleEditor() {
-        if (this.editorContainer.style.display === 'none') {
-            this.editorContainer.style.display = 'flex';
-        } else {
-            this.editorContainer.style.display = 'none';
-        }
+  }
+
+  showNotification(message, type = "info") {
+    const notification = document.createElement("div");
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    notification.style.position = "fixed";
+    notification.style.bottom = "20px";
+    notification.style.right = "20px";
+    notification.style.padding = "12px 20px";
+    notification.style.borderRadius = "4px";
+    notification.style.zIndex = "2000";
+    notification.style.fontFamily = "Arial, sans-serif";
+    notification.style.fontSize = "14px";
+    notification.style.opacity = "0";
+    notification.style.transform = "translateY(20px)";
+    notification.style.transition = "opacity 0.3s, transform 0.3s";
+
+    if (type === "error") {
+      notification.style.backgroundColor = "#ff4c4c";
+      notification.style.color = "white";
+    } else if (type === "success") {
+      notification.style.backgroundColor = "#4caf50";
+      notification.style.color = "white";
+    } else {
+      notification.style.backgroundColor = "#2196f3";
+      notification.style.color = "white";
     }
-    
-    runCode() {
-        try {
-            // Get the code
-            const code = this.codeTextarea.value;
-            
-            // Create a function from the code
-            const fn = new Function('engine', 'animAPI', code);
-            
-            // Run the function
-            fn(this.engine, new AnimationAPI(this.engine));
-            
-            // Show success message
-            this.showNotification('Animation script executed successfully!', 'success');
-        } catch (error) {
-            console.error('Error running animation code:', error);
-            this.showNotification(`Error: ${error.message}`, 'error');
-        }
-    }
-    
-    loadSample(sampleName) {
-        switch(sampleName) {
-            case 'default':
-                this.codeTextarea.value = this.getDefaultSample();
-                break;
-            case 'particles':
-                this.codeTextarea.value = this.getParticlesSample();
-                break;
-            case 'typing':
-                this.codeTextarea.value = this.getTypingSample();
-                break;
-            case 'path':
-                this.codeTextarea.value = this.getPathSample();
-                break;
-            case 'wave':
-                this.codeTextarea.value = this.getWaveSample();
-                break;
-        }
-    }
-    
-    showNotification(message, type = 'info') {
-        const notification = document.createElement('div');
-        notification.textContent = message;
-        notification.style.position = 'fixed';
-        notification.style.bottom = '20px';
-        notification.style.right = '20px';
-        notification.style.padding = '10px 20px';
-        notification.style.borderRadius = '5px';
-        notification.style.zIndex = '2000';
-        notification.style.fontFamily = 'Arial, sans-serif';
-        
-        if (type === 'error') {
-            notification.style.backgroundColor = '#ff4c4c';
-            notification.style.color = 'white';
-        } else if (type === 'success') {
-            notification.style.backgroundColor = '#4caf50';
-            notification.style.color = 'white';
-        } else {
-            notification.style.backgroundColor = '#2196f3';
-            notification.style.color = 'white';
-        }
-        
-        document.body.appendChild(notification);
-        
-        // Auto-remove after 3 seconds
-        setTimeout(() => {
-            document.body.removeChild(notification);
-        }, 3000);
-    }
-    
-    getDefaultSample() {
-        return `// Clear all existing objects
+
+    document.body.appendChild(notification);
+
+    // Trigger animation
+    setTimeout(() => {
+      notification.style.opacity = "1";
+      notification.style.transform = "translateY(0)";
+    }, 10);
+
+    // Auto-remove after 3 seconds
+    setTimeout(() => {
+      notification.style.opacity = "0";
+      notification.style.transform = "translateY(20px)";
+
+      setTimeout(() => {
+        document.body.removeChild(notification);
+      }, 300);
+    }, 3000);
+  }
+
+  getDefaultSample() {
+    return `// Clear all existing objects
 animAPI.clearAll();
 
 // Set the animation FPS and duration
@@ -250,14 +392,15 @@ const text = animAPI.createShape('text', {
 });
 
 // Fade in the text
+// Fade in the text
 animAPI.fadeIn(text, 0, 30);
 
 // Play the animation
 animAPI.play();`;
-    }
-    
-    getParticlesSample() {
-        return `// Create a particle explosion
+  }
+
+  getParticlesSample() {
+    return `// Create a particle explosion
 animAPI.clearAll();
 animAPI.setFPS(30);
 animAPI.setDuration(5);
@@ -291,10 +434,10 @@ animAPI.animate(text, 'fontSize', [
 
 // Play the animation
 animAPI.play();`;
-    }
-    
-    getTypingSample() {
-        return `// Create a typing text animation
+  }
+
+  getTypingSample() {
+    return `// Create a typing text animation
 animAPI.clearAll();
 animAPI.setDuration(8);
 
@@ -345,10 +488,10 @@ for (let i = 0; i < 16; i++) {
 }
 
 animAPI.play();`;
-    }
-    
-    getPathSample() {
-        return `// Create an object following a complex path
+  }
+
+  getPathSample() {
+    return `// Create an object following a complex path
 animAPI.clearAll();
 animAPI.setDuration(10);
 
@@ -403,10 +546,10 @@ for (let i = 0; i < path.length; i += 10) {
 }
 
 animAPI.play();`;
-    }
-    
-    getWaveSample() {
-        return `// Create a wave animation with multiple objects
+  }
+
+  getWaveSample() {
+    return `// Create a wave animation with multiple objects
 animAPI.clearAll();
 animAPI.setDuration(10);
 
@@ -491,5 +634,5 @@ for (let frame = 0; frame <= 240; frame += 5) {
 animAPI.animate(ball, 'y', ballYKeyframes);
 
 animAPI.play();`;
-    }
+  }
 }
