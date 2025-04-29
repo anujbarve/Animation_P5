@@ -4,18 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Advanced Animation Platform</title>
-    <link rel="stylesheet" href="css/style.css">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <!-- External Libraries -->
-    <script src="libs/p5.min.js"></script>
-    <script src="libs/p5.sound.min.js"></script>
-    <script src="libs/dat.gui.min.js"></script>
-    <script src="libs/CCapture.all.min.js"></script>
-    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.9/dat.gui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/CCapture.js/1.1.0/CCapture.all.min.js"></script>
     <!-- Engine Core -->
     <script src="js/engine/AnimationEngine.js"></script>
     <script src="js/engine/Timeline.js"></script>
     <script src="js/engine/Recorder.js"></script>
-    
     <!-- Shape Classes -->
     <script src="js/shapes/BaseShape.js"></script>
     <script src="js/shapes/Circle.js"></script>
@@ -24,36 +22,65 @@
     <script src="js/shapes/Text.js"></script>
     <script src="js/shapes/AdvanceShape.js"></script>
     <script src="js/shapes/FlowPath.js"></script>
-    
     <!-- Animation Classes -->
     <script src="js/animation/KeyFrameManager.js"></script>
     <script src="js/animation/Interpolation.js"></script>
     <script src="js/animation/EasingFunctions.js"></script>
-    
     <!-- GUI Components -->
     <script src="js/gui/UIManager.js"></script>
     <script src="js/gui/ToolbarPanel.js"></script>
-    
     <script src="js/gui/TimelinePanel.js"></script>
     <script src="js/gui/Properties.js"></script>
+    <script src="js/gui/CodeEditorPanel.js"></script>
     <!-- Storage & Export -->
     <script src="js/storage/ProjectManager.js"></script>
     <script src="js/storage/ExportManager.js"></script>
-
-        <!-- Animation API -->
+    <!-- Animation API -->
     <script src="js/api/AnimationAPI.js"></script>
-    <script src="js/gui/CodeEditorPanel.js"></script>
-    
     <!-- Main Application -->
     <script src="js/main.js"></script>
+    <!-- Custom Styles if needed beyond Tailwind -->
+    <style>
+        /* Additional custom styles for elements Tailwind can't cover easily */
+        .keyframe-marker {
+            transform: rotate(45deg) translateY(-50%);
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+        .keyframe-marker:hover {
+            transform: rotate(45deg) translateY(-50%) scale(1.2);
+            box-shadow: 0 0 5px #fbbf24;
+        }
+        .scrubber-handle {
+            width: 10px;
+            height: 10px;
+            background-color: red;
+            position: absolute;
+            top: 0;
+            left: -4px;
+            border-radius: 50%;
+        }
+    </style>
 </head>
-<body>
-    <header>
-        <h1>Animation Platform</h1>
+<body class="bg-gray-900 text-gray-100 font-sans overflow-hidden">
+    <header class="bg-gray-800 p-2 text-center shadow-md">
+        <h1 class="text-2xl font-bold">Animation Platform</h1>
     </header>
-    <div id="app-container">
-        <div id="canvas-container"></div>
-        <div id="timeline-container"></div>
+    <div id="app-container" class="flex flex-col h-screen">
+        <div id="canvas-container" class="flex-1 relative bg-gray-700 overflow-hidden"></div>
+        <div id="ui-toggle-bar" class="fixed top-4 left-4 bg-gray-800 border border-gray-600 rounded-lg p-2 flex gap-2 z-50 shadow-lg">
+            <button title="Toggle Timeline" class="ui-toggle-button timeline-toggle w-8 h-8 bg-transparent border border-gray-600 rounded text-gray-100 flex items-center justify-center text-base cursor-pointer hover:bg-gray-700 active:bg-blue-600">⏱️</button>
+            <button title="Toggle Properties" class="ui-toggle-button properties-toggle w-8 h-8 bg-transparent border border-gray-600 rounded text-gray-100 flex items-center justify-center text-base cursor-pointer hover:bg-gray-700 active:bg-blue-600">🔧</button>
+            <button title="Toggle Tools" class="ui-toggle-button toolbar-toggle w-8 h-8 bg-transparent border border-gray-600 rounded text-gray-100 flex items-center justify-center text-base cursor-pointer hover:bg-gray-700 active:bg-blue-600">🧰</button>
+            <button title="Toggle Code Editor" class="ui-toggle-button code-editor-toggle w-8 h-8 bg-transparent border border-gray-600 rounded text-gray-100 flex items-center justify-center text-base cursor-pointer hover:bg-gray-700">📝</button>
+            <button title="Collapse All" class="ui-toggle-button collapse-all w-8 h-8 bg-transparent border border-gray-600 rounded text-gray-100 flex items-center justify-center text-base cursor-pointer hover:bg-gray-700">◀</button>
+        </div>
+        <div id="gui-container" class="fixed top-16 right-4 bg-gray-800 border border-gray-600 rounded-lg shadow-lg overflow-y-auto max-h-[80vh] w-72 z-40 transition-transform duration-300"></div>
+        <div id="timeline-container" class="bg-gray-800 border-t border-gray-600 h-48 fixed bottom-0 left-0 right-0 z-40 transition-transform duration-300 shadow-lg"></div>
+        <div id="code-editor-wrapper" class="fixed inset-0 flex items-center justify-center z-50 hidden">
+            <div id="code-editor-container" class="bg-gray-800 border border-gray-600 rounded-lg shadow-2xl w-[700px] h-[500px] flex flex-col overflow-hidden">
+                <!-- Header will be populated by JS -->
+            </div>
+        </div>
     </div>
 </body>
 </html>

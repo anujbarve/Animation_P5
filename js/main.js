@@ -2,7 +2,7 @@ let engine;
 let uiManager;
 let animAPI;
 
-// Add to the setup function
+// Setup function for p5.js
 function setup() {
     // Create canvas and add it to container
     const canvasContainer = document.getElementById('canvas-container');
@@ -21,14 +21,11 @@ function setup() {
     // Initialize Animation API
     animAPI = new AnimationAPI(engine);
     
-    // Initialize Code Editor
-    const codeEditor = new CodeEditorPanel(engine);
-    codeEditor.initialize();
-    
     // Set framerate
     frameRate(60);
 }
 
+// Draw loop for p5.js
 function draw() {
     // Update engine and UI
     engine.update();
@@ -36,6 +33,7 @@ function draw() {
     uiManager.update();
 }
 
+// Create sample objects for demonstration
 function createSampleObjects() {
     // Add a few sample shapes
     const circle = new Circle(200, 300, 80);
@@ -81,10 +79,11 @@ function createSampleObjects() {
     engine.selectObject(circle);
 }
 
-// Optional: Handle window resize
+// Handle window resize
 function windowResized() {
-    // This can be optionally implemented to make the canvas responsive
-    // You would need to update the canvas and engine dimensions
+    // Optionally resize canvas if needed
+    // resizeCanvas(windowWidth, windowHeight);
+    // engine.setCanvasSize(windowWidth, windowHeight);
 }
 
 // Prevent default behavior for some keyboard events

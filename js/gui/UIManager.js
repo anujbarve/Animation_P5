@@ -24,9 +24,6 @@ class UIManager {
     }
     
     initialize() {
-        // Create main stylesheet
-        this.createGlobalStyles();
-        
         // Initialize GUI
         this.initializeGUI();
         
@@ -53,21 +50,18 @@ class UIManager {
     }
     
     initializeGUI() {
-        this.gui = new dat.GUI({ autoPlace: false, width: 300 });
+        this.gui = new dat.GUI({ autoPlace: false, width: 288 }); // Tailwind w-72 = 288px
         
         // Place the GUI in a custom container
-        const guiContainer = document.createElement('div');
-        guiContainer.id = 'gui-container';
-        guiContainer.className = 'panel-container';
-        document.body.appendChild(guiContainer);
+        const guiContainer = document.getElementById('gui-container');
         guiContainer.appendChild(this.gui.domElement);
         
-        // Apply custom styling to dat.GUI
+        // Apply custom styling to dat.GUI if needed (minimal since Tailwind handles most)
         this.styleGUI();
     }
     
     styleGUI() {
-        // Add custom CSS for dat.GUI elements to make it more modern
+        // Minimal custom styles since Tailwind handles the container
         const style = document.createElement('style');
         style.textContent = `
             .dg .c {
@@ -81,48 +75,27 @@ class UIManager {
                 border-radius: 2px;
                 padding: 1px 4px;
             }
-            .dg .c select {
-                border-radius: 2px;
-            }
-            .dg .cr.function .property-name {
-                width: 100%;
-            }
             .dg li:not(.folder) {
-                border-bottom: 1px solid #2c2c2c;
+                border-bottom: 1px solid #374151;
                 transition: background-color 0.1s;
             }
             .dg li:not(.folder):hover {
-                background-color: #1a1a1a;
+                background-color: #2d3748;
             }
             .dg .c .slider {
-                background: #2c2c2c;
+                background: #2d3748;
                 border-radius: 2px;
                 box-shadow: none;
             }
-            .dg .c .slider:hover {
-                background: #333;
-            }
             .dg .c .slider-fg {
-                background: #4d94e7;
+                background: #4299e1;
                 border-radius: 2px;
-            }
-            .dg .closed .arrow {
-                border-left-color: #777;
-            }
-            .dg .open .arrow {
-                border-top-color: #777;
-            }
-            .dg .closed:hover .arrow {
-                border-left-color: #aaa;
-            }
-            .dg .open:hover .arrow {
-                border-top-color: #aaa;
             }
             .keyframe-button {
                 margin-left: 5px;
                 background: none;
                 border: none;
-                color: #ffcc00;
+                color: #fbbf24;
                 cursor: pointer;
                 font-size: 12px;
                 transition: opacity 0.2s;
@@ -134,200 +107,8 @@ class UIManager {
         document.head.appendChild(style);
     }
     
-    createGlobalStyles() {
-        const style = document.createElement('style');
-        style.textContent = `
-            :root {
-                --bg-color: #1e1e1e;
-                --panel-bg: #252525;
-                --border-color: #444;
-                --text-color: #e0e0e0;
-                --accent-color: #4d94e7;
-                --secondary-color: #555;
-                --timeline-track: #2a2a2a;
-                --keyframe-color: #ffcc00;
-                --slider-color: #333;
-                --button-hover: #2c2c2c;
-            }
-            
-            body {
-                background-color: var(--bg-color);
-                color: var(--text-color);
-                margin: 0;
-                padding: 0;
-                font-family: 'Segoe UI', Arial, sans-serif;
-                overflow: hidden;
-            }
-            
-            .panel-container {
-                background-color: var(--panel-bg);
-                border: 1px solid var(--border-color);
-                border-radius: 4px;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-                overflow: hidden;
-                transition: all 0.3s ease;
-            }
-            
-            #gui-container {
-                position: absolute;
-                top: 10px;
-                right: 10px;
-                max-height: 90vh;
-                overflow-y: auto;
-                width: 300px;
-                z-index: 100;
-                transition: transform 0.3s ease;
-            }
-            
-            #timeline-container {
-                position: absolute;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                height: 180px;
-                background-color: var(--panel-bg);
-                border-top: 1px solid var(--border-color);
-                z-index: 100;
-                transition: transform 0.3s ease;
-            }
-            
-            .button {
-                background-color: var(--secondary-color);
-                color: var(--text-color);
-                border: none;
-                border-radius: 4px;
-                padding: 5px 10px;
-                margin: 0 5px;
-                cursor: pointer;
-                transition: background-color 0.2s;
-                outline: none;
-            }
-            
-            .button:hover {
-                background-color: var(--button-hover);
-            }
-            
-            .button.primary {
-                background-color: var(--accent-color);
-            }
-            
-            .button.primary:hover {
-                background-color: #3a7bca;
-            }
-            
-            .ui-toggle-bar {
-                position: fixed;
-                top: 10px;
-                left: 10px;
-                background-color: var(--panel-bg);
-                border: 1px solid var(--border-color);
-                border-radius: 4px;
-                padding: 5px;
-                display: flex;
-                gap: 5px;
-                z-index: 1000;
-                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            }
-            
-            .ui-toggle-button {
-                width: 32px;
-                height: 32px;
-                background-color: transparent;
-                border: 1px solid var(--border-color);
-                border-radius: 4px;
-                color: var(--text-color);
-                cursor: pointer;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 16px;
-                padding: 0;
-                transition: all 0.2s;
-            }
-            
-            .ui-toggle-button:hover {
-                background-color: var(--button-hover);
-            }
-            
-            .ui-toggle-button.active {
-                background-color: var(--accent-color);
-                color: white;
-            }
-            
-            .timeline-ruler {
-                background-color: #1a1a1a;
-            }
-            
-            .timeline-tracks {
-                background-color: #151515;
-            }
-            
-            .timeline-track {
-                background-color: var(--timeline-track);
-            }
-            
-            .keyframe-marker {
-                background-color: var(--keyframe-color);
-                transition: transform 0.1s, box-shadow 0.1s;
-            }
-            
-            .keyframe-marker:hover {
-                transform: rotate(45deg) translateY(-50%) scale(1.2);
-                box-shadow: 0 0 5px var(--keyframe-color);
-            }
-            
-            .ruler-marker {
-                background-color: #666;
-            }
-            
-            .ruler-label {
-                color: #aaa;
-                font-size: 9px;
-            }
-            
-            /* Responsive adjustments */
-            @media (max-width: 1200px) {
-                #gui-container {
-                    width: 250px;
-                }
-                
-                #timeline-container {
-                    height: 150px;
-                }
-            }
-            
-            @media (max-width: 800px) {
-                #gui-container {
-                    transform: translateX(100%);
-                }
-                
-                #gui-container.visible {
-                    transform: translateX(0);
-                }
-                
-                #timeline-container {
-                    height: 120px;
-                }
-            }
-        `;
-        document.head.appendChild(style);
-    }
-    
     initializeUIToggleControls() {
-        // Create a minimalistic toggle bar
-        const toggleBar = document.createElement('div');
-        toggleBar.id = 'ui-toggle-bar';
-        toggleBar.className = 'ui-toggle-bar';
-        toggleBar.innerHTML = `
-            <button title="Toggle Timeline" class="ui-toggle-button timeline-toggle active">⏱️</button>
-            <button title="Toggle Properties" class="ui-toggle-button properties-toggle active">🔧</button>
-            <button title="Toggle Tools" class="ui-toggle-button toolbar-toggle active">🧰</button>
-            <button title="Toggle Code Editor" class="ui-toggle-button code-editor-toggle">📝</button>
-            <button title="Collapse All" class="ui-toggle-button collapse-all">◀</button>
-        `;
-        document.body.appendChild(toggleBar);
-        
-        // Add event listeners
+        // Add event listeners to toggle buttons
         document.querySelector('.timeline-toggle').addEventListener('click', () => this.togglePanel('timeline'));
         document.querySelector('.properties-toggle').addEventListener('click', () => this.togglePanel('properties'));
         document.querySelector('.toolbar-toggle').addEventListener('click', () => this.togglePanel('toolbar'));
@@ -341,18 +122,19 @@ class UIManager {
                 this.uiState.timelineVisible = !this.uiState.timelineVisible;
                 const timelineContainer = document.getElementById('timeline-container');
                 if (this.uiState.timelineVisible) {
-                    timelineContainer.style.transform = 'translateY(0)';
+                    timelineContainer.classList.remove('translate-y-full');
                 } else {
-                    timelineContainer.style.transform = 'translateY(100%)';
+                    timelineContainer.classList.add('translate-y-full');
                 }
                 break;
             case 'properties':
                 this.uiState.propertiesVisible = !this.uiState.propertiesVisible;
+                const guiContainer = document.getElementById('gui-container');
                 if (this.uiState.propertiesVisible) {
-                    document.getElementById('gui-container').style.transform = 'translateX(0)';
+                    guiContainer.classList.remove('translate-x-full');
                     this.propertiesPanel.show();
                 } else {
-                    document.getElementById('gui-container').style.transform = 'translateX(100%)';
+                    guiContainer.classList.add('translate-x-full');
                     this.propertiesPanel.hide();
                 }
                 break;
@@ -384,15 +166,15 @@ class UIManager {
         this.uiState.toolbarVisible = newState;
         
         // Update UI elements
-        document.getElementById('timeline-container').style.transform = 
-            newState ? 'translateY(0)' : 'translateY(100%)';
-            
-        document.getElementById('gui-container').style.transform = 
-            newState ? 'translateX(0)' : 'translateX(100%)';
-            
+        const timelineContainer = document.getElementById('timeline-container');
+        const guiContainer = document.getElementById('gui-container');
         if (newState) {
+            timelineContainer.classList.remove('translate-y-full');
+            guiContainer.classList.remove('translate-x-full');
             this.propertiesPanel.show();
         } else {
+            timelineContainer.classList.add('translate-y-full');
+            guiContainer.classList.add('translate-x-full');
             this.propertiesPanel.hide();
         }
         
@@ -495,16 +277,7 @@ class UIManager {
         // Adjust UI components based on window size
         const width = window.innerWidth;
         
-        // Adjust GUI width
-        if (width < 1000) {
-            document.getElementById('gui-container').style.width = '250px';
-            this.gui.width = 250;
-        } else {
-            document.getElementById('gui-container').style.width = '300px';
-            this.gui.width = 300;
-        }
-        
-        // Update timeline to fit new width
+        // Adjust GUI width if needed (handled by Tailwind mostly)
         if (this.timelinePanel) {
             this.timelinePanel.fitTimelineToWindow();
         }

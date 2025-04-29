@@ -2,18 +2,14 @@ class ToolbarPanel {
   constructor(engine, gui) {
     this.engine = engine;
     this.gui = gui;
-
     // Add reference to the AnimationAPI
     this.animation = new AnimationAPI(engine);
-
     // GUI folders
     this.toolsFolder = null;
     this.projectFolder = null;
     this.templatesFolder = null;
-
     // GUI controllers
     this.toolControllers = {};
-
     // Panel visibility state
     this.visible = true;
   }
@@ -22,11 +18,9 @@ class ToolbarPanel {
     // Create folders
     this.toolsFolder = this.gui.addFolder("Tools");
     this.projectFolder = this.gui.addFolder("Project");
-
     // Open folders by default
     this.toolsFolder.open();
     this.projectFolder.open();
-
     // Add tools
     this.addShapeTools();
     this.addCanvasSettings();
@@ -221,7 +215,6 @@ class ToolbarPanel {
         }
       },
     };
-
     const actionsFolder = this.projectFolder.addFolder("Project Actions");
     actionsFolder.add(projectActions, "newProject").name("New Project");
     actionsFolder.add(projectActions, "saveProject").name("Save Project");
@@ -242,7 +235,7 @@ class ToolbarPanel {
     const fileInput = document.createElement("input");
     fileInput.type = "file";
     fileInput.accept = ".json";
-    fileInput.style.display = "none";
+    fileInput.className = "hidden";
     document.body.appendChild(fileInput);
 
     fileInput.onchange = (event) => {
@@ -269,52 +262,42 @@ class ToolbarPanel {
   showExportOptions() {
     // Create export dialog
     const exportDialog = document.createElement("div");
-    exportDialog.className = "export-dialog";
-    exportDialog.style.position = "fixed";
-    exportDialog.style.left = "50%";
-    exportDialog.style.top = "50%";
-    exportDialog.style.transform = "translate(-50%, -50%)";
-    exportDialog.style.backgroundColor = "var(--panel-bg)";
-    exportDialog.style.border = "1px solid var(--border-color)";
-    exportDialog.style.borderRadius = "4px";
-    exportDialog.style.padding = "20px";
-    exportDialog.style.width = "350px";
-    exportDialog.style.boxShadow = "0 4px 15px rgba(0,0,0,0.3)";
-    exportDialog.style.zIndex = "1000";
+    exportDialog.className =
+      "fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-gray-800 border border-gray-600 rounded-lg shadow-2xl w-80 p-5 z-50";
 
     exportDialog.innerHTML = `
-            <h3 style="margin-top:0;">Export Animation</h3>
-            <div style="margin-bottom:15px;">
-                <label>Format:</label>
-                <select id="export-format" style="width:100%;padding:5px;margin-top:5px;background:#222;color:#fff;border:1px solid #444;">
-                    <option value="gif">GIF</option>
-                    <option value="mp4">MP4 Video</option>
-                    <option value="webm" selected>WebM Video</option>
-                    <option value="png">PNG Sequence</option>
-                </select>
-            </div>
-            <div style="margin-bottom:15px;">
-                <label>Quality:</label>
-                <select id="export-quality" style="width:100%;padding:5px;margin-top:5px;background:#222;color:#fff;border:1px solid #444;">
-                    <option value="0.5">Low</option>
-                    <option value="0.8" selected>Medium</option>
-                    <option value="1.0">High</option>
-                </select>
-            </div>
-            <div style="margin-bottom:15px;">
-                <label>Range:</label>
-                <div style="display:flex;gap:10px;margin-top:5px;">
-                    <input type="number" id="export-start-frame" placeholder="Start" value="0" style="flex:1;padding:5px;background:#222;color:#fff;border:1px solid #444;">
-                    <input type="number" id="export-end-frame" placeholder="End" value="${
-                      this.engine.timeline.totalFrames - 1
-                    }" style="flex:1;padding:5px;background:#222;color:#fff;border:1px solid #444;">
+                <h3 class="text-lg font-bold mb-4">Export Animation</h3>
+                <div class="mb-4">
+                    <label class="block mb-1">Format:</label>
+                    <select id="export-format" class="w-full p-2 bg-gray-700 text-gray-100 border border-gray-600 rounded">
+                        <option value="gif">GIF</option>
+                        <option value="mp4">MP4 Video</option>
+                        <option value="webm" selected>WebM Video</option>
+                        <option value="png">PNG Sequence</option>
+                    </select>
                 </div>
-            </div>
-            <div style="display:flex;justify-content:space-between;margin-top:20px;">
-                <button id="export-cancel" class="button">Cancel</button>
-                <button id="export-confirm" class="button primary">Export</button>
-            </div>
-        `;
+                <div class="mb-4">
+                    <label class="block mb-1">Quality:</label>
+                    <select id="export-quality" class="w-full p-2 bg-gray-700 text-gray-100 border border-gray-600 rounded">
+                        <option value="0.5">Low</option>
+                        <option value="0.8" selected>Medium</option>
+                        <option value="1.0">High</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block mb-1">Range:</label>
+                    <div class="flex gap-2 mt-1">
+                        <input type="number" id="export-start-frame" placeholder="Start" value="0" class="flex-1 p-2 bg-gray-700 text-gray-100 border border-gray-600 rounded">
+                        <input type="number" id="export-end-frame" placeholder="End" value="${
+                          this.engine.timeline.totalFrames - 1
+                        }" class="flex-1 p-2 bg-gray-700 text-gray-100 border border-gray-600 rounded">
+                    </div>
+                </div>
+                <div class="flex justify-between mt-5">
+                    <button id="export-cancel" class="bg-gray-600 text-gray-100 border-none rounded px-4 py-2 cursor-pointer hover:bg-gray-500">Cancel</button>
+                    <button id="export-confirm" class="bg-blue-600 text-gray-100 border-none rounded px-4 py-2 cursor-pointer hover:bg-blue-500">Export</button>
+                </div>
+            `;
 
     document.body.appendChild(exportDialog);
 
@@ -377,7 +360,7 @@ class ToolbarPanel {
       .name("Particle Effect");
     this.templatesFolder.add(templates, "waveAnimation").name("Wave Animation");
     this.templatesFolder.add(templates, "logoReveal").name("Logo Reveal");
-    this.templatesFolder.add(templates, "recursive").name("recursive Reveal");
+    this.templatesFolder.add(templates, "recursive").name("Recursive Reveal");
 
     // Add information about templates
     const info = { message: "Click a template to create a pre-made animation" };
@@ -836,8 +819,7 @@ class ToolbarPanel {
     }
   }
 
-  createRecursiveDoublingAnimation(
-  ) {
+  createRecursiveDoublingAnimation() {
     this.animation.clearAll();
     this.animation.setDuration(20);
     this.animation.setFPS(60);
@@ -851,8 +833,6 @@ class ToolbarPanel {
       fill: [0, 0, 250],
       name: "node 1",
     });
-
-    // 
 
     const n2 = this.animation.createShape("circle", {
       x: 600,
@@ -1116,10 +1096,10 @@ class ToolbarPanel {
       y: n1.y + 50,
       height: 50,
       width: 100,
-      cornerRadius: 10, 
+      cornerRadius: 10,
       fill: [255, 255, 255],
       name: "",
-      visible :true
+      visible: true,
     });
 
     const data2 = this.animation.createShape("rectangle", {
@@ -1163,7 +1143,7 @@ class ToolbarPanel {
       cornerRadius: 10,
       fill: [255, 255, 255],
       name: "",
-      visible : false
+      visible: false,
     });
 
     const data6 = this.animation.createShape("rectangle", {
@@ -1199,193 +1179,183 @@ class ToolbarPanel {
       visible: false,
     });
 
-    this.animation.animateMultiple(data,{
-      text : [
+    this.animation.animateMultiple(data, {
+      text: [
         {
-          frame : 0,
-          value : "1,2,3,4,5,6,7,8"
+          frame: 0,
+          value: "1,2,3,4,5,6,7,8",
         },
         {
-          frame : 300,
-          value : "1,2,3,4"
+          frame: 300,
+          value: "1,2,3,4",
         },
         {
-          frame : 600,
-          value : "1,4"
+          frame: 600,
+          value: "1,4",
         },
         {
-          frame : 1200,
-          value : "1"
-        }
-      ]
-    });
-
-    this.animation.animateMultiple(data8,{
-      text : [
-        {
-          frame : 300,
-          value : "5,6,7,8"
+          frame: 1200,
+          value: "1",
         },
-        {
-          frame : 600,
-          value : "5,8"
-        },
-        {
-          frame : 1200,
-          value : "8"
-        }
       ],
-      visible : [
-        {
-          frame : 0,
-          value : false
-        },
-        {
-          frame : 300,
-          value : true
-        },
-        {
-          frame : 300,
-          value : true
-        }
-      ]
     });
 
-    this.animation.animateMultiple(data2,{
-      text : [
+    this.animation.animateMultiple(data8, {
+      text: [
         {
-          frame : 600,
-          value : "2,3"
+          frame: 300,
+          value: "5,6,7,8",
         },
         {
-          frame : 1200,
-          value : "2"
-        }
+          frame: 600,
+          value: "5,8",
+        },
+        {
+          frame: 1200,
+          value: "8",
+        },
       ],
-      visible : [
+      visible: [
         {
-          frame : 0,
-          value : false
+          frame: 0,
+          value: false,
         },
         {
-          frame : 600,
-          value : true
+          frame: 300,
+          value: true,
         },
-        {
-          frame : 1200,
-          value : true
-        }
-      ]
-    });
-
-    this.animation.animateMultiple(data7,{
-      text : [
-        {
-          frame : 600,
-          value : "6,7"
-        },
-        {
-          frame : 1200,
-          value : "7"
-        }
       ],
-      visible : [
-        {
-          frame : 0,
-          value : false
-        },
-        {
-          frame : 600,
-          value : true
-        },
-        {
-          frame : 1200,
-          value : true
-        },
-      ]
     });
 
-
-    this.animation.animateMultiple(data5,{
-      text : [
+    this.animation.animateMultiple(data2, {
+      text: [
         {
-          frame : 1200,
-          value : "5"
-        }
+          frame: 600,
+          value: "2,3",
+        },
+        {
+          frame: 1200,
+          value: "2",
+        },
       ],
-      visible : [
+      visible: [
         {
-          frame : 0,
-          value : false
+          frame: 0,
+          value: false,
         },
         {
-          frame : 1200,
-          value : true
-        }
-      ]
-    });
-
-
-    this.animation.animateMultiple(data4,{
-      text : [
+          frame: 600,
+          value: true,
+        },
         {
-          frame : 1200,
-          value : "4"
-        }
+          frame: 1200,
+          value: true,
+        },
       ],
-      visible : [
-        {
-          frame : 0,
-          value : false
-        },
-        {
-          frame : 1200,
-          value : true
-        }
-      ]
     });
 
-
-    this.animation.animateMultiple(data3,{
-      text : [
+    this.animation.animateMultiple(data7, {
+      text: [
         {
-          frame : 1200,
-          value : "3"
-        }
+          frame: 600,
+          value: "6,7",
+        },
+        {
+          frame: 1200,
+          value: "7",
+        },
       ],
-      visible : [
+      visible: [
         {
-          frame : 0,
-          value : false
+          frame: 0,
+          value: false,
         },
         {
-          frame : 1200,
-          value : true
-        }
-      ]
-    });
-
-
-    this.animation.animateMultiple(data6,{
-      text : [
+          frame: 600,
+          value: true,
+        },
         {
-          frame : 1200,
-          value : "6"
-        }
+          frame: 1200,
+          value: true,
+        },
       ],
-      visible : [
-        {
-          frame : 0,
-          value : false
-        },
-        {
-          frame : 1200,
-          value : true
-        }
-      ]
     });
 
+    this.animation.animateMultiple(data5, {
+      text: [
+        {
+          frame: 1200,
+          value: "5",
+        },
+      ],
+      visible: [
+        {
+          frame: 0,
+          value: false,
+        },
+        {
+          frame: 1200,
+          value: true,
+        },
+      ],
+    });
 
+    this.animation.animateMultiple(data4, {
+      text: [
+        {
+          frame: 1200,
+          value: "4",
+        },
+      ],
+      visible: [
+        {
+          frame: 0,
+          value: false,
+        },
+        {
+          frame: 1200,
+          value: true,
+        },
+      ],
+    });
+
+    this.animation.animateMultiple(data3, {
+      text: [
+        {
+          frame: 1200,
+          value: "3",
+        },
+      ],
+      visible: [
+        {
+          frame: 0,
+          value: false,
+        },
+        {
+          frame: 1200,
+          value: true,
+        },
+      ],
+    });
+
+    this.animation.animateMultiple(data6, {
+      text: [
+        {
+          frame: 1200,
+          value: "6",
+        },
+      ],
+      visible: [
+        {
+          frame: 0,
+          value: false,
+        },
+        {
+          frame: 1200,
+          value: true,
+        },
+      ],
+    });
 
     this.animation.reset();
     this.animation.play(true);

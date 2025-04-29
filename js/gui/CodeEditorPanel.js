@@ -15,52 +15,33 @@ class CodeEditorPanel {
   }
 
   createEditorDOM() {
-    // Create editor container
-    this.editorContainer = document.createElement("div");
-    this.editorContainer.className = "code-editor-container panel-container";
-    this.editorContainer.style.position = "fixed";
-    this.editorContainer.style.left = "50%";
-    this.editorContainer.style.top = "50%";
-    this.editorContainer.style.transform = "translate(-50%, -50%)";
-    this.editorContainer.style.width = "700px";
-    this.editorContainer.style.height = "500px";
-    this.editorContainer.style.zIndex = "1000";
-    this.editorContainer.style.display = "none";
-    this.editorContainer.style.flexDirection = "column";
-    this.editorContainer.style.padding = "0";
-    this.editorContainer.style.overflow = "hidden";
+    // Use the container defined in HTML
+    this.editorContainer = document.getElementById("code-editor-container");
+    if (!this.editorContainer) {
+      this.editorContainer = document.createElement("div");
+      this.editorContainer.id = "code-editor-container";
+      this.editorContainer.className =
+        "bg-gray-800 border border-gray-600 rounded-lg shadow-2xl w-[700px] h-[500px] flex flex-col overflow-hidden";
+      document.body.appendChild(this.editorContainer);
+    }
+    this.editorContainer.innerHTML = "";
 
     // Editor header
     const header = document.createElement("div");
-    header.className = "editor-header";
-    header.style.display = "flex";
-    header.style.justifyContent = "space-between";
-    header.style.alignItems = "center";
-    header.style.padding = "10px 15px";
-    header.style.borderBottom = "1px solid var(--border-color)";
-    header.style.backgroundColor = "#1a1a1a";
+    header.className =
+      "editor-header flex justify-between items-center p-3 border-b border-gray-600 bg-gray-700";
 
     const title = document.createElement("h3");
     title.textContent = "Animation Script Editor";
-    title.style.margin = "0";
-    title.style.fontSize = "16px";
-    title.style.cursor = "move"; // Indicate draggable
+    title.className = "m-0 text-base cursor-move";
 
     const headerActions = document.createElement("div");
-    headerActions.style.display = "flex";
-    headerActions.style.gap = "10px";
+    headerActions.className = "flex gap-2";
 
     const closeBtn = document.createElement("button");
-    closeBtn.className = "button";
+    closeBtn.className =
+      "bg-gray-600 text-gray-100 border-none rounded w-7 h-7 flex items-center justify-center cursor-pointer hover:bg-gray-500 text-xl font-bold";
     closeBtn.innerHTML = "×";
-    closeBtn.style.width = "28px";
-    closeBtn.style.height = "28px";
-    closeBtn.style.padding = "0";
-    closeBtn.style.fontSize = "20px";
-    closeBtn.style.fontWeight = "bold";
-    closeBtn.style.display = "flex";
-    closeBtn.style.justifyContent = "center";
-    closeBtn.style.alignItems = "center";
     closeBtn.addEventListener("click", () => {
       this.toggleEditor(false);
     });
@@ -71,58 +52,37 @@ class CodeEditorPanel {
 
     // Editor content area
     const contentArea = document.createElement("div");
-    contentArea.className = "editor-content";
-    contentArea.style.display = "flex";
-    contentArea.style.flexDirection = "column";
-    contentArea.style.height = "calc(100% - 50px)";
-    contentArea.style.padding = "10px";
+    contentArea.className =
+      "editor-content flex flex-col h-[calc(100%-50px)] p-2";
 
     // Editor textarea
     this.codeTextarea = document.createElement("textarea");
-    this.codeTextarea.className = "code-textarea";
-    this.codeTextarea.style.width = "100%";
-    this.codeTextarea.style.height = "calc(100% - 50px)";
-    this.codeTextarea.style.backgroundColor = "#222";
-    this.codeTextarea.style.color = "#eee";
-    this.codeTextarea.style.border = "1px solid #333";
-    this.codeTextarea.style.padding = "10px";
-    this.codeTextarea.style.fontFamily = "monospace";
-    this.codeTextarea.style.fontSize = "14px";
-    this.codeTextarea.style.resize = "none";
-    this.codeTextarea.style.lineHeight = "1.4";
+    this.codeTextarea.className =
+      "code-textarea w-full h-[calc(100%-50px)] bg-gray-700 text-gray-200 border border-gray-600 p-2 font-mono text-sm resize-none leading-5";
     this.codeTextarea.style.tabSize = "2";
 
     // Button controls
     const controls = document.createElement("div");
-    controls.className = "editor-controls";
-    controls.style.display = "flex";
-    controls.style.justifyContent = "space-between";
-    controls.style.marginTop = "10px";
-    controls.style.padding = "10px 0";
+    controls.className = "editor-controls flex justify-between mt-2 p-2";
 
     const runButton = document.createElement("button");
-    runButton.className = "button primary";
+    runButton.className =
+      "bg-blue-600 text-gray-100 border-none rounded px-4 py-2 cursor-pointer hover:bg-blue-500";
     runButton.textContent = "Run Animation";
     runButton.addEventListener("click", () => {
       this.runCode();
     });
 
     const samplesWrapper = document.createElement("div");
-    samplesWrapper.style.display = "flex";
-    samplesWrapper.style.alignItems = "center";
-    samplesWrapper.style.gap = "10px";
+    samplesWrapper.className = "flex items-center gap-2";
 
     const samplesLabel = document.createElement("span");
+    samplesLabel.className = "text-sm";
     samplesLabel.textContent = "Examples:";
-    samplesLabel.style.fontSize = "14px";
 
     const sampleMenu = document.createElement("select");
-    sampleMenu.className = "sample-menu";
-    sampleMenu.style.backgroundColor = "#333";
-    sampleMenu.style.color = "#fff";
-    sampleMenu.style.border = "1px solid #555";
-    sampleMenu.style.padding = "5px 10px";
-    sampleMenu.style.borderRadius = "3px";
+    sampleMenu.className =
+      "bg-gray-700 text-gray-100 border border-gray-600 rounded p-2";
 
     const samples = {
       default: "Basic Animation",
@@ -155,8 +115,6 @@ class CodeEditorPanel {
 
     this.editorContainer.appendChild(header);
     this.editorContainer.appendChild(contentArea);
-
-    document.body.appendChild(this.editorContainer);
 
     // Make editor draggable
     this.makeEditorDraggable(header);
@@ -205,19 +163,8 @@ class CodeEditorPanel {
 
     // Add line numbers with a simple approach
     const lineNumbers = document.createElement("div");
-    lineNumbers.className = "line-numbers";
-    lineNumbers.style.position = "absolute";
-    lineNumbers.style.left = "0";
-    lineNumbers.style.top = "0";
-    lineNumbers.style.width = "30px";
-    lineNumbers.style.height = "100%";
-    lineNumbers.style.backgroundColor = "#1a1a1a";
-    lineNumbers.style.color = "#666";
-    lineNumbers.style.fontFamily = "monospace";
-    lineNumbers.style.fontSize = "14px";
-    lineNumbers.style.textAlign = "right";
-    lineNumbers.style.paddingRight = "5px";
-    lineNumbers.style.overflowY = "hidden";
+    lineNumbers.className =
+      "line-numbers absolute left-0 top-0 w-8 h-full bg-gray-700 text-gray-500 font-mono text-sm text-right pr-1 overflow-y-hidden";
 
     // In full implementation, this would be more sophisticated
     this.codeTextarea.style.paddingLeft = "35px";
@@ -253,7 +200,14 @@ class CodeEditorPanel {
     const newState = show === null ? !this.isVisible : show;
     this.isVisible = newState;
 
-    this.editorContainer.style.display = this.isVisible ? "flex" : "none";
+    const editorWrapper = document.getElementById("code-editor-wrapper");
+    if (editorWrapper) {
+      if (this.isVisible) {
+        editorWrapper.classList.remove("hidden");
+      } else {
+        editorWrapper.classList.add("hidden");
+      }
+    }
 
     // Update toggle button state if there is one
     const button = document.querySelector(".code-editor-toggle");
@@ -262,7 +216,6 @@ class CodeEditorPanel {
     }
   }
 
-  // In CodeEditorPanel.js
   runCode() {
     try {
       // Get the code
@@ -310,43 +263,29 @@ class CodeEditorPanel {
 
   showNotification(message, type = "info") {
     const notification = document.createElement("div");
-    notification.className = `notification ${type}`;
+    notification.className = `fixed bottom-5 right-5 p-3 rounded shadow-lg z-50 font-sans text-sm opacity-0 transform translate-y-5 transition-opacity duration-300 transition-transform duration-300`;
     notification.textContent = message;
-    notification.style.position = "fixed";
-    notification.style.bottom = "20px";
-    notification.style.right = "20px";
-    notification.style.padding = "12px 20px";
-    notification.style.borderRadius = "4px";
-    notification.style.zIndex = "2000";
-    notification.style.fontFamily = "Arial, sans-serif";
-    notification.style.fontSize = "14px";
-    notification.style.opacity = "0";
-    notification.style.transform = "translateY(20px)";
-    notification.style.transition = "opacity 0.3s, transform 0.3s";
 
     if (type === "error") {
-      notification.style.backgroundColor = "#ff4c4c";
-      notification.style.color = "white";
+      notification.classList.add("bg-red-500", "text-white");
     } else if (type === "success") {
-      notification.style.backgroundColor = "#4caf50";
-      notification.style.color = "white";
+      notification.classList.add("bg-green-500", "text-white");
     } else {
-      notification.style.backgroundColor = "#2196f3";
-      notification.style.color = "white";
+      notification.classList.add("bg-blue-500", "text-white");
     }
 
     document.body.appendChild(notification);
 
     // Trigger animation
     setTimeout(() => {
-      notification.style.opacity = "1";
-      notification.style.transform = "translateY(0)";
+      notification.classList.remove("opacity-0", "translate-y-5");
+      notification.classList.add("opacity-100", "translate-y-0");
     }, 10);
 
     // Auto-remove after 3 seconds
     setTimeout(() => {
-      notification.style.opacity = "0";
-      notification.style.transform = "translateY(20px)";
+      notification.classList.add("opacity-0", "translate-y-5");
+      notification.classList.remove("opacity-100", "translate-y-0");
 
       setTimeout(() => {
         document.body.removeChild(notification);
@@ -364,18 +303,18 @@ animAPI.setDuration(10); // seconds
 
 // Create a circle
 const circle = animAPI.createShape('circle', {
-    x: 400,
-    y: 300,
-    size: 100,
-    fill: color(255, 100, 100),
-    name: "My Circle"
+  x: 400,
+  y: 300,
+  size: 100,
+  fill: color(255, 100, 100),
+  name: "My Circle"
 });
 
 // Animate the circle
 animAPI.animate(circle, 'x', [
-    {frame: 0, value: 400},
-    {frame: 120, value: 600, easing: 'easeInOutQuad'},
-    {frame: 240, value: 400, easing: 'easeInOutQuad'}
+  {frame: 0, value: 400},
+  {frame: 120, value: 600, easing: 'easeInOutQuad'},
+  {frame: 240, value: 400, easing: 'easeInOutQuad'}
 ]);
 
 // Add a pulsing effect
@@ -383,15 +322,14 @@ animAPI.pulse(circle, 0, 5, 240, 0.8, 1.2);
 
 // Create a text object
 const text = animAPI.createShape('text', {
-    x: 400,
-    y: 150,
-    text: "Programmatic Animation",
-    fontSize: 32,
-    fill: color(255, 255, 255),
-    name: "Title"
+  x: 400,
+  y: 150,
+  text: "Programmatic Animation",
+  fontSize: 32,
+  fill: color(255, 255, 255),
+  name: "Title"
 });
 
-// Fade in the text
 // Fade in the text
 animAPI.fadeIn(text, 0, 30);
 
@@ -407,22 +345,22 @@ animAPI.setDuration(5);
 
 // Create particle system at the center of screen
 const particles = animAPI.createParticleSystem(400, 300, 50, {
-    type: 'circle',
-    size: 15,
-    color: [255, 200, 100],
-    duration: 90,
-    spread: 300,
-    easing: 'easeOutCubic',
-    scaleDown: true
+  type: 'circle',
+  size: 15,
+  color: [255, 200, 100],
+  duration: 90,
+  spread: 300,
+  easing: 'easeOutCubic',
+  scaleDown: true
 });
 
 // Add some text
 const text = animAPI.createShape('text', {
-    x: 400,
-    y: 300,
-    text: "BOOM!",
-    fontSize: 48,
-    fill: color(255, 100, 50),
+  x: 400,
+  y: 300,
+  text: "BOOM!",
+  fontSize: 48,
+  fill: color(255, 100, 50),
     name: "Explosion Text"
 });
 
