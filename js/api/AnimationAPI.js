@@ -27,12 +27,12 @@ class AnimationAPI {
   
     switch (type.toLowerCase()) {
       case "circle":
-        shape = new Circle(x, y, props.size || props.diameter || 100);
+        shape = new Circle(x, y, props.size || props.diameter || 100,props.name);
         break;
   
       case "rectangle":
       case "rect":
-        shape = new Rectangle(x, y, props.width || 100, props.height || 80);
+        shape = new Rectangle(x, y, props.width || 100, props.height || 80,props.name);
         if (props.cornerRadius !== undefined) {
           shape.cornerRadius = props.cornerRadius;
         }
@@ -130,6 +130,7 @@ class AnimationAPI {
   
     return shape;
   }
+  
 
   /**
    * Apply common properties to a shape

@@ -836,126 +836,558 @@ class ToolbarPanel {
     }
   }
 
-  /**
-   * Creates a recursive doubling animation
-   * @param {number} generations - Number of doubling generations
-   * @param {number} maxShapes - Maximum number of shapes to create
-   * @param {boolean} useRandomColors - Whether to use random colors for each generation
-   */
   createRecursiveDoublingAnimation(
-    generations = 4,
-    maxShapes = 64,
-    useRandomColors = true
   ) {
-    // Clear existing objects if user confirms
-    if (confirm("This will create a data flow animation. Continue?")) {
-      // Set up canvas
-      this.animation.clearAll();
-      this.engine.setCanvasSize(1900, 1000);
-      
-      // Create three nodes: Source, Processor, and Destination
-      const sourceNode = this.animation.createShape("rectangle", {
-        x: 250,
-        y: 200,
-        width: 100,
-        height: 120,
-        fill: [50, 100, 200],
-        name: "Data Source"
-      });
-      
-      const processorNode = this.animation.createShape("circle", {
-        x: 500,
-        y: 350,
-        width: 120,
-        height: 120,
-        fill: [200, 150, 50],
-        name: "Processor"
-      });
-      
-      const destinationNode = this.animation.createShape("rectangle", {
-        x: 750,
-        y: 350,
-        width: 140,
-        height: 80,
-        cornerRadius: 10,
-        fill: [50, 180, 100],
-        name: "Destination"
-      });
-      
-      // Add labels
-      const sourceLabel = this.animation.createShape("text", {
-        x: sourceNode.x,
-        y: sourceNode.y + 80,
-        text: "DATA SOURCE",
-        fontSize: 14,
-        fill: [255, 255, 255]
-      });
-      
-      const processorLabel = this.animation.createShape("text", {
-        x: processorNode.x,
-        y: processorNode.y + 80,
-        text: "PROCESSOR",
-        fontSize: 14,
-        fill: [255, 255, 255]
-      });
-      
-      const destinationLabel = this.animation.createShape("text", {
-        x: destinationNode.x,
-        y: destinationNode.y + 60,
-        text: "DESTINATION",
-        fontSize: 14,
-        fill: [255, 255, 255]
-      });
-      
-      // Create flow paths
-      // Source to Processor flow (regular bezier)
-      const flowPath1 = this.animation.createShape("flowpath", {
-        startShape: sourceNode,
-        endShape: processorNode,
-        startConnection: "bottom",
-        endConnection: "top",
-        pathStyle: "bezier",
-        curveIntensity: 0.3,
-        arrowEnd: true,
-        arrowSize: 8,
-        stroke: [100, 200, 250],
-        strokeWeight: 2,
-        flowParticles: 8,        // Add flowing particles
-        particleSize: 6,         // Size of particles
-        fill: [150, 220, 255],   // Particle color
-        animationSpeed: 2        // Speed of flow
-      });
-      
-      // Processor to Destination flow (wave style)
-      const flowPath2 = this.animation.createShape("flowpath", {
-        startShape: processorNode,
-        endShape: destinationNode,
-        startConnection: "right",
-        endConnection: "left",
-        pathStyle: "bezier",
-        curveIntensity: 0,
-        stroke: [100, 200, 150],
-        strokeWeight: 2,
-        flowParticles: 2,
-        particleSize: 5,
-        animationSpeed: 5
-      });
-      
+    this.animation.clearAll();
+    this.animation.setDuration(20);
+    this.animation.setFPS(60);
+    this.engine.setCanvasSize(1900, 1000);
 
-      // Add a title
-      const title = this.animation.createShape("text", {
-        x: 500,
-        y: 80,
-        text: "DATA FLOW VISUALIZATION",
-        fontSize: 24,
-        fontFamily: "Arial",
-        textStyle: "bold",
-        fill: [255, 255, 255]
-      });
-      
-      // Start the animation
-      this.animation.reset();
-      this.animation.play(true); // Set to loop
-    }
+    const n1 = this.animation.createShape("circle", {
+      x: 200,
+      y: 200,
+      width: 120,
+      height: 120,
+      fill: [0, 0, 250],
+      name: "node 1",
+    });
+
+    // 
+
+    const n2 = this.animation.createShape("circle", {
+      x: 600,
+      y: 200,
+      width: 120,
+      height: 120,
+      fill: [0, 0, 250],
+      name: "node 2",
+    });
+
+    const n3 = this.animation.createShape("circle", {
+      x: 600,
+      y: 600,
+      width: 120,
+      height: 120,
+      fill: [0, 0, 250],
+      name: "node 3",
+    });
+
+    const n4 = this.animation.createShape("circle", {
+      x: 200,
+      y: 600,
+      width: 120,
+      height: 120,
+      fill: [0, 0, 250],
+      name: "node 4",
+    });
+
+    const n5 = this.animation.createShape("circle", {
+      x: 400,
+      y: 500,
+      width: 120,
+      height: 120,
+      fill: [0, 0, 200],
+      name: "node 5",
+    });
+
+    const n6 = this.animation.createShape("circle", {
+      x: 800,
+      y: 500,
+      width: 120,
+      height: 120,
+      fill: [0, 0, 200],
+      name: "node 6",
+    });
+
+    const n7 = this.animation.createShape("circle", {
+      x: 800,
+      y: 100,
+      width: 120,
+      height: 120,
+      fill: [0, 0, 200],
+      name: "node 7",
+    });
+
+    const n8 = this.animation.createShape("circle", {
+      x: 400,
+      y: 100,
+      width: 120,
+      height: 120,
+      fill: [0, 0, 200],
+      name: "node 8",
+    });
+
+    const fp1 = this.animation.createShape("flowpath", {
+      startShape: n1,
+      endShape: n2,
+      startConnection: "right",
+      endConnection: "left",
+      pathStyle: "bezier",
+      curveIntensity: 0,
+      arrowEnd: false,
+      arrowSize: 8,
+      stroke: [100, 200, 250],
+      strokeWeight: 2,
+      flowParticles: 8, // Add flowing particles
+      particleSize: 6, // Size of particles
+      fill: [150, 220, 255], // Particle color
+      animationSpeed: 2, // Speed of flow
+    });
+
+    const fp2 = this.animation.createShape("flowpath", {
+      startShape: n2,
+      endShape: n3,
+      startConnection: "bottom",
+      endConnection: "top",
+      pathStyle: "bezier",
+      curveIntensity: 0,
+      arrowEnd: false,
+      arrowSize: 8,
+      stroke: [100, 200, 250],
+      strokeWeight: 2,
+      flowParticles: 8, // Add flowing particles
+      particleSize: 6, // Size of particles
+      fill: [150, 220, 255], // Particle color
+      animationSpeed: 2, // Speed of flow
+    });
+
+    const fp3 = this.animation.createShape("flowpath", {
+      startShape: n3,
+      endShape: n4,
+      startConnection: "left",
+      endConnection: "right",
+      pathStyle: "bezier",
+      curveIntensity: 0,
+      arrowEnd: false,
+      arrowSize: 8,
+      stroke: [100, 200, 250],
+      strokeWeight: 2,
+      flowParticles: 8, // Add flowing particles
+      particleSize: 6, // Size of particles
+      fill: [150, 220, 255], // Particle color
+      animationSpeed: 2, // Speed of flow
+    });
+
+    const fp4 = this.animation.createShape("flowpath", {
+      startShape: n4,
+      endShape: n1,
+      startConnection: "top",
+      endConnection: "bottom",
+      pathStyle: "bezier",
+      curveIntensity: 0,
+      arrowEnd: false,
+      arrowSize: 8,
+      stroke: [100, 200, 250],
+      strokeWeight: 2,
+      flowParticles: 8, // Add flowing particles
+      particleSize: 6, // Size of particles
+      fill: [150, 220, 255], // Particle color
+      animationSpeed: 2, // Speed of flow
+    });
+
+    const fp5 = this.animation.createShape("flowpath", {
+      startShape: n5,
+      endShape: n6,
+      startConnection: "right",
+      endConnection: "left",
+      pathStyle: "bezier",
+      curveIntensity: 0,
+      arrowEnd: false,
+      arrowSize: 8,
+      stroke: [100, 200, 250],
+      strokeWeight: 2,
+      flowParticles: 8, // Add flowing particles
+      particleSize: 6, // Size of particles
+      fill: [150, 220, 255], // Particle color
+      animationSpeed: 2, // Speed of flow
+    });
+
+    const fp6 = this.animation.createShape("flowpath", {
+      startShape: n6,
+      endShape: n7,
+      startConnection: "top",
+      endConnection: "bottom",
+      pathStyle: "bezier",
+      curveIntensity: 0,
+      arrowEnd: false,
+      arrowSize: 8,
+      stroke: [100, 200, 250],
+      strokeWeight: 2,
+      flowParticles: 8, // Add flowing particles
+      particleSize: 6, // Size of particles
+      fill: [150, 220, 255], // Particle color
+      animationSpeed: 2, // Speed of flow
+    });
+
+    const fp7 = this.animation.createShape("flowpath", {
+      startShape: n7,
+      endShape: n8,
+      startConnection: "left",
+      endConnection: "right",
+      pathStyle: "bezier",
+      curveIntensity: 0,
+      arrowEnd: false,
+      arrowSize: 8,
+      stroke: [100, 200, 250],
+      strokeWeight: 2,
+      flowParticles: 8, // Add flowing particles
+      particleSize: 6, // Size of particles
+      fill: [150, 220, 255], // Particle color
+      animationSpeed: 2, // Speed of flow
+    });
+
+    const fp8 = this.animation.createShape("flowpath", {
+      startShape: n8,
+      endShape: n5,
+      pathStyle: "bezier",
+      curveIntensity: 0,
+      arrowEnd: false,
+      arrowSize: 8,
+      stroke: [100, 200, 250],
+      strokeWeight: 2,
+      flowParticles: 8, // Add flowing particles
+      particleSize: 6, // Size of particles
+      fill: [150, 220, 255], // Particle color
+      animationSpeed: 2, // Speed of flow
+    });
+
+    const fp9 = this.animation.createShape("flowpath", {
+      startShape: n1,
+      endShape: n8,
+      pathStyle: "bezier",
+      curveIntensity: 0,
+      arrowEnd: false,
+      arrowSize: 8,
+      stroke: [100, 200, 250],
+      strokeWeight: 2,
+      flowParticles: 8, // Add flowing particles
+      particleSize: 6, // Size of particles
+      fill: [150, 220, 255], // Particle color
+      animationSpeed: 2, // Speed of flow
+    });
+
+    const fp10 = this.animation.createShape("flowpath", {
+      startShape: n2,
+      endShape: n7,
+      pathStyle: "bezier",
+      curveIntensity: 0,
+      arrowEnd: false,
+      arrowSize: 8,
+      stroke: [100, 200, 250],
+      strokeWeight: 2,
+      flowParticles: 8, // Add flowing particles
+      particleSize: 6, // Size of particles
+      fill: [150, 220, 255], // Particle color
+      animationSpeed: 2, // Speed of flow
+    });
+
+    const fp11 = this.animation.createShape("flowpath", {
+      startShape: n3,
+      endShape: n6,
+      pathStyle: "bezier",
+      curveIntensity: 0,
+      arrowEnd: false,
+      arrowSize: 8,
+      stroke: [100, 200, 250],
+      strokeWeight: 2,
+      flowParticles: 8, // Add flowing particles
+      particleSize: 6, // Size of particles
+      fill: [150, 220, 255], // Particle color
+      animationSpeed: 2, // Speed of flow
+    });
+
+    const fp12 = this.animation.createShape("flowpath", {
+      startShape: n4,
+      endShape: n5,
+      pathStyle: "bezier",
+      curveIntensity: 0,
+      arrowEnd: false,
+      arrowSize: 8,
+      stroke: [100, 200, 250],
+      strokeWeight: 2,
+      flowParticles: 8, // Add flowing particles
+      particleSize: 6, // Size of particles
+      fill: [150, 220, 255], // Particle color
+      animationSpeed: 2, // Speed of flow
+    });
+
+    const data = this.animation.createShape("rectangle", {
+      x: n1.x + 50,
+      y: n1.y + 50,
+      height: 50,
+      width: 100,
+      cornerRadius: 10, 
+      fill: [255, 255, 255],
+      name: "",
+      visible :true
+    });
+
+    const data2 = this.animation.createShape("rectangle", {
+      x: n2.x + 50,
+      y: n2.y + 50,
+      height: 50,
+      width: 100,
+      cornerRadius: 10,
+      fill: [255, 255, 255],
+      name: "",
+      visible: false,
+    });
+
+    const data3 = this.animation.createShape("rectangle", {
+      x: n3.x + 50,
+      y: n3.y + 50,
+      height: 50,
+      width: 100,
+      cornerRadius: 10,
+      fill: [255, 255, 255],
+      name: "",
+      visible: false,
+    });
+
+    const data4 = this.animation.createShape("rectangle", {
+      x: n4.x + 50,
+      y: n4.y + 50,
+      height: 50,
+      width: 100,
+      cornerRadius: 10,
+      fill: [255, 255, 255],
+      name: "",
+      visible: false,
+    });
+
+    const data5 = this.animation.createShape("rectangle", {
+      x: n5.x + 50,
+      y: n5.y + 50,
+      height: 50,
+      width: 100,
+      cornerRadius: 10,
+      fill: [255, 255, 255],
+      name: "",
+      visible : false
+    });
+
+    const data6 = this.animation.createShape("rectangle", {
+      x: n6.x + 50,
+      y: n6.y + 50,
+      height: 50,
+      width: 100,
+      cornerRadius: 10,
+      fill: [255, 255, 255],
+      name: "",
+      visible: false,
+    });
+
+    const data7 = this.animation.createShape("rectangle", {
+      x: n7.x + 50,
+      y: n7.y + 50,
+      height: 50,
+      width: 100,
+      cornerRadius: 10,
+      fill: [255, 255, 255],
+      name: "",
+      visible: false,
+    });
+
+    const data8 = this.animation.createShape("rectangle", {
+      x: n8.x + 50,
+      y: n8.y + 50,
+      height: 50,
+      width: 100,
+      cornerRadius: 10,
+      fill: [255, 255, 255],
+      name: "",
+      visible: false,
+    });
+
+    this.animation.animateMultiple(data,{
+      text : [
+        {
+          frame : 0,
+          value : "1,2,3,4,5,6,7,8"
+        },
+        {
+          frame : 300,
+          value : "1,2,3,4"
+        },
+        {
+          frame : 600,
+          value : "1,4"
+        },
+        {
+          frame : 1200,
+          value : "1"
+        }
+      ]
+    });
+
+    this.animation.animateMultiple(data8,{
+      text : [
+        {
+          frame : 300,
+          value : "5,6,7,8"
+        },
+        {
+          frame : 600,
+          value : "5,8"
+        },
+        {
+          frame : 1200,
+          value : "8"
+        }
+      ],
+      visible : [
+        {
+          frame : 0,
+          value : false
+        },
+        {
+          frame : 300,
+          value : true
+        },
+        {
+          frame : 300,
+          value : true
+        }
+      ]
+    });
+
+    this.animation.animateMultiple(data2,{
+      text : [
+        {
+          frame : 600,
+          value : "2,3"
+        },
+        {
+          frame : 1200,
+          value : "2"
+        }
+      ],
+      visible : [
+        {
+          frame : 0,
+          value : false
+        },
+        {
+          frame : 600,
+          value : true
+        },
+        {
+          frame : 1200,
+          value : true
+        }
+      ]
+    });
+
+    this.animation.animateMultiple(data7,{
+      text : [
+        {
+          frame : 600,
+          value : "6,7"
+        },
+        {
+          frame : 1200,
+          value : "7"
+        }
+      ],
+      visible : [
+        {
+          frame : 0,
+          value : false
+        },
+        {
+          frame : 600,
+          value : true
+        },
+        {
+          frame : 1200,
+          value : true
+        },
+      ]
+    });
+
+
+    this.animation.animateMultiple(data5,{
+      text : [
+        {
+          frame : 1200,
+          value : "5"
+        }
+      ],
+      visible : [
+        {
+          frame : 0,
+          value : false
+        },
+        {
+          frame : 1200,
+          value : true
+        }
+      ]
+    });
+
+
+    this.animation.animateMultiple(data4,{
+      text : [
+        {
+          frame : 1200,
+          value : "4"
+        }
+      ],
+      visible : [
+        {
+          frame : 0,
+          value : false
+        },
+        {
+          frame : 1200,
+          value : true
+        }
+      ]
+    });
+
+
+    this.animation.animateMultiple(data3,{
+      text : [
+        {
+          frame : 1200,
+          value : "3"
+        }
+      ],
+      visible : [
+        {
+          frame : 0,
+          value : false
+        },
+        {
+          frame : 1200,
+          value : true
+        }
+      ]
+    });
+
+
+    this.animation.animateMultiple(data6,{
+      text : [
+        {
+          frame : 1200,
+          value : "6"
+        }
+      ],
+      visible : [
+        {
+          frame : 0,
+          value : false
+        },
+        {
+          frame : 1200,
+          value : true
+        }
+      ]
+    });
+
+
+
+    this.animation.reset();
+    this.animation.play(true);
   }
 }
