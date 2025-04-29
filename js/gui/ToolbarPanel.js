@@ -2,6 +2,9 @@ class ToolbarPanel {
   constructor(engine, gui) {
     this.engine = engine;
     this.gui = gui;
+    
+    // Add reference to the AnimationAPI
+    this.animation = new AnimationAPI(engine);
 
     // GUI folders
     this.toolsFolder = null;
@@ -117,7 +120,7 @@ class ToolbarPanel {
       .addColor(bgColorObj, "backgroundColor")
       .name("Canvas Color")
       .onChange((value) => {
-        this.engine.backgroundColor = color(value[0], value[1], value[2]);
+        this.animation.setBackgroundColor(value);
       });
 
     // Canvas size
@@ -182,8 +185,8 @@ class ToolbarPanel {
       fps: this.engine.timeline.fps,
       duration: this.engine.timeline.totalFrames / this.engine.timeline.fps,
       updateTimeline: () => {
-        this.engine.timeline.setFPS(timelineSettings.fps);
-        this.engine.timeline.setDuration(timelineSettings.duration);
+        this.animation.setFPS(timelineSettings.fps);
+        this.animation.setDuration(timelineSettings.duration);
       },
     };
 
@@ -214,7 +217,7 @@ class ToolbarPanel {
         if (
           confirm("Create new project? Current work will be lost if not saved.")
         ) {
-          this.engine.clearAll();
+          this.animation.clearAll();
         }
       },
     };
@@ -230,13 +233,37 @@ class ToolbarPanel {
   }
 
   saveProject() {
-    // In a full implementation, this would serialize the project state
-    alert("In a full implementation, this would save the project.");
+    this.animation.saveProject();
+    alert("Project saved successfully!");
   }
 
   loadProject() {
-    // In a full implementation, this would load a saved project
-    alert("In a full implementation, this would load a project.");
+    // Create an invisible file input element to handle file selection
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.json';
+    fileInput.style.display = 'none';
+    document.body.appendChild(fileInput);
+
+    fileInput.onchange = (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const projectData = JSON.parse(e.target.result);
+            this.animation.loadProject(projectData);
+            alert("Project loaded successfully!");
+          } catch (error) {
+            alert("Error loading project: " + error.message);
+          }
+        };
+        reader.readAsText(file);
+      }
+      document.body.removeChild(fileInput);
+    };
+
+    fileInput.click();
   }
 
   showExportOptions() {
@@ -261,16 +288,17 @@ class ToolbarPanel {
                 <label>Format:</label>
                 <select id="export-format" style="width:100%;padding:5px;margin-top:5px;background:#222;color:#fff;border:1px solid #444;">
                     <option value="gif">GIF</option>
-                    <option value="video">MP4 Video</option>
-                    <option value="sequence">PNG Sequence</option>
+                    <option value="mp4">MP4 Video</option>
+                    <option value="webm" selected>WebM Video</option>
+                    <option value="png">PNG Sequence</option>
                 </select>
             </div>
             <div style="margin-bottom:15px;">
                 <label>Quality:</label>
                 <select id="export-quality" style="width:100%;padding:5px;margin-top:5px;background:#222;color:#fff;border:1px solid #444;">
-                    <option value="low">Low</option>
-                    <option value="medium" selected>Medium</option>
-                    <option value="high">High</option>
+                    <option value="0.5">Low</option>
+                    <option value="0.8" selected>Medium</option>
+                    <option value="1.0">High</option>
                 </select>
             </div>
             <div style="margin-bottom:15px;">
@@ -297,7 +325,7 @@ class ToolbarPanel {
 
     document.getElementById("export-confirm").addEventListener("click", () => {
       const format = document.getElementById("export-format").value;
-      const quality = document.getElementById("export-quality").value;
+      const quality = parseFloat(document.getElementById("export-quality").value);
       const startFrame = parseInt(
         document.getElementById("export-start-frame").value
       );
@@ -305,10 +333,18 @@ class ToolbarPanel {
         document.getElementById("export-end-frame").value
       );
 
-      // In a full implementation, this would trigger the export process
-      alert(
-        `In a full implementation, this would export a ${format} animation from frame ${startFrame} to ${endFrame} at ${quality} quality.`
-      );
+      // Use AnimationAPI's export function
+      this.animation.export({
+        format: format,
+        quality: quality,
+        fps: this.engine.timeline.fps,
+        filename: `animation_${Date.now()}`
+      });
+      
+      // Set the desired frame range
+      this.engine.timeline.setFrame(startFrame);
+      
+      alert(`Exporting animation as ${format} from frame ${startFrame} to ${endFrame} at ${quality} quality.`);
 
       document.body.removeChild(exportDialog);
     });
@@ -362,9 +398,11 @@ class ToolbarPanel {
     let x = centerX + Math.random() * 100 - 50;
     let y = centerY + Math.random() * 100 - 50;
 
-    // Create the shape using UIManager's helper
-    const uiManager = this.engine.uiManager;
-    const newShape = uiManager.createShape(type, x, y);
+    // Create the shape using the AnimationAPI
+    const newShape = this.animation.createShape(type, {
+      x: x,
+      y: y
+    });
 
     // Select the new shape
     this.engine.selectObject(newShape);
@@ -398,91 +436,66 @@ class ToolbarPanel {
     }
   }
 
-  // Animation template methods
+  // Animation template methods using the AnimationAPI
   createBounceAnimation() {
     // Clear existing objects if user confirms
     if (confirm("This will create a new animation. Continue?")) {
-      this.engine.clearAll();
+      this.animation.clearAll();
 
       // Create a bouncing ball
-      const ball = this.createShape("circle");
-      ball.name = "Bouncing Ball";
-      ball.width = 80;
-      ball.fill = color(255, 100, 100);
-      ball.x = this.engine.canvasWidth / 2;
-      ball.y = 100;
+      const ball = this.animation.createShape("circle", {
+        x: this.engine.canvasWidth / 2,
+        y: 100,
+        size: 80,
+        fill: [255, 100, 100],
+        name: "Bouncing Ball"
+      });
 
-      // Set up keyframes for bouncing
-      if (!ball.keyframes) ball.keyframes = {};
-
-      // Y position keyframes for bouncing
-      ball.keyframes.y = [
+      // Create keyframes for bouncing
+      this.animation.animate(ball, "y", [
         { frame: 0, value: 100, easing: "easeInQuad" },
-        {
-          frame: 20,
-          value: this.engine.canvasHeight - 40,
-          easing: "easeOutBounce",
-        },
-        {
-          frame: 45,
-          value: this.engine.canvasHeight - 40,
-          easing: "easeInQuad",
-        },
+        { frame: 20, value: this.engine.canvasHeight - 40, easing: "easeOutBounce" },
+        { frame: 45, value: this.engine.canvasHeight - 40, easing: "easeInQuad" },
         { frame: 60, value: 200, easing: "easeOutQuad" },
-        {
-          frame: 75,
-          value: this.engine.canvasHeight - 40,
-          easing: "easeOutBounce",
-        },
-        {
-          frame: 90,
-          value: this.engine.canvasHeight - 40,
-          easing: "easeInQuad",
-        },
+        { frame: 75, value: this.engine.canvasHeight - 40, easing: "easeOutBounce" },
+        { frame: 90, value: this.engine.canvasHeight - 40, easing: "easeInQuad" },
         { frame: 105, value: 300, easing: "easeOutQuad" },
-        {
-          frame: 120,
-          value: this.engine.canvasHeight - 40,
-          easing: "easeOutBounce",
-        },
-      ];
+        { frame: 120, value: this.engine.canvasHeight - 40, easing: "easeOutBounce" }
+      ]);
 
       // Squash and stretch
-      ball.keyframes.width = [
+      this.animation.animate(ball, "width", [
         { frame: 0, value: 80, easing: "linear" },
         { frame: 19, value: 90, easing: "easeInCubic" },
         { frame: 20, value: 100, easing: "linear" },
         { frame: 22, value: 60, easing: "easeOutCubic" },
         { frame: 30, value: 80, easing: "easeInOutCubic" },
-
         { frame: 59, value: 80, easing: "linear" },
         { frame: 60, value: 90, easing: "easeInCubic" },
         { frame: 74, value: 90, easing: "easeInCubic" },
         { frame: 75, value: 100, easing: "linear" },
         { frame: 77, value: 60, easing: "easeOutCubic" },
         { frame: 85, value: 80, easing: "easeInOutCubic" },
-
         { frame: 104, value: 80, easing: "linear" },
         { frame: 105, value: 90, easing: "easeInCubic" },
         { frame: 119, value: 90, easing: "easeInCubic" },
         { frame: 120, value: 100, easing: "linear" },
         { frame: 122, value: 60, easing: "easeOutCubic" },
-        { frame: 130, value: 80, easing: "easeInOutCubic" },
-      ];
+        { frame: 130, value: 80, easing: "easeInOutCubic" }
+      ]);
 
-      // Create a shadow
-      const shadow = this.createShape("ellipse");
-      shadow.name = "Ball Shadow";
-      shadow.width = 100;
-      shadow.height = 20;
-      shadow.fill = color(0, 0, 0, 100);
-      shadow.x = this.engine.canvasWidth / 2;
-      shadow.y = this.engine.canvasHeight - 10;
+      // Create a shadow with the AnimationAPI
+      const shadow = this.animation.createShape("circle", {
+        x: this.engine.canvasWidth / 2,
+        y: this.engine.canvasHeight - 10,
+        width: 100,
+        height: 20,
+        fill: [0, 0, 0, 100],
+        name: "Ball Shadow"
+      });
 
       // Shadow animation
-      if (!shadow.keyframes) shadow.keyframes = {};
-
-      shadow.keyframes.width = [
+      this.animation.animate(shadow, "width", [
         { frame: 0, value: 60, easing: "linear" },
         { frame: 20, value: 100, easing: "easeOutQuad" },
         { frame: 45, value: 100, easing: "linear" },
@@ -490,433 +503,295 @@ class ToolbarPanel {
         { frame: 75, value: 90, easing: "easeOutQuad" },
         { frame: 90, value: 90, easing: "linear" },
         { frame: 105, value: 80, easing: "easeInOutQuad" },
-        { frame: 120, value: 85, easing: "easeOutQuad" },
-      ];
+        { frame: 120, value: 85, easing: "easeOutQuad" }
+      ]);
 
-      shadow.keyframes.opacity = [
+      this.animation.animate(shadow, "opacity", [
         { frame: 0, value: 150, easing: "linear" },
         { frame: 20, value: 100, easing: "easeOutQuad" },
         { frame: 60, value: 180, easing: "easeInQuad" },
         { frame: 75, value: 120, easing: "easeOutQuad" },
         { frame: 105, value: 150, easing: "easeInQuad" },
-        { frame: 120, value: 130, easing: "easeOutQuad" },
-      ];
+        { frame: 120, value: 130, easing: "easeOutQuad" }
+      ]);
 
       // Set object order
       this.engine.sendToBack(shadow);
       this.engine.bringToFront(ball);
 
       // Start the animation
-      this.engine.timeline.restart();
-      this.engine.play();
+      this.animation.reset();
+      this.animation.play();
     }
   }
 
   createTypingAnimation() {
     // Clear existing objects if user confirms
     if (confirm("This will create a new animation. Continue?")) {
-      this.engine.clearAll();
+      this.animation.clearAll();
 
-      // Create text object
-      const text = this.createShape("text");
-      text.name = "Typing Text";
-      text.text = "";
-      text.fontSize = 36;
-      text.fill = color(255, 255, 255);
-      text.x = this.engine.canvasWidth / 2;
-      text.y = this.engine.canvasHeight / 2;
+      // Create text object using the AnimationAPI
+      const text = this.animation.createShape("text", {
+        x: this.engine.canvasWidth / 2,
+        y: this.engine.canvasHeight / 2,
+        text: "",
+        fontSize: 36,
+        fill: [255, 255, 255],
+        name: "Typing Text"
+      });
 
-      // Final text content
-      const finalText = "Creating programmatic animations is fun!";
-
-      // Create keyframes for each character
-      if (!text.keyframes) text.keyframes = {};
-      text.keyframes.text = [];
-
-      for (let i = 0; i <= finalText.length; i++) {
-        text.keyframes.text.push({
-          frame: i * 3,
-          value: finalText.substring(0, i),
-          easing: "linear",
-        });
-      }
-
-      // Add a cursor
-      const cursor = this.createShape("rectangle");
-      cursor.name = "Cursor";
-      cursor.width = 3;
-      cursor.height = 36;
-      cursor.fill = color(255, 255, 255);
-      cursor.x = this.engine.canvasWidth / 2 + 5;
-      cursor.y = this.engine.canvasHeight / 2;
-
-      // Make cursor blink and follow text
-      if (!cursor.keyframes) cursor.keyframes = {};
-      cursor.keyframes.opacity = [];
-      cursor.keyframes.x = [];
-
-      // Cursor position follows text
-      for (let i = 0; i <= finalText.length; i++) {
-        // Calculate cursor X position based on text width
-        // For simplicity, we're approximating width based on character count
-        const textWidth = i * 20; // Rough approximation
-        cursor.keyframes.x.push({
-          frame: i * 3,
-          value: text.x - textWidth / 2 + textWidth + 5,
-          easing: "linear",
-        });
-      }
-
-      // Cursor blinking
-      for (let i = 0; i < 120; i += 10) {
-        cursor.keyframes.opacity.push(
-          { frame: i, value: 255, easing: "linear" },
-          { frame: i + 5, value: 0, easing: "linear" }
-        );
-      }
+      // Use the AnimationAPI's typeText method
+      this.animation.typeText(
+        text,
+        0,
+        "Creating programmatic animations is fun!",
+        80,
+        "linear",
+        {
+          cursor: true,
+          cursorChar: "|",
+          cursorBlinkRate: 15
+        }
+      );
 
       // Start the animation
-      this.engine.timeline.restart();
-      this.engine.play();
+      this.animation.reset();
+      this.animation.play();
     }
   }
 
   createFadeInOutAnimation() {
     // Clear existing objects if user confirms
     if (confirm("This will create a new animation. Continue?")) {
-      this.engine.clearAll();
+      this.animation.clearAll();
 
-      // Create a centered text with fade in/out animation
-      const text = this.createShape("text");
-      text.name = "Fading Text";
-      text.text = "FADE IN & OUT";
-      text.fontSize = 48;
-      text.fontFamily = "Arial";
-      text.textStyle = "bold";
-      text.fill = color(255, 255, 255);
-      text.x = this.engine.canvasWidth / 2;
-      text.y = this.engine.canvasHeight / 2;
+      // Create a background with the AnimationAPI
+      const bg = this.animation.createShape("rectangle", {
+        x: this.engine.canvasWidth / 2,
+        y: this.engine.canvasHeight / 2,
+        width: this.engine.canvasWidth,
+        height: this.engine.canvasHeight,
+        fill: [30, 30, 30],
+        name: "Background"
+      });
 
-      // Create fade keyframes
-      if (!text.keyframes) text.keyframes = {};
-      text.keyframes.opacity = [
-        { frame: 0, value: 0, easing: "linear" },
-        { frame: 30, value: 255, easing: "easeOutCubic" },
-        { frame: 60, value: 255, easing: "linear" },
-        { frame: 90, value: 0, easing: "easeInCubic" },
-      ];
+      // Create a centered text with the AnimationAPI
+      const text = this.animation.createShape("text", {
+        x: this.engine.canvasWidth / 2,
+        y: this.engine.canvasHeight / 2,
+        text: "FADE IN & OUT",
+        fontSize: 48,
+        fontFamily: "Arial",
+        textStyle: "bold",
+        fill: [255, 255, 255],
+        name: "Fading Text"
+      });
 
-      // Add subtle scaling
-      text.keyframes.fontSize = [
+      // Use the AnimationAPI's crossFade method
+      this.animation.fadeIn(text, 0, 30, "easeOutCubic");
+      this.animation.animate(text, "fontSize", [
         { frame: 0, value: 36, easing: "easeOutQuad" },
         { frame: 30, value: 48, easing: "easeOutQuad" },
         { frame: 60, value: 48, easing: "linear" },
-        { frame: 90, value: 54, easing: "easeInQuad" },
-      ];
-
-      // Create a background shape
-      const bg = this.createShape("rectangle");
-      bg.name = "Background";
-      bg.width = this.engine.canvasWidth;
-      bg.height = this.engine.canvasHeight;
-      bg.fill = color(30, 30, 30);
-      bg.x = this.engine.canvasWidth / 2;
-      bg.y = this.engine.canvasHeight / 2;
+        { frame: 90, value: 54, easing: "easeInQuad" }
+      ]);
+      this.animation.fadeOut(text, 60, 30, "easeInCubic");
 
       // Set object order
       this.engine.sendToBack(bg);
       this.engine.bringToFront(text);
 
       // Start the animation
-      this.engine.timeline.restart();
-      this.engine.play();
+      this.animation.reset();
+      this.animation.play();
     }
   }
 
   createParticleAnimation() {
     // Clear existing objects if user confirms
     if (confirm("This will create a new animation. Continue?")) {
-      this.engine.clearAll();
+      this.animation.clearAll();
 
       // Create a text that will explode into particles
-      const text = this.createShape("text");
-      text.name = "Exploding Text";
-      text.text = "BOOM!";
-      text.fontSize = 72;
-      text.fontFamily = "Impact";
-      text.fill = color(255, 100, 50);
-      text.x = this.engine.canvasWidth / 2;
-      text.y = this.engine.canvasHeight / 2;
+      const text = this.animation.createShape("text", {
+        x: this.engine.canvasWidth / 2,
+        y: this.engine.canvasHeight / 2,
+        text: "BOOM!",
+        fontSize: 72,
+        fontFamily: "Impact",
+        fill: [255, 100, 50],
+        name: "Exploding Text"
+      });
 
-      // Create keyframes for text
-      if (!text.keyframes) text.keyframes = {};
-      text.keyframes.fontSize = [
+      // Animate the text growing and then disappearing
+      this.animation.animate(text, "fontSize", [
         { frame: 0, value: 10, easing: "easeOutElastic" },
         { frame: 20, value: 72, easing: "easeOutElastic" },
         { frame: 45, value: 90, easing: "easeInBack" },
-        { frame: 50, value: 0, easing: "linear" },
-      ];
+        { frame: 50, value: 0, easing: "linear" }
+      ]);
 
-      // Create particle burst
-      const particleCount = 30;
-      const particles = [];
-
-      // Create particles that will appear after text explodes
-      for (let i = 0; i < particleCount; i++) {
-        const size = Math.random() * 20 + 5;
-        const particle = this.createShape("circle");
-        particle.name = `Particle ${i}`;
-        particle.width = size;
-        particle.fill = color(
-          Math.random() * 100 + 155,
-          Math.random() * 100,
-          Math.random() * 50
+      // Add a frame action to create particles after text explodes
+      this.animation.addFrameAction(50, () => {
+        // Create particle explosion using the AnimationAPI's particle system
+        this.animation.createParticleSystem(
+          this.engine.canvasWidth / 2,
+          this.engine.canvasHeight / 2,
+          30,
+          {
+            type: "circle",
+            size: 20,
+            sizeVariation: 10,
+            colorStart: [255, 100, 50],
+            colorEnd: [255, 255, 0],
+            duration: 70,
+            spread: 200,
+            gravity: 0.5,
+            startFrame: 50,
+            scaleDown: true
+          }
         );
-        particle.x = text.x;
-        particle.y = text.y;
-        particle.opacity = 0;
-
-        // Start particles invisible
-        if (!particle.keyframes) particle.keyframes = {};
-
-        // Random direction for each particle
-        const angle = Math.random() * Math.PI * 2;
-        const speed = Math.random() * 300 + 100;
-        const destX = text.x + Math.cos(angle) * speed;
-        const destY = text.y + Math.sin(angle) * speed;
-
-        // Opacity keyframes
-        particle.keyframes.opacity = [
-          { frame: 0, value: 0, easing: "linear" },
-          { frame: 50, value: 0, easing: "linear" },
-          { frame: 55, value: 255, easing: "linear" },
-          { frame: 85, value: 255, easing: "linear" },
-          { frame: 120, value: 0, easing: "easeInQuad" },
-        ];
-
-        // Position keyframes
-        particle.keyframes.x = [
-          { frame: 50, value: text.x, easing: "linear" },
-          { frame: 120, value: destX, easing: "easeOutCubic" },
-        ];
-
-        particle.keyframes.y = [
-          { frame: 50, value: text.y, easing: "linear" },
-          { frame: 120, value: destY, easing: "easeOutCubic" },
-        ];
-
-        // Size animation
-        particle.keyframes.width = [
-          { frame: 50, value: size, easing: "linear" },
-          { frame: 120, value: size * 0.2, easing: "easeInQuad" },
-        ];
-
-        particles.push(particle);
-      }
+      });
 
       // Start the animation
-      this.engine.timeline.restart();
-      this.engine.play();
+      this.animation.reset();
+      this.animation.play();
     }
   }
 
   createWaveAnimation() {
     // Clear existing objects if user confirms
     if (confirm("This will create a new animation. Continue?")) {
-      this.engine.clearAll();
+      this.animation.clearAll();
 
-      // Create a wave of circles
-      const circleCount = 12;
-      const circles = [];
+      // Create a group of circles in a circular arrangement using the AnimationAPI
+      const circleGroup = this.animation.createGroup(
+        12,
+        "circle",
+        {
+          centerX: this.engine.canvasWidth / 2,
+          centerY: this.engine.canvasHeight / 2,
+          radius: 150,
+          size: 30,
+          fill: [100, 200, 255]
+        },
+        "circle"
+      );
 
-      // Create circles
-      for (let i = 0; i < circleCount; i++) {
-        const circle = this.createShape("circle");
-        circle.name = `Wave Circle ${i + 1}`;
-        circle.width = 30;
-        circle.fill = color(100, 200, 255);
+      // Use the AnimationAPI's waveEffect to create a wave animation
+      this.animation.waveEffect(
+        circleGroup,
+        "width",
+        0,
+        120,
+        30,
+        60,
+        "easeInOutSine",
+        true
+      );
 
-        // Position in a circle
-        const angle = (i / circleCount) * Math.PI * 2;
-        const radius = 150;
-        circle.x = this.engine.canvasWidth / 2 + Math.cos(angle) * radius;
-        circle.y = this.engine.canvasHeight / 2 + Math.sin(angle) * radius;
+      // Create a center circle
+      const centerCircle = this.animation.createShape("circle", {
+        x: this.engine.canvasWidth / 2,
+        y: this.engine.canvasHeight / 2,
+        size: 60,
+        fill: [50, 100, 255],
+        name: "Center Circle"
+      });
 
-        // Create wave effect
-        if (!circle.keyframes) circle.keyframes = {};
-
-        // Wave scaling
-        circle.keyframes.width = [];
-
-        // Create oscillations
-        for (let frame = 0; frame <= 120; frame += 30) {
-          const offset = i * 5; // Staggered timing
-          circle.keyframes.width.push(
-            {
-              frame: (frame + offset) % 120,
-              value: 30,
-              easing: "easeInOutQuad",
-            },
-            {
-              frame: (frame + offset + 15) % 120,
-              value: 60,
-              easing: "easeInOutQuad",
-            }
-          );
-        }
-
-        // Sort keyframes by frame
-        circle.keyframes.width.sort((a, b) => a.frame - b.frame);
-
-        circles.push(circle);
-      }
-
-      // Create center object
-      const centerCircle = this.createShape("circle");
-      centerCircle.name = "Center Circle";
-      centerCircle.width = 60;
-      centerCircle.fill = color(50, 100, 255);
-      centerCircle.x = this.engine.canvasWidth / 2;
-      centerCircle.y = this.engine.canvasHeight / 2;
-
-      // Center circle animation
-      if (!centerCircle.keyframes) centerCircle.keyframes = {};
-      centerCircle.keyframes.width = [
-        { frame: 0, value: 60, easing: "easeInOutQuad" },
-        { frame: 30, value: 80, easing: "easeInOutQuad" },
-        { frame: 60, value: 60, easing: "easeInOutQuad" },
-        { frame: 90, value: 80, easing: "easeInOutQuad" },
-        { frame: 120, value: 60, easing: "easeInOutQuad" },
-      ];
-
-      centerCircle.keyframes.rotation = [
-        { frame: 0, value: 0, easing: "linear" },
-        { frame: 120, value: 360, easing: "linear" },
-      ];
+      // Use the AnimationAPI to spin the center circle
+      this.animation.spin(centerCircle, 0, 120, 1, true, "linear");
+      
+      // Pulse the center circle
+      this.animation.pulse(centerCircle, 0, 2, 120, 0.8, 1.2);
 
       // Start the animation
-      this.engine.timeline.restart();
-      this.engine.play();
+      this.animation.reset();
+      this.animation.play();
     }
   }
 
   createLogoRevealAnimation() {
     // Clear existing objects if user confirms
     if (confirm("This will create a new animation. Continue?")) {
-      this.engine.clearAll();
+      this.animation.clearAll();
 
-      // Create rectangle elements for a logo
-      const parts = [];
+      // Define logo parts colors
       const colors = [
-        color(50, 100, 200),
-        color(60, 160, 220),
-        color(70, 180, 240),
-        color(80, 200, 255),
+        [50, 100, 200],
+        [60, 160, 220],
+        [70, 180, 240],
+        [80, 200, 255]
       ];
 
-      // Create logo shape with multiple parts
+      // Create a group of rectangles for the logo
+      const parts = [];
       for (let i = 0; i < 4; i++) {
-        const rect = this.createShape("rectangle");
-        rect.name = `Logo Part ${i + 1}`;
-        rect.width = 80;
-        rect.height = 80;
-        rect.x = this.engine.canvasWidth / 2 - 120 + i * 80;
-        rect.y = this.engine.canvasHeight / 2;
-        rect.cornerRadius = 10;
-        rect.fill = colors[i];
-        rect.opacity = 0;
-        rect.rotation = 45;
-
-        // Create animation
-        if (!rect.keyframes) rect.keyframes = {};
-
-        const delay = i * 5;
-        rect.keyframes.opacity = [
-          { frame: 0 + delay, value: 0, easing: "linear" },
-          { frame: 15 + delay, value: 255, easing: "easeOutQuad" },
-        ];
-
-        rect.keyframes.rotation = [
-          { frame: 0 + delay, value: 45, easing: "easeOutBack" },
-          { frame: 20 + delay, value: 0, easing: "easeOutBack" },
-        ];
-
-        rect.keyframes.y = [
-          {
-            frame: 0 + delay,
-            value: this.engine.canvasHeight / 2 - 100,
-            easing: "easeOutBack",
-          },
-          {
-            frame: 20 + delay,
-            value: this.engine.canvasHeight / 2,
-            easing: "easeOutBack",
-          },
-        ];
-
+        const rect = this.animation.createShape("rectangle", {
+          x: this.engine.canvasWidth / 2 - 120 + i * 80,
+          y: this.engine.canvasHeight / 2 - 100, // Start above final position
+          width: 80,
+          height: 80,
+          cornerRadius: 10,
+          fill: colors[i],
+          opacity: 0,
+          rotation: 45,
+          name: `Logo Part ${i + 1}`
+        });
+        
         parts.push(rect);
       }
-
-      // Add text
-      const text = this.createShape("text");
-      text.name = "Logo Text";
-      text.text = "ANIMATOR";
-      text.fontSize = 48;
-      text.fontFamily = "Arial";
-      text.textStyle = "bold";
-      text.fill = color(255, 255, 255);
-      text.x = this.engine.canvasWidth / 2;
-      text.y = this.engine.canvasHeight / 2 + 100;
-      text.opacity = 0;
-
-      // Text animation
-      if (!text.keyframes) text.keyframes = {};
-      text.keyframes.opacity = [
-        { frame: 25, value: 0, easing: "linear" },
-        { frame: 40, value: 255, easing: "easeOutQuad" },
-      ];
-
-      text.keyframes.y = [
-        {
-          frame: 25,
-          value: this.engine.canvasHeight / 2 + 150,
-          easing: "easeOutQuad",
-        },
-        {
-          frame: 50,
-          value: this.engine.canvasHeight / 2 + 100,
-          easing: "easeOutQuad",
-        },
-      ];
-
-      // Create final combined animation
+      
+      // Create staggered animation for logo parts
       for (let i = 0; i < parts.length; i++) {
         const part = parts[i];
-
-        // Add scale bounce at the end
-        part.keyframes.width.push(
-          { frame: 60, value: 80, easing: "easeInQuad" },
-          { frame: 70, value: 100, easing: "easeOutBack" },
-          { frame: 80, value: 80, easing: "easeInOutQuad" }
-        );
-
-        part.keyframes.height.push(
-          { frame: 60, value: 80, easing: "easeInQuad" },
-          { frame: 70, value: 100, easing: "easeOutBack" },
-          { frame: 80, value: 80, easing: "easeInOutQuad" }
-        );
+        const delay = i * 5;
+        
+        // Fade in, rotate and move down
+        this.animation.fadeIn(part, delay, 15, "easeOutQuad");
+        
+        this.animation.animate(part, "rotation", [
+          { frame: delay, value: 45, easing: "easeOutBack" },
+          { frame: 20 + delay, value: 0, easing: "easeOutBack" }
+        ]);
+        
+        this.animation.animate(part, "y", [
+          { frame: delay, value: this.engine.canvasHeight / 2 - 100, easing: "easeOutBack" },
+          { frame: 20 + delay, value: this.engine.canvasHeight / 2, easing: "easeOutBack" }
+        ]);
+        
+        // Add bounce effect at the end
+        this.animation.pulse(part, 60 + delay, 1, 20, 0.8, 1.2, "easeOutBack");
       }
-
-      // Text final animation
-      text.keyframes.fontSize.push(
-        { frame: 60, value: 48, easing: "easeInQuad" },
-        { frame: 70, value: 52, easing: "easeOutQuad" },
-        { frame: 80, value: 48, easing: "easeInOutQuad" }
-      );
-
+      
+      // Add text using the AnimationAPI
+      const text = this.animation.createShape("text", {
+        x: this.engine.canvasWidth / 2,
+        y: this.engine.canvasHeight / 2 + 150, // Start below final position
+        text: "ANIMATOR",
+        fontSize: 48,
+        fontFamily: "Arial",
+        textStyle: "bold",
+        fill: [255, 255, 255],
+        opacity: 0,
+        name: "Logo Text"
+      });
+      
+      // Animate the text
+      this.animation.fadeIn(text, 25, 15, "easeOutQuad");
+      
+      this.animation.animate(text, "y", [
+        { frame: 25, value: this.engine.canvasHeight / 2 + 150, easing: "easeOutQuad" },
+        { frame: 50, value: this.engine.canvasHeight / 2 + 100, easing: "easeOutQuad" }
+      ]);
+      
+      // Add text pulse
+      this.animation.pulse(text, 60, 1, 20, 0.95, 1.08, "easeInOutQuad");
+      
       // Start the animation
-      this.engine.timeline.restart();
-      this.engine.play();
+      this.animation.reset();
+      this.animation.play();
     }
   }
 }
+    

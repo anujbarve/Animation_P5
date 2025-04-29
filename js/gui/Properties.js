@@ -8,6 +8,7 @@ class PropertiesPanel {
         this.shapeFolder = null;
         this.styleFolder = null;
         this.animationFolder = null;
+        this.presetsFolder = null; // Add this line
         
         // GUI controllers
         this.controllers = {
@@ -95,6 +96,17 @@ class PropertiesPanel {
             this.animationFolder.remove(this.controllers.animation[key]);
         }
         this.controllers.animation = {};
+        
+        // Remove the presets folder if it exists
+        if (this.presetsFolder) {
+            try {
+                this.animationFolder.removeFolder(this.presetsFolder);
+            } catch (e) {
+                // In case there's an issue removing the folder
+                console.warn('Could not remove presets folder:', e);
+            }
+            this.presetsFolder = null;
+        }
     }
     
     addShapeControllers() {
@@ -267,7 +279,18 @@ class PropertiesPanel {
         const obj = this.engine.selectedObject;
         if (!obj) return;
         
-        const presetsFolder = this.animationFolder.addFolder('Animation Presets');
+        // Remove existing presets folder if it exists
+        if (this.presetsFolder) {
+            try {
+                this.animationFolder.removeFolder(this.presetsFolder);
+            } catch (e) {
+                // In case there's an issue removing the folder
+                console.warn('Could not remove presets folder:', e);
+            }
+        }
+        
+        // Create new presets folder
+        this.presetsFolder = this.animationFolder.addFolder('Animation Presets');
         
         const presets = {
             fadeIn: () => {
@@ -327,7 +350,7 @@ class PropertiesPanel {
         };
         
         for (const [name, action] of Object.entries(presets)) {
-            presetsFolder.add({ [name]: action }, name);
+            this.presetsFolder.add({ [name]: action }, name);
         }
     }
     

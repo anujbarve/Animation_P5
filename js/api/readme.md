@@ -1,853 +1,1421 @@
 # AnimationAPI Documentation
 
-The `AnimationAPI` provides a high-level interface for creating and manipulating animations programmatically in the p5.js Animation Platform. This API simplifies the process of creating complex animations with minimal code.
+An extensive JavaScript animation library for creating and manipulating animated shapes and effects in a canvas environment.
 
 ## Table of Contents
-- [Basic Usage](#basic-usage)
-- [Creating Shapes](#creating-shapes)
-- [Animation Methods](#animation-methods)
-- [Special Effects](#special-effects)
-- [Group Animations](#group-animations)
-- [Playback Control](#playback-control)
-- [Examples](#examples)
 
-## Basic Usage
+- [AnimationAPI Documentation](#animationapi-documentation)
+  - [Table of Contents](#table-of-contents)
+  - [Constructor](#constructor)
+  - [Shape Management](#shape-management)
+    - [createShape](#createshape)
+  - [Basic Animation](#basic-animation)
+    - [animate](#animate)
+    - [animateMultiple](#animatemultiple)
+    - [clearAnimation](#clearanimation)
+    - [clearAllAnimations](#clearallanimations)
+  - [Movement Animations](#movement-animations)
+    - [moveFromTo](#movefromto)
+    - [moveTo](#moveto)
+    - [followPath](#followpath)
+  - [Transformation Animations](#transformation-animations)
+    - [scale](#scale)
+    - [scaleTo](#scaleto)
+    - [rotate](#rotate)
+    - [spin](#spin)
+    - [morph](#morph)
+  - [Visual Effects](#visual-effects)
+    - [fadeIn](#fadein)
+    - [fadeOut](#fadeout)
+    - [crossFade](#crossfade)
+    - [pulse](#pulse)
+    - [colorCycle](#colorcycle)
+    - [flash](#flash)
+    - [transition](#transition)
+  - [Particle Systems](#particle-systems)
+    - [createParticleSystem](#createparticlesystem)
+    - [createEmitter](#createemitter)
+  - [Camera Effects](#camera-effects)
+    - [cameraShake](#camerashake)
+    - [zoom](#zoom)
+  - [Group Animations](#group-animations)
+    - [createGroup](#creategroup)
+    - [animateGroup](#animategroup)
+    - [animateGroupMultiple](#animategroupmultiple)
+    - [waveEffect](#waveeffect)
+    - [pulseGroup](#pulsegroup)
+  - [Text Animations](#text-animations)
+    - [typeText](#typetext)
+  - [Sequence Management](#sequence-management)
+    - [defineSequence](#definesequence)
+    - [applySequence](#applysequence)
+    - [applyPreset](#applypreset)
+    - [addFrameAction](#addframeaction)
+  - [Playback Controls](#playback-controls)
+    - [play](#play)
+    - [pause](#pause)
+    - [reset](#reset)
+    - [setDuration](#setduration)
+    - [setFPS](#setfps)
+    - [clearAll](#clearall)
+  - [Project Management](#project-management)
+    - [export](#export)
+    - [saveProject](#saveproject)
+    - [loadProject](#loadproject)
+    - [setBackgroundColor](#setbackgroundcolor)
+  - [Advanced Usage Examples](#advanced-usage-examples)
+    - [Creating and Animating a Simple Shape](#creating-and-animating-a-simple-shape)
+    - [Creating a Particle Effect](#creating-a-particle-effect)
+    - [Creating a Complex Scene with Camera Effects](#creating-a-complex-scene-with-camera-effects)
+- [AnimationAPI Documentation (Continued)](#animationapi-documentation-continued)
+  - [Advanced Usage Examples (Continued)](#advanced-usage-examples-continued)
+    - [Creating and Animating a Group](#creating-and-animating-a-group)
+    - [Morphing Between Shapes](#morphing-between-shapes)
+    - [Creating Text Animation](#creating-text-animation)
+    - [Using Custom Animation Sequences](#using-custom-animation-sequences)
+    - [Creating a Complex Transition](#creating-a-complex-transition)
+    - [Using Particle Systems for Special Effects](#using-particle-systems-for-special-effects)
+    - [Creating Camera Effects](#creating-camera-effects)
+  - [Best Practices](#best-practices)
+    - [Performance Optimization](#performance-optimization)
+    - [Animation Timing](#animation-timing)
+    - [Code Organization](#code-organization)
+  - [Troubleshooting](#troubleshooting)
+    - [Common Issues](#common-issues)
+    - [Debugging Tools](#debugging-tools)
+  - [Integration with Other Systems](#integration-with-other-systems)
+
+## Constructor
 
 ```javascript
-// Create a new animation API instance
-const animAPI = new AnimationAPI(engine);
-
-// Clear any existing objects
-animAPI.clearAll();
-
-// Create a circle
-const circle = animAPI.createShape('circle', {
-    x: 400,
-    y: 300,
-    size: 100,
-    fill: color(255, 0, 0)
-});
-
-// Add a horizontal movement animation
-animAPI.animate(circle, 'x', [
-    {frame: 0, value: 400},
-    {frame: 60, value: 600, easing: 'easeInOutQuad'},
-    {frame: 120, value: 400, easing: 'easeInOutQuad'}
-]);
-
-// Play the animation
-animAPI.play();
+const animation = new AnimationAPI(engine);
 ```
 
-## Creating Shapes
-
-### createShape(type, props)
-Creates a new shape with the specified properties and adds it to the animation engine.
+Initializes a new AnimationAPI instance with the specified rendering engine.
 
 **Parameters:**
-- `type` (String): Shape type: 'circle', 'rectangle', 'text', or 'path'
-- `props` (Object): Properties for the shape
+- `engine`: The rendering engine that will handle the animation
 
-**Returns:** The created shape object
+## Shape Management
 
-**Common Props for All Shapes:**
-- `x` (Number): X position (defaults to canvas center)
-- `y` (Number): Y position (defaults to canvas center)
-- `fill` (p5.Color): Fill color
-- `stroke` (p5.Color): Stroke color
-- `strokeWeight` (Number): Stroke thickness
-- `opacity` (Number): Opacity (0-255)
-- `rotation` (Number): Rotation in degrees
-- `name` (String): Identifying name for the shape
+### createShape
 
-**Shape-Specific Props:**
+```javascript
+const shape = animation.createShape(type, props);
+```
 
-Circle:
-- `size` (Number): Diameter of the circle (defaults to 100)
+Creates a new shape of the specified type with the given properties.
 
-Rectangle:
-- `width` (Number): Width of rectangle (defaults to 100)
-- `height` (Number): Height of rectangle (defaults to 80)
-- `cornerRadius` (Number): Corner radius for rounded rectangles
+**Parameters:**
+- `type`: Type of shape to create ("circle", "rectangle", "rect", "text", "path")
+- `props`: Object containing properties for the shape
 
-Text:
-- `text` (String): Text content (defaults to "Text")
-- `fontSize` (Number): Font size
-- `fontFamily` (String): Font family
-
-Path:
-- `points` (Array): Array of {x, y} points
-- `closed` (Boolean): Whether the path is closed
+**Returns:** The created shape
 
 **Example:**
 ```javascript
-// Create a rounded rectangle
-const rect = animAPI.createShape('rectangle', {
-    x: 400,
-    y: 300,
-    width: 200,
-    height: 100,
-    cornerRadius: 20,
-    fill: color(100, 150, 255),
-    name: "My Rectangle"
+const circle = animation.createShape("circle", {
+  x: 100,
+  y: 100,
+  size: 50,
+  fill: [255, 0, 0]
 });
 ```
 
-## Animation Methods
+**Common Properties:**
+- `x`, `y`: Position coordinates
+- `fill`: Fill color (string, array, or color object)
+- `stroke`: Stroke color
+- `strokeWeight`: Width of stroke
+- `opacity`: Transparency (0-255)
+- `rotation`: Rotation in degrees
+- `visible`: Whether the shape is visible
 
-### animate(shape, property, keyframes, easingType)
-Animates a property of a shape using multiple keyframes.
+**Shape-Specific Properties:**
+- Circle: `size` or `diameter`
+- Rectangle: `width`, `height`, `cornerRadius`
+- Text: `text`, `fontSize`, `fontFamily`, `textAlign`, `textStyle`
+- Path: `points` (array of {x, y} coordinates), `closed` (boolean)
+
+## Basic Animation
+
+### animate
+
+```javascript
+animation.animate(shape, property, keyframes, easingType);
+```
+
+Animates a property of a shape with multiple keyframes.
 
 **Parameters:**
-- `shape` (Object): The shape to animate
-- `property` (String): Property name to animate (e.g., 'x', 'y', 'rotation', 'width')
-- `keyframes` (Array): Array of keyframe objects {frame, value, easing}
-- `easingType` (String, optional): Default easing function (defaults to 'easeInOutCubic')
+- `shape`: Shape to animate
+- `property`: Property to animate (e.g., "x", "y", "opacity")
+- `keyframes`: Array of keyframe objects `{frame, value, easing}`
+- `easingType`: Default easing type (e.g., "easeInOutCubic")
 
-**Returns:** The shape object (for chaining)
+**Returns:** The shape for chaining
 
 **Example:**
 ```javascript
-animAPI.animate(circle, 'x', [
-    {frame: 0, value: 100},
-    {frame: 30, value: 500, easing: 'easeOutQuad'},
-    {frame: 60, value: 300, easing: 'easeInQuad'}
-]);
+animation.animate(circle, "opacity", [
+  { frame: 0, value: 0 },
+  { frame: 30, value: 255 },
+  { frame: 60, value: 0 }
+], "easeInOutQuad");
 ```
 
-### fadeIn(shape, startFrame, duration, easing)
+### animateMultiple
+
+```javascript
+animation.animateMultiple(shape, propertyMap, defaultEasing);
+```
+
+Animates multiple properties of a shape at once.
+
+**Parameters:**
+- `shape`: Shape to animate
+- `propertyMap`: Object mapping properties to keyframe arrays
+- `defaultEasing`: Default easing type for all animations
+
+**Returns:** The shape for chaining
+
+**Example:**
+```javascript
+animation.animateMultiple(circle, {
+  "x": [
+    { frame: 0, value: 100 },
+    { frame: 60, value: 300 }
+  ],
+  "y": [
+    { frame: 0, value: 100 },
+    { frame: 60, value: 200 }
+  ]
+}, "easeOutQuad");
+```
+
+### clearAnimation
+
+```javascript
+animation.clearAnimation(shape, property);
+```
+
+Removes all keyframes for a property.
+
+**Parameters:**
+- `shape`: Shape to modify
+- `property`: Property to clear animations for
+
+**Returns:** The shape for chaining
+
+### clearAllAnimations
+
+```javascript
+animation.clearAllAnimations(shape);
+```
+
+Clears all animations on a shape.
+
+**Parameters:**
+- `shape`: Shape to clear animations from
+
+**Returns:** The shape for chaining
+
+## Movement Animations
+
+### moveFromTo
+
+```javascript
+animation.moveFromTo(shape, startFrame, endFrame, fromX, fromY, toX, toY, easing);
+```
+
+Moves a shape from one position to another.
+
+**Parameters:**
+- `shape`: Shape to animate
+- `startFrame`: Starting frame
+- `endFrame`: Ending frame
+- `fromX`: Start X position
+- `fromY`: Start Y position
+- `toX`: End X position
+- `toY`: End Y position
+- `easing`: Easing function (default: "easeInOutCubic")
+
+**Returns:** The shape for chaining
+
+### moveTo
+
+```javascript
+animation.moveTo(shape, startFrame, duration, toX, toY, easing);
+```
+
+Moves a shape from its current position to a target position.
+
+**Parameters:**
+- `shape`: Shape to animate
+- `startFrame`: Starting frame
+- `duration`: Duration in frames
+- `toX`: Target X position
+- `toY`: Target Y position
+- `easing`: Easing function (default: "easeInOutCubic")
+
+**Returns:** The shape for chaining
+
+### followPath
+
+```javascript
+animation.followPath(shape, path, startFrame, endFrame, easing, orientToPath);
+```
+
+Makes a shape follow a path.
+
+**Parameters:**
+- `shape`: Shape to animate
+- `path`: Array of points `{x, y}`
+- `startFrame`: Starting frame
+- `endFrame`: Ending frame
+- `easing`: Easing function (default: "linear")
+- `orientToPath`: Whether the shape should rotate to follow the path (default: false)
+
+**Returns:** The shape for chaining
+
+## Transformation Animations
+
+### scale
+
+```javascript
+animation.scale(shape, startFrame, endFrame, fromScale, toScale, easing);
+```
+
+Scales a shape.
+
+**Parameters:**
+- `shape`: Shape to animate
+- `startFrame`: Starting frame
+- `endFrame`: Ending frame
+- `fromScale`: Starting scale factor
+- `toScale`: Ending scale factor
+- `easing`: Easing function (default: "easeInOutQuad")
+
+**Returns:** The shape for chaining
+
+### scaleTo
+
+```javascript
+animation.scaleTo(shape, startFrame, duration, targetWidth, targetHeight, easing);
+```
+
+Scales a shape to specific dimensions.
+
+**Parameters:**
+- `shape`: Shape to animate
+- `startFrame`: Starting frame
+- `duration`: Duration in frames
+- `targetWidth`: Target width
+- `targetHeight`: Target height (optional, maintains aspect ratio if not specified)
+- `easing`: Easing function (default: "easeInOutQuad")
+
+**Returns:** The shape for chaining
+
+### rotate
+
+```javascript
+animation.rotate(shape, startFrame, endFrame, fromAngle, toAngle, easing);
+```
+
+Rotates a shape from one angle to another.
+
+**Parameters:**
+- `shape`: Shape to animate
+- `startFrame`: Starting frame
+- `endFrame`: Ending frame
+- `fromAngle`: Starting angle in degrees
+- `toAngle`: Ending angle in degrees
+- `easing`: Easing function (default: "easeInOutCubic")
+
+**Returns:** The shape for chaining
+
+### spin
+
+```javascript
+animation.spin(shape, startFrame, duration, revolutions, clockwise, easing);
+```
+
+Creates a continuous rotation animation.
+
+**Parameters:**
+- `shape`: Shape to animate
+- `startFrame`: Starting frame
+- `duration`: Duration in frames
+- `revolutions`: Number of full revolutions (default: 1)
+- `clockwise`: Direction of rotation (default: true)
+- `easing`: Easing function (default: "linear")
+
+**Returns:** The shape for chaining
+
+### morph
+
+```javascript
+animation.morph(fromShape, toShape, startFrame, duration, easing);
+```
+
+Creates a morph animation between two shapes.
+
+**Parameters:**
+- `fromShape`: Starting shape
+- `toShape`: Target shape
+- `startFrame`: Starting frame
+- `duration`: Duration in frames
+- `easing`: Easing function (default: "easeInOutCubic")
+
+**Returns:** The morphed shape
+
+## Visual Effects
+
+### fadeIn
+
+```javascript
+animation.fadeIn(shape, startFrame, duration, easing);
+```
+
 Creates a fade-in animation.
 
 **Parameters:**
-- `shape` (Object): The shape to fade in
-- `startFrame` (Number, optional): Starting frame (defaults to 0)
-- `duration` (Number, optional): Duration in frames (defaults to 30)
-- `easing` (String, optional): Easing function (defaults to 'easeOutCubic')
+- `shape`: Shape to animate
+- `startFrame`: Starting frame (default: 0)
+- `duration`: Duration in frames (default: 30)
+- `easing`: Easing function (default: "easeOutCubic")
 
-**Returns:** The shape object (for chaining)
+**Returns:** The shape for chaining
 
-### fadeOut(shape, startFrame, duration, easing)
+### fadeOut
+
+```javascript
+animation.fadeOut(shape, startFrame, duration, easing);
+```
+
 Creates a fade-out animation.
 
 **Parameters:**
-- `shape` (Object): The shape to fade out
-- `startFrame` (Number): Starting frame
-- `duration` (Number, optional): Duration in frames (defaults to 30)
-- `easing` (String, optional): Easing function (defaults to 'easeInCubic')
+- `shape`: Shape to animate
+- `startFrame`: Starting frame
+- `duration`: Duration in frames (default: 30)
+- `easing`: Easing function (default: "easeInCubic")
 
-**Returns:** The shape object (for chaining)
+**Returns:** The shape for chaining
 
-### moveFromTo(shape, startFrame, endFrame, fromX, fromY, toX, toY, easing)
-Animates a shape from one position to another.
+### crossFade
 
-**Parameters:**
-- `shape` (Object): The shape to move
-- `startFrame` (Number): Starting frame
-- `endFrame` (Number): Ending frame
-- `fromX` (Number): Starting X position
-- `fromY` (Number): Starting Y position
-- `toX` (Number): Ending X position
-- `toY` (Number): Ending Y position
-- `easing` (String, optional): Easing function (defaults to 'easeInOutCubic')
+```javascript
+animation.crossFade(shapeOut, shapeIn, startFrame, duration, easing);
+```
 
-**Returns:** The shape object (for chaining)
-
-### scale(shape, startFrame, endFrame, fromScale, toScale, easing)
-Creates a scaling animation.
+Creates a cross-fade between two shapes.
 
 **Parameters:**
-- `shape` (Object): The shape to scale
-- `startFrame` (Number): Starting frame
-- `endFrame` (Number): Ending frame
-- `fromScale` (Number): Starting scale
-- `toScale` (Number): Ending scale
-- `easing` (String, optional): Easing function (defaults to 'easeInOutQuad')
+- `shapeOut`: Shape to fade out
+- `shapeIn`: Shape to fade in
+- `startFrame`: Starting frame
+- `duration`: Duration in frames (default: 30)
+- `easing`: Easing function (default: "easeInOutCubic")
 
-**Returns:** The shape object (for chaining)
+**Returns:** Array of the two shapes
 
-### rotate(shape, startFrame, endFrame, fromAngle, toAngle, easing)
-Animates the rotation of a shape.
+### pulse
 
-**Parameters:**
-- `shape` (Object): The shape to rotate
-- `startFrame` (Number): Starting frame
-- `endFrame` (Number): Ending frame
-- `fromAngle` (Number): Starting angle in degrees
-- `toAngle` (Number): Ending angle in degrees
-- `easing` (String, optional): Easing function (defaults to 'easeInOutCubic')
+```javascript
+animation.pulse(shape, startFrame, count, duration, minScale, maxScale, easing);
+```
 
-**Returns:** The shape object (for chaining)
-
-### followPath(shape, path, startFrame, endFrame, easing)
-Makes a shape follow a path animation.
+Creates a pulsing animation (scale up and down).
 
 **Parameters:**
-- `shape` (Object): The shape to animate
-- `path` (Array): Array of {x, y} points defining the path
-- `startFrame` (Number): Starting frame
-- `endFrame` (Number): Ending frame
-- `easing` (String, optional): Easing function (defaults to 'linear')
+- `shape`: Shape to animate
+- `startFrame`: Starting frame
+- `count`: Number of pulses (default: 3)
+- `duration`: Duration in frames (default: 60)
+- `minScale`: Minimum scale factor (default: 0.8)
+- `maxScale`: Maximum scale factor (default: 1.2)
+- `easing`: Easing function (default: "easeInOutQuad")
 
-**Returns:** The shape object (for chaining)
+**Returns:** The shape for chaining
 
-## Special Effects
+### colorCycle
 
-### pulse(shape, startFrame, count, duration, minScale, maxScale, easing)
-Creates a pulsing animation that scales up and down.
+```javascript
+animation.colorCycle(shape, startFrame, duration, colors, property, easing);
+```
 
-**Parameters:**
-- `shape` (Object): The shape to pulse
-- `startFrame` (Number): Starting frame
-- `count` (Number, optional): Number of pulses (defaults to 3)
-- `duration` (Number, optional): Total duration in frames (defaults to 60)
-- `minScale` (Number, optional): Minimum scale factor (defaults to 0.8)
-- `maxScale` (Number, optional): Maximum scale factor (defaults to 1.2)
-- `easing` (String, optional): Easing function (defaults to 'easeInOutQuad')
-
-**Returns:** The shape object (for chaining)
-
-### typeText(textObj, startFrame, text, duration, easing)
-Creates a typing animation for text objects.
+Creates a color cycling animation.
 
 **Parameters:**
-- `textObj` (Text): The text object to animate
-- `startFrame` (Number): Starting frame
-- `text` (String): The text to type
-- `duration` (Number, optional): Duration in frames (defaults to 60)
-- `easing` (String, optional): Easing function (defaults to 'linear')
+- `shape`: Shape to animate
+- `startFrame`: Starting frame
+- `duration`: Duration in frames
+- `colors`: Array of colors to cycle through
+- `property`: Property to animate ('fill' or 'stroke', default: 'fill')
+- `easing`: Easing function (default: "linear")
 
-**Returns:** The text object (for chaining)
+**Returns:** The shape for chaining
 
-### createParticleSystem(x, y, count, options)
-Creates a particle system at the specified position.
+### flash
+
+```javascript
+animation.flash(startFrame, count, duration, color);
+```
+
+Creates a flashing effect (for lightning, etc.).
 
 **Parameters:**
-- `x` (Number): X position of the particle emitter
-- `y` (Number): Y position of the particle emitter
-- `count` (Number, optional): Number of particles (defaults to 20)
-- `options` (Object, optional): Configuration options:
-  - `type` (String): Particle shape type (defaults to 'circle')
-  - `size` (Number): Particle size (defaults to 10)
-  - `color` (Array): RGB color array (defaults to [255, 255, 255])
-  - `duration` (Number): Animation duration (defaults to 60)
-  - `spread` (Number): Maximum distance particles travel (defaults to 200)
-  - `easing` (String): Movement easing (defaults to 'easeOutCubic')
-  - `scaleDown` (Boolean): Whether particles should shrink (defaults to false)
+- `startFrame`: Starting frame
+- `count`: Number of flashes (default: 1)
+- `duration`: Duration in frames (default: 10)
+- `color`: Flash color (default: [255, 255, 255])
+
+**Returns:** The flash object
+
+### transition
+
+```javascript
+animation.transition(startFrame, duration, type, options);
+```
+
+Creates a scene transition effect.
+
+**Parameters:**
+- `startFrame`: Starting frame
+- `duration`: Duration in frames
+- `type`: Transition type ('fade', 'wipe', 'iris', 'dissolve', default: 'fade')
+- `options`: Transition options (color, direction, onTransition callback)
+
+**Returns:** The transition shape
+
+## Particle Systems
+
+### createParticleSystem
+
+```javascript
+animation.createParticleSystem(x, y, count, options);
+```
+
+Creates a particle system.
+
+**Parameters:**
+- `x`: X position of emitter
+- `y`: Y position of emitter
+- `count`: Number of particles (default: 20)
+- `options`: Particle system options
+
+**Options:**
+- `type`: Type of particles (default: "circle")
+- `size`: Particle size (default: 10)
+- `sizeVariation`: Random size variation (default: 0)
+- `colorStart`: Starting color (default: [255, 255, 255])
+- `colorEnd`: Ending color (optional)
+- `duration`: Particle lifespan in frames (default: 60)
+- `durationVariation`: Random duration variation (default: 0)
+- `spread`: Spread distance (default: 200)
+- `spreadX`, `spreadY`: Independent X/Y spread
+- `radialSpread`: Use radial distribution if true
+- `gravity`: Gravity effect (default: 0)
+- `startFrame`: Starting frame (default: 0)
+- `emitRate`: Emission rate (default: 0, all at once)
+- `opacityStart`: Starting opacity (default: 255)
+- `opacityEnd`: Ending opacity (default: 0)
+- `scaleDown`: Whether particles should scale down (default: false)
+- `endScale`: Final scale if scaling down (default: 0.2)
+- `rotation`: Whether particles should rotate (default: false)
+- `startRotation`, `endRotation`: Rotation angles if rotating
 
 **Returns:** Array of particle objects
 
-## Group Animations
+### createEmitter
 
-### createGroup(count, type, baseProps, arrangement)
-Creates a group of shapes arranged in a pattern.
+```javascript
+animation.createEmitter(x, y, options);
+```
+
+Creates a continuous particle emitter.
 
 **Parameters:**
-- `count` (Number): Number of shapes to create
-- `type` (String): Shape type ('circle', 'rectangle', etc.)
-- `baseProps` (Object, optional): Base properties for all shapes
-- `arrangement` (String, optional): Arrangement pattern:
-  - 'circle': Arranged in a circle (default)
-  - 'grid': Arranged in a grid
-  - 'line': Arranged in a horizontal line
+- `x`: X position of emitter
+- `y`: Y position of emitter
+- `options`: Emitter options
 
-**Additional BaseProps for Arrangements:**
-- `centerX` (Number): Center X position (defaults to canvas center)
-- `centerY` (Number): Center Y position (defaults to canvas center)
-- `radius` (Number): Radius/size of arrangement (defaults to 150)
+**Options:**
+- `rate`: Particles per second (default: 5)
+- `duration`: Emitter duration in frames (default: -1, indefinite)
+- `particleLifespan`: Lifespan of each particle in frames (default: 60)
+- `particleCount`: Maximum number of particles (default: 100)
+- `particleSize`: Size of particles (default: 10)
+- `spread`: Spread of particles (default: 100)
+- `type`: Type of particles (default: "circle")
+- `color`: Particle color (default: [255, 255, 255])
+- `opacity`: Particle opacity (default: 255)
+- `fadeOut`: Whether particles should fade out (default: true)
+- `scaleDown`: Whether particles should scale down (default: false)
+- `gravity`: Gravity effect (default: 0)
+- `active`: Whether emitter starts active (default: true)
+
+**Returns:** Emitter control object with methods:
+- `start()`: Activates the emitter
+- `stop()`: Deactivates the emitter
+- `setPosition(x, y)`: Changes the emitter position
+- `setRate(rate)`: Changes the emission rate
+- `setColor(color)`: Changes the particle color
+- `clearParticles()`: Removes all current particles
+
+## Camera Effects
+
+### cameraShake
+
+```javascript
+animation.cameraShake(startFrame, duration, intensity, frequency);
+```
+
+Creates a camera shake effect.
+
+**Parameters:**
+- `startFrame`: Starting frame
+- `duration`: Duration in frames
+- `intensity`: Shake intensity (default: 10)
+- `frequency`: Shake frequency (default: 4)
+
+**Returns:** The animation API for chaining
+
+### zoom
+
+```javascript
+animation.zoom(startFrame, duration, startScale, endScale, focusPoint, easing);
+```
+
+Creates a zoom effect.
+
+**Parameters:**
+- `startFrame`: Starting frame
+- `duration`: Duration in frames
+- `startScale`: Starting scale (default: 1)
+- `endScale`: Ending scale (default: 2)
+- `focusPoint`: Point to focus on `{x, y}` (default: center of canvas)
+- `easing`: Easing function (default: "easeInOutQuad")
+
+**Returns:** The animation API for chaining
+
+## Group Animations
+
+### createGroup
+
+```javascript
+animation.createGroup(count, type, baseProps, arrangement);
+```
+
+Creates a group of objects.
+
+**Parameters:**
+- `count`: Number of objects to create
+- `type`: Type of shapes to create
+- `baseProps`: Base properties for all shapes
+- `arrangement`: Arrangement pattern ("circle", "grid", "line", "random", "stack", default: "circle")
 
 **Returns:** Array of created shapes
 
-### animateGroup(group, property, keyframes, staggerFrames, easingType)
-Animates a property of all shapes in a group with staggered timing.
-
-**Parameters:**
-- `group` (Array): Array of shapes to animate
-- `property` (String): Property to animate
-- `keyframes` (Array): Array of keyframe objects
-- `staggerFrames` (Number, optional): Frames to stagger between objects (defaults to 5)
-- `easingType` (String, optional): Default easing function (defaults to 'easeInOutCubic')
-
-**Returns:** The group array (for chaining)
-
-### waveEffect(group, property, startFrame, duration, minValue, maxValue, easing)
-Creates a wave effect animation on a group of shapes.
-
-**Parameters:**
-- `group` (Array): Array of shapes
-- `property` (String): Property to animate
-- `startFrame` (Number): Starting frame
-- `duration` (Number): Total duration in frames
-- `minValue` (Number): Minimum property value
-- `maxValue` (Number): Maximum property value
-- `easing` (String, optional): Easing function (defaults to 'easeInOutSine')
-
-**Returns:** The group array (for chaining)
-
-## Playback Control
-
-### clearAll()
-Removes all objects and resets the animation.
-
-**Returns:** The AnimationAPI instance (for chaining)
-
-### setDuration(seconds)
-Sets the total animation duration in seconds.
-
-**Parameters:**
-- `seconds` (Number): Duration in seconds
-
-**Returns:** The AnimationAPI instance (for chaining)
-
-### setFPS(fps)
-Sets the animation framerate.
-
-**Parameters:**
-- `fps` (Number): Frames per second
-
-**Returns:** The AnimationAPI instance (for chaining)
-
-### reset()
-Resets the animation to the beginning (frame 0).
-
-**Returns:** The AnimationAPI instance (for chaining)
-
-### play()
-Starts playing the animation.
-
-**Returns:** The AnimationAPI instance (for chaining)
-
-## Examples
-
-### 1. Bouncing Ball Animation
+### animateGroup
 
 ```javascript
-// Create a bouncing ball animation
-animAPI.clearAll();
-animAPI.setFPS(30);
-animAPI.setDuration(5);
-
-// Create a ball
-const ball = animAPI.createShape('circle', {
-    x: 400,
-    y: 100,
-    size: 80,
-    fill: color(255, 100, 100),
-    name: "Bouncing Ball"
-});
-
-// Create a floor
-const floor = animAPI.createShape('rectangle', {
-    x: 400,
-    y: 550,
-    width: 800,
-    height: 20,
-    fill: color(100, 100, 100),
-    name: "Floor"
-});
-
-// Set up path for bouncing
-const path = [
-    {x: 400, y: 100},
-    {x: 400, y: 500},
-    {x: 400, y: 200},
-    {x: 400, y: 500},
-    {x: 400, y: 300},
-    {x: 400, y: 500}
-];
-
-// Animate along the path
-animAPI.followPath(ball, path, 0, 150, 'easeOutBounce');
-
-// Add squash and stretch
-animAPI.animate(ball, 'width', [
-    {frame: 30, value: 80},
-    {frame: 40, value: 100, easing: 'easeInCubic'},
-    {frame: 45, value: 60, easing: 'easeOutCubic'},
-    {frame: 50, value: 80, easing: 'easeInOutCubic'},
-    {frame: 90, value: 80},
-    {frame: 100, value: 100, easing: 'easeInCubic'},
-    {frame: 105, value: 60, easing: 'easeOutCubic'},
-    {frame: 110, value: 80, easing: 'easeInOutCubic'}
-]);
-
-animAPI.play();
+animation.animateGroup(group, property, keyframes, staggerFrames, easingType, reverse);
 ```
 
-### 2. Text Typing with Cursor
+Animates a group with staggered timing.
+
+**Parameters:**
+- `group`: Array of shapes to animate
+- `property`: Property to animate
+- `keyframes`: Array of keyframe objects
+- `staggerFrames`: Frame offset between each object's animation (default: 5)
+- `easingType`: Easing function (default: "easeInOutCubic")
+- `reverse`: Whether to animate in reverse order (default: false)
+
+**Returns:** The group for chaining
+
+### animateGroupMultiple
 
 ```javascript
-animAPI.clearAll();
-animAPI.setDuration(8);
-
-// Background
-const bg = animAPI.createShape('rectangle', {
-    x: 400,
-    y: 300,
-    width: 600,
-    height: 200,
-    fill: color(40, 40, 40),
-    cornerRadius: 10
-});
-
-// Create text with typing effect
-const text = animAPI.createShape('text', {
-    x: 400,
-    y: 300,
-    text: "",
-    fontSize: 24,
-    fill: color(50, 255, 50)
-});
-
-// Generate the typing effect
-animAPI.typeText(text, 10, "console.log('Animation complete!');", 120);
-
-// Create blinking cursor
-const cursor = animAPI.createShape('rectangle', {
-    x: 400,
-    y: 300,
-    width: 2,
-    height: 24,
-    fill: color(50, 255, 50)
-});
-
-// Make cursor blink and follow text
-for (let i = 0; i < 12; i++) {
-    cursor.addKeyframe('opacity', i * 15, i % 2 === 0 ? 255 : 0);
-}
-
-animAPI.play();
+animation.animateGroupMultiple(group, propertyMap, staggerFrames, easingType, reverse);
 ```
 
-### 3. Particle Explosion
+Animates multiple properties of a group with staggers.
+
+**Parameters:**
+- `group`: Array of shapes to animate
+- `propertyMap`: Map of properties to keyframe arrays
+- `staggerFrames`: Frame offset between each object's animation (default: 5)
+- `easingType`: Default easing function (default: "easeInOutCubic")
+- `reverse`: Whether to animate in reverse order (default: false)
+
+**Returns:** The group for chaining
+
+### waveEffect
 
 ```javascript
-animAPI.clearAll();
-animAPI.setFPS(30);
-animAPI.setDuration(4);
+animation.waveEffect(group, property, startFrame, duration, minValue, maxValue, easing, loop);
+```
 
-// Create particle system
-animAPI.createParticleSystem(400, 300, 50, {
-    type: 'circle',
-    size: 15,
-    color: [255, 200, 50],
-    duration: 90,
-    spread: 300,
-    easing: 'easeOutCubic',
+Creates a wave effect on a group of objects.
+
+**Parameters:**
+- `group`: Array of shapes to animate
+- `property`: Property to animate
+- `startFrame`: Starting frame
+- `duration`: Duration in frames
+- `minValue`: Minimum value
+- `maxValue`: Maximum value
+- `easing`: Easing function (default: "easeInOutSine")
+- `loop`: Whether to loop the animation (default: false)
+
+**Returns:** The group for chaining
+
+### pulseGroup
+
+```javascript
+animation.pulseGroup(group, startFrame, duration, minScale, maxScale, staggerFrames);
+```
+
+Creates a pulsing effect on a group.
+
+**Parameters:**
+- `group`: Array of shapes
+- `startFrame`: Starting frame
+- `duration`: Duration in frames (default: 60)
+- `minScale`: Minimum scale (default: 0.8)
+- `maxScale`: Maximum scale (default: 1.2)
+- `staggerFrames`: Frame offset between animations (default: 6)
+
+**Returns:** The group for chaining
+
+## Text Animations
+
+### typeText
+
+```javascript
+animation.typeText(textObj, startFrame, text, duration, easing, options);
+```
+
+Creates a typing animation for text objects.
+
+**Parameters:**
+- `textObj`: Text object to animate
+- `startFrame`: Starting frame
+- `text`: Text to type
+- `duration`: Duration in frames (default: 60)
+- `easing`: Easing function (default: "linear")
+- `options`: Additional options
+
+**Options:**
+- `cursor`: Whether to show cursor (default: true)
+- `cursorChar`: Character to use for cursor (default: "|")
+- `cursorBlinkRate`: Cursor blink rate in frames (default: 15)
+- `startWithEmpty`: Whether to start with empty text (default: true)
+
+**Returns:** The text object for chaining
+
+## Sequence Management
+
+### defineSequence
+
+```javascript
+animation.defineSequence(name, sequenceFn);
+```
+
+Creates an animation sequence that can be reused.
+
+**Parameters:**
+- `name`: Name of the sequence
+- `sequenceFn`: Function that defines the sequence
+
+**Returns:** The animation API for chaining
+
+### applySequence
+
+```javascript
+animation.applySequence(name, target, startFrame, options);
+```
+
+Applies a pre-defined animation sequence.
+
+**Parameters:**
+- `name`: Name of the sequence to apply
+- `target`: Target shape or group to animate
+- `startFrame`: Starting frame for the sequence (default: 0)
+- `options`: Custom options for the sequence
+
+**Returns:** The animated object(s)
+
+### applyPreset
+
+```javascript
+animation.applyPreset(presetName, shape, startFrame, options);
+```
+
+Applies a simple animation preset for common effects.
+
+**Parameters:**
+- `presetName`: Name of the animation preset
+- `shape`: Shape to animate
+- `startFrame`: Starting frame
+- `options`: Preset options
+
+**Available Presets:**
+- `bounce`: Bouncing animation
+- `wiggle`: Wiggling animation
+- `pop`: Popping in effect
+- `dropIn`: Drop from top with bounce
+- `slideIn`: Slide in from a direction
+- `fadeRotateIn`: Fade in with rotation
+- `pulseAndShrink`: Pulse and then shrink away
+- `typewriter`: Typewriter text effect
+- `shimmer`: Shimmer/highlight effect
+
+**Returns:** The animated shape
+
+### addFrameAction
+
+```javascript
+animation.addFrameAction(frame, callback);
+```
+
+Adds a new animation frame action.
+
+**Parameters:**
+- `frame`: Frame number to add
+- `callback`: Function to call on this frame
+
+**Returns:** The animation API for chaining
+
+## Playback Controls
+
+### play
+
+```javascript
+animation.play(loop);
+```
+
+Plays the animation.
+
+**Parameters:**
+- `loop`: Whether to loop the animation (default: false)
+
+**Returns:** The animation API for chaining
+
+### pause
+
+```javascript
+animation.pause();
+```
+
+Pauses the animation.
+
+**Returns:** The animation API for chaining
+
+### reset
+
+```javascript
+animation.reset();
+```
+
+Resets the animation to the beginning.
+
+**Returns:** The animation API for chaining
+
+### setDuration
+
+```javascript
+animation.setDuration(seconds);
+```
+
+Sets the animation duration.
+
+**Parameters:**
+- `seconds`: Duration in seconds
+
+**Returns:** The animation API for chaining
+
+### setFPS
+
+```javascript
+animation.setFPS(fps);
+```
+
+Sets the animation FPS.
+
+**Parameters:**
+- `fps`: Frames per second
+
+**Returns:** The animation API for chaining
+
+### clearAll
+
+```javascript
+animation.clearAll();
+```
+
+Clears all objects and resets the animation.
+
+**Returns:** The animation API for chaining
+
+## Project Management
+
+### export
+
+```javascript
+animation.export(options);
+```
+
+Exports the animation.
+
+**Parameters:**
+- `options`: Export options
+
+**Options:**
+- `format`: Output format (default: "webm")
+- `quality`: Output quality (default: 0.8)
+- `fps`: Frames per second (default: engine's FPS)
+- `filename`: Output filename (default: generated from timestamp)
+
+**Returns:** The animation API for chaining
+
+### saveProject
+
+```javascript
+animation.saveProject(filename);
+```
+
+Saves the current project.
+
+**Parameters:**
+- `filename`: Optional filename
+
+**Returns:** The animation API for chaining
+
+### loadProject
+
+```javascript
+animation.loadProject(jsonData);
+```
+
+Loads a project.
+
+**Parameters:**
+- `jsonData`: Project data
+
+**Returns:** The animation API for chaining
+
+### setBackgroundColor
+
+```javascript
+animation.setBackgroundColor(colorValue);
+```
+
+Sets the background color.
+
+**Parameters:**
+- `colorValue`: Background color (string, array, or color object)
+
+**Returns:** The animation API for chaining
+
+## Advanced Usage Examples
+
+### Creating and Animating a Simple Shape
+
+```javascript
+// Create a circle
+const circle = animation.createShape("circle", {
+  x: 100,
+  y: 100,
+  size: 50,
+  fill: [255, 0, 0]
+});
+
+// Animate it moving in a circle
+animation.animate(circle, "x", [
+  { frame: 0, value: 100 },
+  { frame: 30, value: 200 },
+  { frame: 60, value: 100 }
+], "easeInOutQuad");
+
+animation.animate(circle, "y", [
+  { frame: 0, value: 100 },
+  { frame: 30, value: 200 },
+  { frame: 60, value: 100 }
+], "easeInOutQuad");
+
+// Fade it in and out
+animation.fadeIn(circle, 0, 20);
+animation.fadeOut(circle, 40, 20);
+```
+
+### Creating a Particle Effect
+
+```javascript
+// Create a burst of particles
+const particles = animation.createParticleSystem(
+  400, 300, 50, {
+    type: "circle",
+    size: 10,
+    sizeVariation: 5,
+    colorStart: [255, 0, 0],
+    colorEnd: [255, 255, 0],
+    duration: 60,
+    spread: 200,
+    gravity: 2,
     scaleDown: true
+  }
+);
+
+// Create a continuous emitter
+const emitter = animation.createEmitter(
+  400, 300, {
+    rate: 10,
+    particleLifespan: 45,
+    color: [0, 255, 255],
+    spread: 100,
+    gravity: 1,
+    scaleDown: true
+  }
+);
+
+// Move the emitter
+animation.addFrameAction(60, () => {
+  emitter.setPosition(200, 200);
 });
 
-// Add title that scales up
-const title = animAPI.createShape('text', {
-    x: 400,
-    y: 300,
-    text: "BOOM!",
-    fontSize: 10,
-    fill: color(255, 100, 50)
+// Stop the emitter after 120 frames
+animation.addFrameAction(120, () => {
+  emitter.stop();
 });
-
-// Animate title
-animAPI.animate(title, 'fontSize', [
-    {frame: 0, value: 10, easing: 'easeOutElastic'},
-    {frame: 20, value: 72, easing: 'easeOutElastic'}
-]);
-
-animAPI.play();
 ```
 
-### 4. Wave Animation
+### Creating a Complex Scene with Camera Effects
 
 ```javascript
-animAPI.clearAll();
-animAPI.setDuration(5);
-
-// Create a row of circles
-const circles = animAPI.createGroup(15, 'circle', {
-    size: 30,
-    fill: color(100, 200, 255),
-    centerY: 300,
-    arrangement: 'line',
-    radius: 300  // Controls the length of the line
+// Create a scene with multiple elements
+const background = animation.createShape("rectangle", {
+  x: 400,
+  y: 300,
+  width: 800,
+  height: 600,
+  fill: [20, 20, 40]
 });
 
-// Create wave effect
-animAPI.waveEffect(circles, 'y', 0, 120, 250, 350);
-
-// Add color transition
-circles.forEach((circle, index) => {
-    animAPI.animate(circle, 'fill', [
-        { 
-            frame: index * 5, 
-            value: color(100, 150, 255) 
-        },
-        { 
-            frame: index * 5 + 60, 
-            value: color(255, 100, 150) 
-        },
-        { 
-            frame: index * 5 + 120, 
-            value: color(100, 150, 255) 
-        }
-    ]);
+const sun = animation.createShape("circle", {
+  x: 600,
+  y: 200,
+  size: 80,
+  fill: [255, 200, 0]
 });
 
-animAPI.play();
+// Create a scene transition
+animation.transition(120, 60, "iris", {
+  x: 400,
+  y: 300,
+  color: [0, 0, 0],
+  onTransition: (engine) => {
+    // This runs at the middle of the transition
+    animation.setBackgroundColor([40, 20, 20]);
+  }
+});
+
+// Add a camera shake effect
+animation.cameraShake(200, 30, 15, 5);
+
+// Zoom into the sun
+animation.zoom(250, 90, 1, 2, { x: 600, y: 200 });
 ```
 
-### 5. Logo Reveal Animation
+# AnimationAPI Documentation (Continued)
+
+## Advanced Usage Examples (Continued)
+
+### Creating and Animating a Group
 
 ```javascript
-animAPI.clearAll();
-animAPI.setDuration(5);
+// Create a group of circles arranged in a circle
+const circleGroup = animation.createGroup(12, "circle", {
+  centerX: 400,
+  centerY: 300,
+  radius: 150,
+  size: 30,
+  fill: [100, 100, 255],
+  colors: [
+    [255, 0, 0], [255, 127, 0], [255, 255, 0], 
+    [0, 255, 0], [0, 0, 255], [75, 0, 130]
+  ]
+}, "circle");
 
-// Create background
-const bg = animAPI.createShape('rectangle', {
-    x: 400,
-    y: 300,
-    width: 800,
-    height: 600,
-    fill: color(30, 30, 40)
-});
+// Apply a wave effect to the group
+animation.waveEffect(
+  circleGroup,
+  "size",
+  0,
+  120,
+  20,
+  60,
+  "easeInOutSine",
+  true
+);
 
-// Create logo elements
-const circle = animAPI.createShape('circle', {
-    x: 400,
-    y: 300,
-    size: 0,
-    fill: color(0, 120, 255, 200),
-    name: "Logo Circle"
-});
-
-const ring = animAPI.createShape('circle', {
-    x: 400,
-    y: 300,
-    size: 0,
-    fill: color(0, 0, 0, 0),  // Transparent fill
-    stroke: color(0, 180, 255),
-    strokeWeight: 10,
-    name: "Logo Ring"
-});
-
-const logoText = animAPI.createShape('text', {
-    x: 400,
-    y: 300,
-    text: "ANIM8",
-    fontSize: 64,
-    fill: color(255, 255, 255, 0),  // Start transparent
-    name: "Logo Text"
-});
-
-// Animate circle growing
-animAPI.animate(circle, 'size', [
-    {frame: 10, value: 0, easing: 'easeOutBack'},
-    {frame: 40, value: 200, easing: 'easeOutBack'}
-]);
-
-// Animate ring appearing slightly later
-animAPI.animate(ring, 'size', [
-    {frame: 20, value: 0, easing: 'easeOutElastic'},
-    {frame: 60, value: 250, easing: 'easeOutElastic'}
-]);
-
-// Fade in and scale up the logo text
-animAPI.animate(logoText, 'fontSize', [
-    {frame: 30, value: 40, easing: 'easeOutExpo'},
-    {frame: 70, value: 64, easing: 'easeOutExpo'}
-]);
-
-animAPI.animate(logoText, 'fill', [
-    {frame: 30, value: color(255, 255, 255, 0)},
-    {frame: 70, value: color(255, 255, 255, 255)}
-]);
-
-animAPI.play();
+// Animate the group with staggered rotation
+animation.animateGroup(
+  circleGroup,
+  "rotation",
+  [
+    { frame: 0, value: 0 },
+    { frame: 60, value: 360 }
+  ],
+  5,
+  "easeInOutCubic"
+);
 ```
 
-### 6. Interactive Chart Animation
+### Morphing Between Shapes
 
 ```javascript
-animAPI.clearAll();
-animAPI.setDuration(6);
-
-// Data to visualize
-const data = [28, 45, 65, 32, 78, 50, 42, 60];
-const labels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug"];
-
-// Background
-animAPI.createShape('rectangle', {
-    x: 400,
-    y: 300,
-    width: 800,
-    height: 600,
-    fill: color(240, 240, 245)
+// Create two shapes to morph between
+const square = animation.createShape("rectangle", {
+  x: 300,
+  y: 300,
+  width: 100,
+  height: 100,
+  fill: [255, 0, 0],
+  cornerRadius: 0
 });
 
-// Title
-const title = animAPI.createShape('text', {
-    x: 400,
-    y: 80,
-    text: "Monthly Performance",
-    fontSize: 32,
-    fill: color(50, 50, 70),
-    name: "Chart Title"
+const circle = animation.createShape("rectangle", {
+  x: 500,
+  y: 300,
+  width: 120,
+  height: 120,
+  fill: [0, 0, 255],
+  cornerRadius: 60,
+  opacity: 0
 });
 
-// Fade in title
-animAPI.fadeIn(title, 0, 20);
+// Morph the square into the circle
+animation.morph(square, circle, 30, 60);
 
-// Create bars with animation
-for (let i = 0; i < data.length; i++) {
-    // Bar
-    const bar = animAPI.createShape('rectangle', {
-        x: 150 + i * 70,
-        y: 500,
-        width: 40,
-        height: 1,  // Start with minimal height
-        fill: color(70 + i * 20, 100, 180),
-        name: `Bar ${i}`
-    });
-    
-    // Animate height and position
-    animAPI.animate(bar, 'height', [
-        {frame: i * 5, value: 1, easing: 'easeOutExpo'},
-        {frame: i * 5 + 30, value: data[i] * 4, easing: 'easeOutExpo'}
-    ]);
-    
-    animAPI.animate(bar, 'y', [
-        {frame: i * 5, value: 500, easing: 'easeOutExpo'},
-        {frame: i * 5 + 30, value: 500 - data[i] * 2, easing: 'easeOutExpo'}
-    ]);
-    
-    // Label
-    const label = animAPI.createShape('text', {
-        x: 150 + i * 70,
-        y: 520,
-        text: labels[i],
-        fontSize: 14,
-        fill: color(70, 70, 90, 0),  // Start transparent
-        name: `Label ${i}`
-    });
-    
-    // Fade in label
-    animAPI.fadeIn(label, i * 5 + 20, 15);
-    
-    // Value label
-    const value = animAPI.createShape('text', {
-        x: 150 + i * 70,
-        y: 480 - data[i] * 2,
-        text: data[i].toString(),
-        fontSize: 14,
-        fill: color(50, 50, 70, 0),  // Start transparent
-        name: `Value ${i}`
-    });
-    
-    // Fade in value
-    animAPI.fadeIn(value, i * 5 + 35, 10);
-}
-
-animAPI.play();
+// Remove the target shape since it was just used as a reference
+animation.addFrameAction(30, () => {
+  animation.engine.removeObject(circle);
+});
 ```
 
-### 7. Circular Progress Indicator
+### Creating Text Animation
 
 ```javascript
-animAPI.clearAll();
-animAPI.setDuration(5);
-
-// Create background
-animAPI.createShape('rectangle', {
-    x: 400,
-    y: 300,
-    width: 800,
-    height: 600,
-    fill: color(40, 40, 50)
+// Create a text object
+const title = animation.createShape("text", {
+  x: 400,
+  y: 300,
+  text: "Animation API",
+  fontSize: 48,
+  fontFamily: "Arial",
+  textAlign: "center",
+  fill: [255, 255, 255],
+  opacity: 0
 });
 
-// Create progress path (full circle)
-const path = [];
-const radius = 120;
-const center = {x: 400, y: 300};
-const segments = 36;
-
-for (let i = 0; i <= segments; i++) {
-    const angle = (i / segments) * Math.PI * 2 - Math.PI/2; // Start from top
-    path.push({
-        x: center.x + Math.cos(angle) * radius,
-        y: center.y + Math.sin(angle) * radius
-    });
-}
-
-// Create progress indicator
-const indicator = animAPI.createShape('circle', {
-    x: path[0].x,
-    y: path[0].y,
-    size: 30,
-    fill: color(50, 200, 100),
-    name: "Progress Indicator"
+// Apply the typing effect
+animation.typeText(title, 10, "Animation API Demo", 60, "linear", {
+  cursor: true,
+  cursorChar: "_",
+  cursorBlinkRate: 20
 });
 
-// Make indicator follow the path
-animAPI.followPath(indicator, path, 0, 120);
-
-// Create percentage text
-const percentText = animAPI.createShape('text', {
-    x: center.x,
-    y: center.y,
-    text: "0%",
-    fontSize: 48,
-    fill: color(255, 255, 255),
-    name: "Percentage"
+// Animate the text after typing
+animation.addFrameAction(80, () => {
+  animation.pulse(title, 80, 2, 40, 0.9, 1.1);
+  animation.colorCycle(title, 80, 120, [
+    [255, 255, 255],
+    [255, 220, 100],
+    [255, 255, 255]
+  ]);
 });
-
-// Update percentage as animation progresses
-for (let i = 0; i <= 100; i += 5) {
-    const frame = Math.round(i * 1.2); // 120 frames total
-    animAPI.animate(percentText, 'text', [
-        {frame: frame, value: `${i}%`}
-    ]);
-}
-
-// Create a trail effect
-for (let i = 0; i < 10; i++) {
-    const trailDot = animAPI.createShape('circle', {
-        x: path[0].x,
-        y: path[0].y,
-        size: 20 - i*2,
-        fill: color(50, 200, 100, 150 - i*15),
-        name: `Trail_${i}`
-    });
-    
-    // Follow the same path with delay
-    const delayedPath = [...path];
-    animAPI.followPath(trailDot, delayedPath, i*3, 120 + i*3);
-}
-
-animAPI.play();
 ```
 
-### 8. Simulating Physics
+### Using Custom Animation Sequences
 
 ```javascript
-animAPI.clearAll();
-animAPI.setDuration(8);
-animAPI.setFPS(60);
-
-// Create background
-animAPI.createShape('rectangle', {
-    x: 400,
-    y: 300,
-    width: 800,
-    height: 600,
-    fill: color(230, 240, 250)
+// Define a reusable animation sequence
+animation.defineSequence("enterAndSpin", function(shape, startFrame, options) {
+  const duration = options.duration || 60;
+  const direction = options.direction || "left";
+  
+  // Start from off-screen
+  let startX = shape.x;
+  let startY = shape.y;
+  
+  if (direction === "left") {
+    startX = -shape.width;
+  } else if (direction === "right") {
+    startX = this.engine.canvasWidth + shape.width;
+  }
+  
+  // Move in
+  this.moveFromTo(
+    shape, 
+    startFrame, 
+    startFrame + duration/2,
+    startX,
+    startY,
+    shape.x,
+    shape.y,
+    "easeOutQuint"
+  );
+  
+  // Spin
+  this.spin(
+    shape,
+    startFrame + duration/2,
+    duration/2,
+    2,
+    true,
+    "easeOutCubic"
+  );
+  
+  return shape;
 });
 
-// Create a pendulum with a string and ball
-const pendulumOrigin = {x: 400, y: 100};
-const stringLength = 200;
-
-// String (represented as a rectangle for simplicity)
-const string = animAPI.createShape('rectangle', {
-    x: pendulumOrigin.x,
-    y: pendulumOrigin.y + stringLength/2,
-    width: 2,
-    height: stringLength,
-    fill: color(50, 50, 50),
-    name: "Pendulum String"
+// Create a shape
+const star = animation.createShape("path", {
+  x: 400,
+  y: 300,
+  points: [
+    {x: 0, y: -50},
+    {x: 15, y: -15},
+    {x: 50, y: -15},
+    {x: 25, y: 10},
+    {x: 35, y: 50},
+    {x: 0, y: 30},
+    {x: -35, y: 50},
+    {x: -25, y: 10},
+    {x: -50, y: -15},
+    {x: -15, y: -15}
+  ],
+  closed: true,
+  fill: [255, 255, 0]
 });
 
-// Pendulum weight
-const weight = animAPI.createShape('circle', {
-    x: pendulumOrigin.x,
-    y: pendulumOrigin.y + stringLength,
-    size: 50,
-    fill: color(100, 150, 200),
-    stroke: color(50, 100, 150),
-    strokeWeight: 2,
-    name: "Pendulum Weight"
+// Apply the sequence
+animation.applySequence("enterAndSpin", star, 10, {
+  direction: "right",
+  duration: 90
 });
-
-// Create swinging motion
-// We'll use sin function to create the natural pendulum motion
-const numFrames = 240; // 4 seconds at 60fps
-const keyframes = [];
-const angleKeyframes = [];
-
-// Calculate pendulum positions using physics-like formulas
-for (let frame = 0; frame <= numFrames; frame++) {
-    const t = frame / 60; // Time in seconds
-    const angle = Math.PI/6 * Math.sin(2 * t - Math.PI/2); // Max angle ±30°
-    
-    // Calculate position
-    const x = pendulumOrigin.x + Math.sin(angle) * stringLength;
-    const y = pendulumOrigin.y + Math.cos(angle) * stringLength;
-    
-    // Add keyframes for the weight position
-    keyframes.push({frame: frame, value: x, easing: 'linear'});
-    angleKeyframes.push({frame: frame, value: angle * 180/Math.PI, easing: 'linear'});
-}
-
-// Apply animations
-animAPI.animate(weight, 'x', keyframes);
-animAPI.animate(weight, 'y', [
-    ...Array(numFrames + 1).fill(0).map((_, i) => {
-        const t = i / 60;
-        const angle = Math.PI/6 * Math.sin(2 * t - Math.PI/2);
-        return {
-            frame: i,
-            value: pendulumOrigin.y + Math.cos(angle) * stringLength,
-            easing: 'linear'
-        };
-    })
-]);
-
-// Animate the string's angle and position
-animAPI.animate(string, 'rotation', angleKeyframes);
-// Update string position to follow pendulum
-animAPI.animate(string, 'x', keyframes);
-// Keep the string attached to the pendulum origin
-animAPI.animate(string, 'y', [
-    ...Array(numFrames + 1).fill(0).map((_, i) => {
-        const t = i / 60;
-        const angle = Math.PI/6 * Math.sin(2 * t - Math.PI/2);
-        const weightY = pendulumOrigin.y + Math.cos(angle) * stringLength;
-        return {
-            frame: i,
-            value: (pendulumOrigin.y + weightY) / 2,
-            easing: 'linear'
-        };
-    })
-]);
-
-animAPI.play();
 ```
 
-## Available Easing Functions
+### Creating a Complex Transition
 
-The API supports various easing functions to control the motion dynamics:
+```javascript
+// Create some initial scene elements
+const scene1 = animation.createShape("rectangle", {
+  x: 400,
+  y: 300,
+  width: 800,
+  height: 600,
+  fill: [50, 100, 150],
+  name: "scene1Background"
+});
 
-- **Linear**: `linear`
-- **Quadratic**: `easeInQuad`, `easeOutQuad`, `easeInOutQuad`
-- **Cubic**: `easeInCubic`, `easeOutCubic`, `easeInOutCubic`
-- **Quartic**: `easeInQuart`, `easeOutQuart`, `easeInOutQuart`
-- **Quintic**: `easeInQuint`, `easeOutQuint`, `easeInOutQuint`
-- **Sinusoidal**: `easeInSine`, `easeOutSine`, `easeInOutSine`
-- **Exponential**: `easeInExpo`, `easeOutExpo`, `easeInOutExpo`
-- **Circular**: `easeInCirc`, `easeOutCirc`, `easeInOutCirc`
-- **Elastic**: `easeInElastic`, `easeOutElastic`, `easeInOutElastic`
-- **Back**: `easeInBack`, `easeOutBack`, `easeInOutBack`
-- **Bounce**: `easeInBounce`, `easeOutBounce`, `easeInOutBounce`
+const scene1Title = animation.createShape("text", {
+  x: 400,
+  y: 200,
+  text: "Scene 1",
+  fontSize: 64,
+  textAlign: "center",
+  fill: [255, 255, 255]
+});
 
-For detailed visualization of these easing functions, visit [easings.net](https://easings.net/).
+// Create transition and scene change
+animation.transition(120, 45, "wipe", {
+  direction: "left",
+  color: [0, 0, 0],
+  onTransition: (engine) => {
+    // Remove first scene elements
+    const scene1 = engine.getObjectByName("scene1Background");
+    engine.removeObject(scene1);
+    engine.removeObject(scene1Title);
+    
+    // Create second scene
+    const scene2 = animation.createShape("rectangle", {
+      x: 400,
+      y: 300,
+      width: 800,
+      height: 600,
+      fill: [150, 50, 100],
+      name: "scene2Background"
+    });
+    
+    const scene2Title = animation.createShape("text", {
+      x: 400,
+      y: 200,
+      text: "Scene 2",
+      fontSize: 64,
+      textAlign: "center",
+      fill: [255, 255, 255]
+    });
+    
+    // Apply some animation to the new scene
+    animation.fadeIn(scene2Title, 142, 30);
+    animation.applyPreset("bounce", scene2Title, 175);
+  }
+});
+```
+
+### Using Particle Systems for Special Effects
+
+```javascript
+// Create a fire effect
+const fire = animation.createEmitter(400, 500, {
+  rate: 15,
+  type: "circle",
+  particleLifespan: 45,
+  particleCount: 100,
+  particleSize: 20,
+  sizeVariation: 10,
+  spread: 30,
+  spreadY: 80,
+  color: [255, 100, 10],
+  colorEnd: [255, 200, 0],
+  gravity: -2,
+  scaleDown: true
+});
+
+// Create smoke above the fire
+const smoke = animation.createEmitter(400, 450, {
+  rate: 5,
+  type: "circle",
+  particleLifespan: 90,
+  particleCount: 30,
+  particleSize: 25,
+  spread: 40,
+  color: [150, 150, 150, 100],
+  colorEnd: [200, 200, 200, 0],
+  gravity: -1,
+  scaleDown: false
+});
+
+// Add a spark effect on a specific frame
+animation.addFrameAction(60, () => {
+  animation.createParticleSystem(400, 490, 20, {
+    type: "circle",
+    size: 5,
+    colorStart: [255, 255, 200],
+    colorEnd: [255, 255, 0],
+    duration: 30,
+    spread: 100,
+    spreadY: 60,
+    gravity: -3,
+    scaleDown: true
+  });
+});
+
+// Move fire position
+animation.addFrameAction(120, () => {
+  fire.setPosition(300, 500);
+  smoke.setPosition(300, 450);
+});
+```
+
+### Creating Camera Effects
+
+```javascript
+// Create a scene
+const sky = animation.createShape("rectangle", {
+  x: 400,
+  y: 150,
+  width: 800,
+  height: 300,
+  fill: [100, 150, 255]
+});
+
+const ground = animation.createShape("rectangle", {
+  x: 400,
+  y: 450,
+  width: 800,
+  height: 300,
+  fill: [100, 200, 100]
+});
+
+const character = animation.createShape("circle", {
+  x: 200,
+  y: 350,
+  size: 50,
+  fill: [255, 0, 0]
+});
+
+// Move character
+animation.moveTo(character, 0, 120, 600, 350);
+
+// Add camera shake when character reaches midpoint
+animation.addFrameAction(60, () => {
+  animation.cameraShake(60, 20, 8, 5);
+});
+
+// Zoom in on character at the end
+animation.addFrameAction(130, () => {
+  animation.zoom(130, 60, 1, 2.5, { x: 600, y: 350 });
+});
+```
 
 ## Best Practices
 
-1. **Clear Before Creating**: Always start with `clearAll()` to reset the animation state.
-2. **Set Duration and FPS Early**: Use `setDuration()` and `setFPS()` at the beginning to establish animation timing.
-3. **Chain Methods**: Most methods return the original object, allowing for method chaining.
-4. **Use Consistent Naming**: Name your objects descriptively for easier management.
-5. **Group Related Objects**: Use `createGroup()` for sets of related objects.
-6. **Test Different Easings**: The right easing function can dramatically improve an animation's feel.
-7. **Combine Simple Animations**: Create complex effects by combining multiple simple animations.
+### Performance Optimization
 
----
+1. **Limit Particle Count**: Keep particle counts reasonable (under 500 for most applications).
+2. **Clean Up Unused Objects**: Remove objects that are no longer needed.
+3. **Use Keyframes Efficiently**: Avoid creating too many keyframes for smooth animations.
+4. **Group Similar Animations**: Use `animateMultiple` and `animateGroup` when possible.
+5. **Reuse Common Sequences**: Define sequences for repeated patterns.
 
-This API aims to simplify the creation of complex animations while providing fine-grained control when needed. Explore the examples and experiment with different combinations to create your own unique animations.
+### Animation Timing
+
+1. **Plan Your Timeline**: Map out your animation sequence before coding.
+2. **Use Frame Actions**: Add logical breakpoints with `addFrameAction`.
+3. **Consider Easing**: Select appropriate easing functions for natural movement.
+4. **Stagger Animations**: Offset animations for visual interest using staggered timing.
+5. **Test Performance**: Verify animation runs smoothly on target devices.
+
+### Code Organization
+
+1. **Create Animation Sections**: Group related animations together.
+2. **Define Reusable Properties**: Store common values in variables.
+3. **Chain Methods**: Use method chaining for cleaner code.
+4. **Comment Complex Animations**: Document the purpose of animation sequences.
+5. **Use Descriptive Names**: Name objects according to their purpose.
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Animations Not Playing**: Check if the animation engine is properly initialized and playing.
+2. **Objects Disappearing**: Verify that opacity isn't being set to 0.
+3. **Jerky Animations**: Add more keyframes or adjust easing functions.
+4. **High CPU Usage**: Reduce particle count or complex animations.
+5. **Animation Timing Off**: Verify frame numbers and durations.
+
+### Debugging Tools
+
+1. **Frame Markers**: Add timeline markers to track progress.
+2. **Logging Actions**: Use `addFrameAction` to log state at specific frames.
+3. **Visible Bounding Boxes**: Add temporary outline shapes for positioning.
+4. **Slow Down Playback**: Reduce FPS temporarily to observe details.
+5. **Step Through Frames**: Use the timeline controls to move frame by frame.
+
+## Integration with Other Systems
+
+The AnimationAPI can be integrated with other systems:
+
+1. **Event Listeners**: Trigger animations based on user interactions.
+2. **Data Visualization**: Animate data changes over time.
+3. **Game Engines**: Add visual effects to game objects.
+4. **Video Production**: Create animated segments for videos.
+5. **Interactive Storytelling**: Build interactive animated narratives.
+
+By leveraging the full power of the AnimationAPI, you can create complex, professional-quality animations for a wide range of applications.
