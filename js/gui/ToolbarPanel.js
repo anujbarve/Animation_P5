@@ -2,7 +2,7 @@ class ToolbarPanel {
   constructor(engine, gui) {
     this.engine = engine;
     this.gui = gui;
-    
+
     // Add reference to the AnimationAPI
     this.animation = new AnimationAPI(engine);
 
@@ -239,10 +239,10 @@ class ToolbarPanel {
 
   loadProject() {
     // Create an invisible file input element to handle file selection
-    const fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.accept = '.json';
-    fileInput.style.display = 'none';
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = ".json";
+    fileInput.style.display = "none";
     document.body.appendChild(fileInput);
 
     fileInput.onchange = (event) => {
@@ -325,7 +325,9 @@ class ToolbarPanel {
 
     document.getElementById("export-confirm").addEventListener("click", () => {
       const format = document.getElementById("export-format").value;
-      const quality = parseFloat(document.getElementById("export-quality").value);
+      const quality = parseFloat(
+        document.getElementById("export-quality").value
+      );
       const startFrame = parseInt(
         document.getElementById("export-start-frame").value
       );
@@ -338,13 +340,15 @@ class ToolbarPanel {
         format: format,
         quality: quality,
         fps: this.engine.timeline.fps,
-        filename: `animation_${Date.now()}`
+        filename: `animation_${Date.now()}`,
       });
-      
+
       // Set the desired frame range
       this.engine.timeline.setFrame(startFrame);
-      
-      alert(`Exporting animation as ${format} from frame ${startFrame} to ${endFrame} at ${quality} quality.`);
+
+      alert(
+        `Exporting animation as ${format} from frame ${startFrame} to ${endFrame} at ${quality} quality.`
+      );
 
       document.body.removeChild(exportDialog);
     });
@@ -360,6 +364,7 @@ class ToolbarPanel {
       particleExplosion: () => this.createParticleAnimation(),
       waveAnimation: () => this.createWaveAnimation(),
       logoReveal: () => this.createLogoRevealAnimation(),
+      recursive: () => this.createRecursiveDoublingAnimation(),
     };
 
     this.templatesFolder
@@ -372,6 +377,7 @@ class ToolbarPanel {
       .name("Particle Effect");
     this.templatesFolder.add(templates, "waveAnimation").name("Wave Animation");
     this.templatesFolder.add(templates, "logoReveal").name("Logo Reveal");
+    this.templatesFolder.add(templates, "recursive").name("recursive Reveal");
 
     // Add information about templates
     const info = { message: "Click a template to create a pre-made animation" };
@@ -401,7 +407,7 @@ class ToolbarPanel {
     // Create the shape using the AnimationAPI
     const newShape = this.animation.createShape(type, {
       x: x,
-      y: y
+      y: y,
     });
 
     // Select the new shape
@@ -448,19 +454,39 @@ class ToolbarPanel {
         y: 100,
         size: 80,
         fill: [255, 100, 100],
-        name: "Bouncing Ball"
+        name: "Bouncing Ball",
       });
 
       // Create keyframes for bouncing
       this.animation.animate(ball, "y", [
         { frame: 0, value: 100, easing: "easeInQuad" },
-        { frame: 20, value: this.engine.canvasHeight - 40, easing: "easeOutBounce" },
-        { frame: 45, value: this.engine.canvasHeight - 40, easing: "easeInQuad" },
+        {
+          frame: 20,
+          value: this.engine.canvasHeight - 40,
+          easing: "easeOutBounce",
+        },
+        {
+          frame: 45,
+          value: this.engine.canvasHeight - 40,
+          easing: "easeInQuad",
+        },
         { frame: 60, value: 200, easing: "easeOutQuad" },
-        { frame: 75, value: this.engine.canvasHeight - 40, easing: "easeOutBounce" },
-        { frame: 90, value: this.engine.canvasHeight - 40, easing: "easeInQuad" },
+        {
+          frame: 75,
+          value: this.engine.canvasHeight - 40,
+          easing: "easeOutBounce",
+        },
+        {
+          frame: 90,
+          value: this.engine.canvasHeight - 40,
+          easing: "easeInQuad",
+        },
         { frame: 105, value: 300, easing: "easeOutQuad" },
-        { frame: 120, value: this.engine.canvasHeight - 40, easing: "easeOutBounce" }
+        {
+          frame: 120,
+          value: this.engine.canvasHeight - 40,
+          easing: "easeOutBounce",
+        },
       ]);
 
       // Squash and stretch
@@ -481,7 +507,7 @@ class ToolbarPanel {
         { frame: 119, value: 90, easing: "easeInCubic" },
         { frame: 120, value: 100, easing: "linear" },
         { frame: 122, value: 60, easing: "easeOutCubic" },
-        { frame: 130, value: 80, easing: "easeInOutCubic" }
+        { frame: 130, value: 80, easing: "easeInOutCubic" },
       ]);
 
       // Create a shadow with the AnimationAPI
@@ -491,7 +517,7 @@ class ToolbarPanel {
         width: 100,
         height: 20,
         fill: [0, 0, 0, 100],
-        name: "Ball Shadow"
+        name: "Ball Shadow",
       });
 
       // Shadow animation
@@ -503,7 +529,7 @@ class ToolbarPanel {
         { frame: 75, value: 90, easing: "easeOutQuad" },
         { frame: 90, value: 90, easing: "linear" },
         { frame: 105, value: 80, easing: "easeInOutQuad" },
-        { frame: 120, value: 85, easing: "easeOutQuad" }
+        { frame: 120, value: 85, easing: "easeOutQuad" },
       ]);
 
       this.animation.animate(shadow, "opacity", [
@@ -512,7 +538,7 @@ class ToolbarPanel {
         { frame: 60, value: 180, easing: "easeInQuad" },
         { frame: 75, value: 120, easing: "easeOutQuad" },
         { frame: 105, value: 150, easing: "easeInQuad" },
-        { frame: 120, value: 130, easing: "easeOutQuad" }
+        { frame: 120, value: 130, easing: "easeOutQuad" },
       ]);
 
       // Set object order
@@ -537,7 +563,7 @@ class ToolbarPanel {
         text: "",
         fontSize: 36,
         fill: [255, 255, 255],
-        name: "Typing Text"
+        name: "Typing Text",
       });
 
       // Use the AnimationAPI's typeText method
@@ -550,7 +576,7 @@ class ToolbarPanel {
         {
           cursor: true,
           cursorChar: "|",
-          cursorBlinkRate: 15
+          cursorBlinkRate: 15,
         }
       );
 
@@ -572,7 +598,7 @@ class ToolbarPanel {
         width: this.engine.canvasWidth,
         height: this.engine.canvasHeight,
         fill: [30, 30, 30],
-        name: "Background"
+        name: "Background",
       });
 
       // Create a centered text with the AnimationAPI
@@ -584,7 +610,7 @@ class ToolbarPanel {
         fontFamily: "Arial",
         textStyle: "bold",
         fill: [255, 255, 255],
-        name: "Fading Text"
+        name: "Fading Text",
       });
 
       // Use the AnimationAPI's crossFade method
@@ -593,7 +619,7 @@ class ToolbarPanel {
         { frame: 0, value: 36, easing: "easeOutQuad" },
         { frame: 30, value: 48, easing: "easeOutQuad" },
         { frame: 60, value: 48, easing: "linear" },
-        { frame: 90, value: 54, easing: "easeInQuad" }
+        { frame: 90, value: 54, easing: "easeInQuad" },
       ]);
       this.animation.fadeOut(text, 60, 30, "easeInCubic");
 
@@ -620,7 +646,7 @@ class ToolbarPanel {
         fontSize: 72,
         fontFamily: "Impact",
         fill: [255, 100, 50],
-        name: "Exploding Text"
+        name: "Exploding Text",
       });
 
       // Animate the text growing and then disappearing
@@ -628,7 +654,7 @@ class ToolbarPanel {
         { frame: 0, value: 10, easing: "easeOutElastic" },
         { frame: 20, value: 72, easing: "easeOutElastic" },
         { frame: 45, value: 90, easing: "easeInBack" },
-        { frame: 50, value: 0, easing: "linear" }
+        { frame: 50, value: 0, easing: "linear" },
       ]);
 
       // Add a frame action to create particles after text explodes
@@ -648,7 +674,7 @@ class ToolbarPanel {
             spread: 200,
             gravity: 0.5,
             startFrame: 50,
-            scaleDown: true
+            scaleDown: true,
           }
         );
       });
@@ -673,7 +699,7 @@ class ToolbarPanel {
           centerY: this.engine.canvasHeight / 2,
           radius: 150,
           size: 30,
-          fill: [100, 200, 255]
+          fill: [100, 200, 255],
         },
         "circle"
       );
@@ -696,12 +722,12 @@ class ToolbarPanel {
         y: this.engine.canvasHeight / 2,
         size: 60,
         fill: [50, 100, 255],
-        name: "Center Circle"
+        name: "Center Circle",
       });
 
       // Use the AnimationAPI to spin the center circle
       this.animation.spin(centerCircle, 0, 120, 1, true, "linear");
-      
+
       // Pulse the center circle
       this.animation.pulse(centerCircle, 0, 2, 120, 0.8, 1.2);
 
@@ -721,7 +747,7 @@ class ToolbarPanel {
         [50, 100, 200],
         [60, 160, 220],
         [70, 180, 240],
-        [80, 200, 255]
+        [80, 200, 255],
       ];
 
       // Create a group of rectangles for the logo
@@ -736,34 +762,42 @@ class ToolbarPanel {
           fill: colors[i],
           opacity: 0,
           rotation: 45,
-          name: `Logo Part ${i + 1}`
+          name: `Logo Part ${i + 1}`,
         });
-        
+
         parts.push(rect);
       }
-      
+
       // Create staggered animation for logo parts
       for (let i = 0; i < parts.length; i++) {
         const part = parts[i];
         const delay = i * 5;
-        
+
         // Fade in, rotate and move down
         this.animation.fadeIn(part, delay, 15, "easeOutQuad");
-        
+
         this.animation.animate(part, "rotation", [
           { frame: delay, value: 45, easing: "easeOutBack" },
-          { frame: 20 + delay, value: 0, easing: "easeOutBack" }
+          { frame: 20 + delay, value: 0, easing: "easeOutBack" },
         ]);
-        
+
         this.animation.animate(part, "y", [
-          { frame: delay, value: this.engine.canvasHeight / 2 - 100, easing: "easeOutBack" },
-          { frame: 20 + delay, value: this.engine.canvasHeight / 2, easing: "easeOutBack" }
+          {
+            frame: delay,
+            value: this.engine.canvasHeight / 2 - 100,
+            easing: "easeOutBack",
+          },
+          {
+            frame: 20 + delay,
+            value: this.engine.canvasHeight / 2,
+            easing: "easeOutBack",
+          },
         ]);
-        
+
         // Add bounce effect at the end
         this.animation.pulse(part, 60 + delay, 1, 20, 0.8, 1.2, "easeOutBack");
       }
-      
+
       // Add text using the AnimationAPI
       const text = this.animation.createShape("text", {
         x: this.engine.canvasWidth / 2,
@@ -774,24 +808,154 @@ class ToolbarPanel {
         textStyle: "bold",
         fill: [255, 255, 255],
         opacity: 0,
-        name: "Logo Text"
+        name: "Logo Text",
       });
-      
+
       // Animate the text
       this.animation.fadeIn(text, 25, 15, "easeOutQuad");
-      
+
       this.animation.animate(text, "y", [
-        { frame: 25, value: this.engine.canvasHeight / 2 + 150, easing: "easeOutQuad" },
-        { frame: 50, value: this.engine.canvasHeight / 2 + 100, easing: "easeOutQuad" }
+        {
+          frame: 25,
+          value: this.engine.canvasHeight / 2 + 150,
+          easing: "easeOutQuad",
+        },
+        {
+          frame: 50,
+          value: this.engine.canvasHeight / 2 + 100,
+          easing: "easeOutQuad",
+        },
       ]);
-      
+
       // Add text pulse
       this.animation.pulse(text, 60, 1, 20, 0.95, 1.08, "easeInOutQuad");
-      
+
       // Start the animation
       this.animation.reset();
       this.animation.play();
     }
   }
+
+  /**
+   * Creates a recursive doubling animation
+   * @param {number} generations - Number of doubling generations
+   * @param {number} maxShapes - Maximum number of shapes to create
+   * @param {boolean} useRandomColors - Whether to use random colors for each generation
+   */
+  createRecursiveDoublingAnimation(
+    generations = 4,
+    maxShapes = 64,
+    useRandomColors = true
+  ) {
+    // Clear existing objects if user confirms
+    if (confirm("This will create a data flow animation. Continue?")) {
+      // Set up canvas
+      this.animation.clearAll();
+      this.engine.setCanvasSize(1900, 1000);
+      
+      // Create three nodes: Source, Processor, and Destination
+      const sourceNode = this.animation.createShape("rectangle", {
+        x: 250,
+        y: 200,
+        width: 100,
+        height: 120,
+        fill: [50, 100, 200],
+        name: "Data Source"
+      });
+      
+      const processorNode = this.animation.createShape("circle", {
+        x: 500,
+        y: 350,
+        width: 120,
+        height: 120,
+        fill: [200, 150, 50],
+        name: "Processor"
+      });
+      
+      const destinationNode = this.animation.createShape("rectangle", {
+        x: 750,
+        y: 350,
+        width: 140,
+        height: 80,
+        cornerRadius: 10,
+        fill: [50, 180, 100],
+        name: "Destination"
+      });
+      
+      // Add labels
+      const sourceLabel = this.animation.createShape("text", {
+        x: sourceNode.x,
+        y: sourceNode.y + 80,
+        text: "DATA SOURCE",
+        fontSize: 14,
+        fill: [255, 255, 255]
+      });
+      
+      const processorLabel = this.animation.createShape("text", {
+        x: processorNode.x,
+        y: processorNode.y + 80,
+        text: "PROCESSOR",
+        fontSize: 14,
+        fill: [255, 255, 255]
+      });
+      
+      const destinationLabel = this.animation.createShape("text", {
+        x: destinationNode.x,
+        y: destinationNode.y + 60,
+        text: "DESTINATION",
+        fontSize: 14,
+        fill: [255, 255, 255]
+      });
+      
+      // Create flow paths
+      // Source to Processor flow (regular bezier)
+      const flowPath1 = this.animation.createShape("flowpath", {
+        startShape: sourceNode,
+        endShape: processorNode,
+        startConnection: "bottom",
+        endConnection: "top",
+        pathStyle: "bezier",
+        curveIntensity: 0.3,
+        arrowEnd: true,
+        arrowSize: 8,
+        stroke: [100, 200, 250],
+        strokeWeight: 2,
+        flowParticles: 8,        // Add flowing particles
+        particleSize: 6,         // Size of particles
+        fill: [150, 220, 255],   // Particle color
+        animationSpeed: 2        // Speed of flow
+      });
+      
+      // Processor to Destination flow (wave style)
+      const flowPath2 = this.animation.createShape("flowpath", {
+        startShape: processorNode,
+        endShape: destinationNode,
+        startConnection: "right",
+        endConnection: "left",
+        pathStyle: "bezier",
+        curveIntensity: 0,
+        stroke: [100, 200, 150],
+        strokeWeight: 2,
+        flowParticles: 2,
+        particleSize: 5,
+        animationSpeed: 5
+      });
+      
+
+      // Add a title
+      const title = this.animation.createShape("text", {
+        x: 500,
+        y: 80,
+        text: "DATA FLOW VISUALIZATION",
+        fontSize: 24,
+        fontFamily: "Arial",
+        textStyle: "bold",
+        fill: [255, 255, 255]
+      });
+      
+      // Start the animation
+      this.animation.reset();
+      this.animation.play(true); // Set to loop
+    }
+  }
 }
-    

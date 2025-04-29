@@ -24,12 +24,12 @@ class AnimationAPI {
     let shape;
     const x = props.x || this.engine.canvasWidth / 2;
     const y = props.y || this.engine.canvasHeight / 2;
-
+  
     switch (type.toLowerCase()) {
       case "circle":
         shape = new Circle(x, y, props.size || props.diameter || 100);
         break;
-
+  
       case "rectangle":
       case "rect":
         shape = new Rectangle(x, y, props.width || 100, props.height || 80);
@@ -37,7 +37,7 @@ class AnimationAPI {
           shape.cornerRadius = props.cornerRadius;
         }
         break;
-
+  
       case "text":
         shape = new Text(x, y, props.text || "Text");
         if (props.fontSize) shape.fontSize = props.fontSize;
@@ -45,7 +45,7 @@ class AnimationAPI {
         if (props.textAlign) shape.textAlign = props.textAlign;
         if (props.textStyle) shape.textStyle = props.textStyle;
         break;
-
+  
       case "path":
         shape = new Path(x, y);
         if (props.points && Array.isArray(props.points)) {
@@ -55,19 +55,79 @@ class AnimationAPI {
         }
         shape.closed = props.closed !== undefined ? props.closed : false;
         break;
-
+  
+      case "arrow":
+        const arrowStartX = props.startX || x - 50;
+        const arrowStartY = props.startY || y;
+        const arrowEndX = props.endX || x + 50;
+        const arrowEndY = props.endY || y;
+        
+        shape = new Arrow(arrowStartX, arrowStartY, arrowEndX, arrowEndY);
+        if (props.arrowSize !== undefined) shape.arrowSize = props.arrowSize;
+        if (props.arrowType !== undefined) shape.arrowType = props.arrowType;
+        if (props.lineStyle !== undefined) shape.lineStyle = props.lineStyle;
+        break;
+  
+      case "diamond":
+        shape = new Diamond(x, y, props.width || 100, props.height || 80);
+        break;
+  
+      case "parallelogram":
+        shape = new Parallelogram(x, y, props.width || 120, props.height || 60, props.slant || 20);
+        break;
+  
+      case "database":
+        shape = new Database(x, y, props.width || 80, props.height || 120);
+        if (props.capHeight !== undefined) shape.capHeight = props.capHeight;
+        break;
+  
+      case "document":
+        shape = new Document(x, y, props.width || 100, props.height || 120);
+        if (props.curlHeight !== undefined) shape.curlHeight = props.curlHeight;
+        break;
+  
+      case "flowpath":
+        const startX = props.startX || x - 100;
+        const startY = props.startY || y;
+        const endX = props.endX || x + 100;
+        const endY = props.endY || y;
+        
+        shape = new FlowPath(startX, startY, endX, endY);
+        
+        // Apply FlowPath-specific properties
+        if (props.pathStyle !== undefined) shape.pathStyle = props.pathStyle;
+        if (props.curveIntensity !== undefined) shape.curveIntensity = props.curveIntensity;
+        if (props.waveAmplitude !== undefined) shape.waveAmplitude = props.waveAmplitude;
+        if (props.waveFrequency !== undefined) shape.waveFrequency = props.waveFrequency;
+        if (props.animationSpeed !== undefined) shape.animationSpeed = props.animationSpeed;
+        if (props.arrowStart !== undefined) shape.arrowStart = props.arrowStart;
+        if (props.arrowEnd !== undefined) shape.arrowEnd = props.arrowEnd;
+        if (props.arrowSize !== undefined) shape.arrowSize = props.arrowSize;
+        if (props.flowParticles !== undefined) shape.flowParticles = props.flowParticles;
+        if (props.particleSize !== undefined) shape.particleSize = props.particleSize;
+        if (props.lineStyle !== undefined) shape.lineStyle = props.lineStyle;
+        if (props.dashLength !== undefined) shape.dashLength = props.dashLength;
+        
+        // Connect shapes if specified
+        if (props.startShape && props.endShape) {
+          const startConnection = props.startConnection || "center";
+          const endConnection = props.endConnection || "center";
+          shape.connectShapes(props.startShape, props.endShape, startConnection, endConnection);
+        }
+        break;
+  
       default:
         console.error("Unknown shape type:", type);
         return null;
     }
-
+  
     // Apply common properties
     this._applyCommonProperties(shape, props);
-
+  
     // Add to engine and track in our created objects
     this.engine.addObject(shape);
     this.createdObjects.push(shape);
-
+  
     return shape;
   }
 
