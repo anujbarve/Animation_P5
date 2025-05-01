@@ -242,37 +242,36 @@ class DemoCodes {
       darkOrange: [255, 140, 0],
       lightSlateGray: [119, 136, 153],
     };
-
+  
     this.animation.clearAll();
     this.animation.setDuration(10);
     this.animation.setFPS(60);
     this.engine.setCanvasSize(1900, 1000);
-
-    // Node positions and names
-    const nodeData = [
-      { x: 200, y: 400, name: "node 0", fill: colors.goldenRod }, // highlighted
-      { x: 400, y: 400, name: "node 1", fill: colors.steelBlue },
-      { x: 600, y: 400, name: "node 2", fill: colors.steelBlue },
-      { x: 800, y: 400, name: "node 3", fill: colors.steelBlue },
-      { x: 800, y: 200, name: "node 4", fill: colors.steelBlue },
-      { x: 600, y: 200, name: "node 5", fill: colors.steelBlue },
-      { x: 400, y: 200, name: "node 6", fill: colors.steelBlue },
-      { x: 200, y: 200, name: "node 7", fill: colors.steelBlue },
+  
+    // Node coordinates and optional custom colors
+    const nodeGrid = [
+      [200, 400, colors.goldenRod], // node 0 (highlighted)
+      [400, 400],                   // node 1
+      [600, 400],                   // node 2
+      [800, 400],                   // node 3
+      [800, 200],                   // node 4
+      [600, 200],                   // node 5
+      [400, 200],                   // node 6
+      [200, 200],                   // node 7
     ];
-
-    // Create all nodes dynamically
-    const nodes = nodeData.map((data) =>
-      this.animation.createShape("circle", {
-        x: data.x,
-        y: data.y,
+  
+    // Create all nodes and store them as an array of shapes
+    const nodes = nodeGrid.map(([x, y, customFill], index) => {
+      return this.animation.createShape("circle", {
+        x,
+        y,
         size: 80,
-        fill: data.fill,
-        name: data.name,
-      })
-    );
-
-    // Common flowpath config
-    const flowConfig = {
+        fill: customFill || colors.steelBlue,
+        name: `node ${index}`,
+      });
+    });
+  
+    const flowDefaults = {
       pathStyle: "bezier",
       curveIntensity: 0,
       arrowEnd: false,
@@ -284,30 +283,34 @@ class DemoCodes {
       fill: colors.steelBlue,
       animationSpeed: 2,
     };
-
-    // Define connections between nodes
-    const flowPathsData = [
-      { from: 0, to: 1, start: "right", end: "left" },
-      { from: 1, to: 2, start: "right", end: "left" },
-      { from: 2, to: 3, start: "right", end: "left" },
-      { from: 3, to: 4, start: "top", end: "bottom" },
-      { from: 4, to: 5, start: "left", end: "right" },
-      { from: 5, to: 6, start: "left", end: "right" },
-      { from: 6, to: 7, start: "left", end: "right" },
-      { from: 7, to: 0, start: "bottom", end: "top" },
+  
+    // Define flows [startIndex, endIndex, startConnection, endConnection]
+    const flowPaths = [
+      [0, 1, "right", "left"],
+      [1, 2, "right", "left"],
+      [2, 3, "right", "left"],
+      [3, 4, "top", "bottom"],
+      [4, 5, "left", "right"],
+      [5, 6, "left", "right"],
+      [6, 7, "left", "right"],
+      [7, 0, "bottom", "top"],
     ];
-
-    // Create flowpaths dynamically
-    flowPathsData.forEach((fp) => {
+  
+    // Create flows using direct index reference
+    flowPaths.forEach(([startIdx, endIdx, startConn, endConn]) => {
       this.animation.createShape("flowpath", {
-        startShape: nodes[fp.from],
-        endShape: nodes[fp.to],
-        startConnection: fp.start,
-        endConnection: fp.end,
-        ...flowConfig,
+        ...flowDefaults,
+        startShape: nodes[startIdx],
+        endShape: nodes[endIdx],
+        startConnection: startConn,
+        endConnection: endConn,
       });
     });
+  
+    this.animation.reset();
+    this.animation.play(true);
   }
+  
 
   mesh() {
     const colors = {
@@ -888,45 +891,44 @@ class DemoCodes {
       darkOrange: [255, 140, 0],
       lightSlateGray: [119, 136, 153],
     };
-
+    
     this.animation.clearAll();
     this.animation.setDuration(10);
     this.animation.setFPS(60);
     this.engine.setCanvasSize(1900, 1000);
-
-    // Node coordinates and names
+    
+    // Node coordinates and optional custom colors
     const nodeGrid = [
-      // [x, y, name, highlightColor?]
-      [100, 700, "node 0", colors.goldenRod], // Highlighted node
-      [100, 500, "node 1"],
-      [100, 300, "node 2"],
-      [100, 100, "node 3"],
-      [300, 700, "node 4"],
-      [300, 500, "node 5"],
-      [300, 300, "node 6"],
-      [300, 100, "node 7"],
-      [500, 700, "node 8"],
-      [500, 500, "node 9"],
-      [500, 300, "node 10"],
-      [500, 100, "node 11"],
-      [700, 700, "node 12"],
-      [700, 500, "node 13"],
-      [700, 300, "node 14"],
-      [700, 100, "node 15"],
+      [100, 700, colors.goldenRod], // 0
+      [100, 500],                   // 1
+      [100, 300],                   // 2
+      [100, 100],                   // 3
+      [300, 700],                   // 4
+      [300, 500],                   // 5
+      [300, 300],                   // 6
+      [300, 100],                   // 7
+      [500, 700],                   // 8
+      [500, 500],                   // 9
+      [500, 300],                   // 10
+      [500, 100],                   // 11
+      [700, 700],                   // 12
+      [700, 500],                   // 13
+      [700, 300],                   // 14
+      [700, 100],                   // 15
     ];
-
-    // Create all nodes and keep reference by name
-    const nodes = {};
-    nodeGrid.forEach(([x, y, name, customFill]) => {
-      nodes[name] = this.animation.createShape("circle", {
+    
+    // Create all nodes and store them as an array of shapes
+    const nodes = nodeGrid.map(([x, y, customFill], index) => {
+      return this.animation.createShape("rectangle", {
         x,
         y,
-        size: 80,
+        height : 100,
+        width : 100,
         fill: customFill || colors.steelBlue,
-        name,
+        name: `node ${index}`,
       });
     });
-
+    
     const flowDefaults = {
       pathStyle: "bezier",
       curveIntensity: 0,
@@ -939,48 +941,54 @@ class DemoCodes {
       fill: colors.steelBlue,
       animationSpeed: 2,
     };
-
+    
+    // Define flows **by index**, not name
     const flowPaths = [
-      // [startNode, endNode, startConnection, endConnection]
-      ["node 0", "node 4", "right", "left"],
-      ["node 4", "node 8", "right", "left"],
-      ["node 8", "node 12", "right", "left"],
-
-      ["node 1", "node 5", "right", "left"],
-      ["node 5", "node 9", "right", "left"],
-      ["node 9", "node 13", "right", "left"],
-
-      ["node 2", "node 6", "right", "left"],
-      ["node 6", "node 10", "right", "left"],
-      ["node 10", "node 14", "right", "left"],
-
-      ["node 3", "node 7", "right", "left"],
-      ["node 7", "node 11", "right", "left"],
-      ["node 11", "node 15", "right", "left"],
-
-      ["node 0", "node 1", "top", "bottom"],
-      ["node 1", "node 2", "top", "bottom"],
-      ["node 2", "node 3", "top", "bottom"],
-      ["node 4", "node 5", "top", "bottom"],
-      ["node 5", "node 6", "top", "bottom"],
-      ["node 6", "node 7", "top", "bottom"],
-      ["node 8", "node 9", "top", "bottom"],
-      ["node 9", "node 10", "top", "bottom"],
-      ["node 10", "node 11", "top", "bottom"],
-      ["node 12", "node 13", "top", "bottom"],
-      ["node 13", "node 14", "top", "bottom"],
-      ["node 14", "node 15", "top", "bottom"],
+      // [startIndex, endIndex, startConnection, endConnection]
+      [0, 4, "right", "left"],
+      [4, 8, "right", "left"],
+      [8, 12, "right", "left"],
+    
+      [1, 5, "right", "left"],
+      [5, 9, "right", "left"],
+      [9, 13, "right", "left"],
+    
+      [2, 6, "right", "left"],
+      [6, 10, "right", "left"],
+      [10, 14, "right", "left"],
+    
+      [3, 7, "right", "left"],
+      [7, 11, "right", "left"],
+      [11, 15, "right", "left"],
+    
+      [0, 1, "top", "bottom"],
+      [1, 2, "top", "bottom"],
+      [2, 3, "top", "bottom"],
+      [4, 5, "top", "bottom"],
+      [5, 6, "top", "bottom"],
+      [6, 7, "top", "bottom"],
+      [8, 9, "top", "bottom"],
+      [9, 10, "top", "bottom"],
+      [10, 11, "top", "bottom"],
+      [12, 13, "top", "bottom"],
+      [13, 14, "top", "bottom"],
+      [14, 15, "top", "bottom"],
     ];
-
-    flowPaths.forEach(([start, end, startConn, endConn]) => {
+    
+    // Create flows using direct index reference
+    const flows = flowPaths.map(([startIdx, endIdx, startConn, endConn]) => {
       this.animation.createShape("flowpath", {
         ...flowDefaults,
-        startShape: nodes[start],
-        endShape: nodes[end],
+        startShape: nodes[startIdx],
+        endShape: nodes[endIdx],
         startConnection: startConn,
         endConnection: endConn,
       });
     });
+
+
+    this.animation.reset();
+    this.animation.play(true);
   }
 
   hypercubeOptimized() {
@@ -1021,9 +1029,9 @@ class DemoCodes {
       ];
   
       // Create all nodes and keep reference by name
-      const nodes = {};
-      nodeGrid.forEach(([x, y, name, customFill]) => {
-        nodes[name] = this.animation.createShape("circle", {
+      
+      const nodes = nodeGrid.map(([x, y, name, customFill]) => {
+        return this.animation.createShape("circle", {
           x,
           y,
           size: 80,
@@ -1049,22 +1057,114 @@ class DemoCodes {
         // [startNode, endNode, startConnection, endConnection]
   
   
-        ["node 0", "node 4", "center", "center"],
-        ["node 2", "node 6", "center", "center"],
-        ["node 1", "node 5", "center", "center"],
-        ["node 3", "node 7", "center", "center"],
+        [0, 4, "center", "center"],
+        [2, 6, "center", "center"],
+        [1, 5, "center", "center"],
+        [3, 7, "center", "center"],
   
-        ["node 0", "node 1", "center", "center"],
-        ["node 1", "node 2", "center", "center"],
-        ["node 2", "node 3", "center", "center"],
-        ["node 3", "node 0", "center", "center"],
+        [0, 1, "center", "center"],
+        [1, 2, "center", "center"],
+        [2, 3, "center", "center"],
+        [3, 0, "center", "center"],
   
   
-        ["node 4", "node 5", "center", "center"],
-        ["node 5", "node 6", "center", "center"],
-        ["node 6", "node 7", "center", "center"],
-        ["node 7", "node 4", "center", "center"],
+        [4, 5, "center", "center"],
+        [5, 6, "center", "center"],
+        [6, 7, "center", "center"],
+        [7, 4, "center", "center"],
       ];
+  
+      const flows = flowPaths.map(([startIdx, endIdx, startConn, endConn]) => {
+        this.animation.createShape("flowpath", {
+          ...flowDefaults,
+          startShape: nodes[startIdx],
+          endShape: nodes[endIdx],
+          startConnection: startConn,
+          endConnection: endConn,
+        });
+      });
+  }
+
+  matrixVectorOptimized() {
+    const colors = {
+        skyBlue: [135, 206, 235],
+        coral: [255, 127, 80],
+        limeGreen: [50, 205, 50],
+        goldenRod: [218, 165, 32],
+        orchid: [218, 112, 214],
+        slateGray: [112, 128, 144],
+        tomato: [255, 99, 71],
+        steelBlue: [70, 130, 180],
+        mediumPurple: [147, 112, 219],
+        seaGreen: [46, 139, 87],
+        deepPink: [255, 20, 147],
+        turquoise: [64, 224, 208],
+        fireBrick: [178, 34, 34],
+        darkOrange: [255, 140, 0],
+        lightSlateGray: [119, 136, 153],
+      };
+  
+      this.animation.clearAll();
+      this.animation.setDuration(10);
+      this.animation.setFPS(60);
+      this.engine.setCanvasSize(1900, 1000);
+  
+      // Node coordinates and names
+      const nodeGrid = [
+        // [x, y, name, highlightColor?]
+        [400, 400, "node 0", colors.goldenRod], // Highlighted node
+        [400, 500, "node 1"],
+        [400, 600, "node 2"],
+        [400, 700, "node 3"],
+        [500, 400, "node 4"],
+        [500, 500, "node 5"],
+        [500, 600, "node 6"],
+        [500, 700, "node 7"],
+        [600, 400, "node 8"],
+        [600, 500, "node 9"],
+        [600, 600, "node 10"],
+        [600, 700, "node 11"],
+        [700, 400, "node 12"],
+        [700, 500, "node 13"],
+        [700, 600, "node 14"],
+        [700, 700, "node 15"],
+  
+        [200,400,"ov 1", colors.fireBrick],
+        [200,500,"ov 2", colors.fireBrick],
+        [200,600,"ov 3", colors.fireBrick],
+        [200,700,"ov 4", colors.fireBrick],
+  
+        [400,200,"iv 1", colors.fireBrick],
+        [500,200,"iv 2", colors.fireBrick],
+        [600,200,"iv 3", colors.fireBrick],
+        [700,200,"iv 4", colors.fireBrick],
+      ];
+  
+      // Create all nodes and keep reference by name
+      const nodes = nodeGrid.map(([x, y, name, customFill]) =>
+        this.animation.createShape("rectangle", {
+          x,
+          y,
+          height : 100,
+          width : 100,
+          fill: customFill || colors.steelBlue,
+          name,
+        })
+      );
+  
+      const flowDefaults = {
+        pathStyle: "bezier",
+        curveIntensity: 0,
+        arrowEnd: false,
+        arrowSize: 8,
+        stroke: colors.goldenRod,
+        strokeWeight: 2,
+        flowParticles: 8,
+        particleSize: 6,
+        fill: colors.fireBrick,
+        animationSpeed: 2,
+      };
+  
   
       flowPaths.forEach(([start, end, startConn, endConn]) => {
         this.animation.createShape("flowpath", {
@@ -1075,5 +1175,7 @@ class DemoCodes {
           endConnection: endConn,
         });
       });
+  
+      console.log(nodes)
   }
 }

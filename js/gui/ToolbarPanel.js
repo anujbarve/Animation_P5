@@ -1348,7 +1348,7 @@ class ToolbarPanel {
   }
 
   createOneToAllBroadcast() {
-    
+
     const colors = {
       skyBlue: [135, 206, 235],
       coral: [255, 127, 80],
@@ -1376,27 +1376,19 @@ class ToolbarPanel {
     const nodeGrid = [
       // [x, y, name, highlightColor?]
       [100, 700, "node 0", colors.goldenRod], // Highlighted node
-      [100, 500, "node 1"],
-      [100, 300, "node 2"],
-      [100, 100, "node 3"],
-      [300, 700, "node 4"],
-      [300, 500, "node 5"],
-      [300, 300, "node 6"],
+      [500, 700, "node 1"],
+      [500, 300, "node 2"],
+      [100, 300, "node 3"],
+      [300, 500, "node 4"],
+      [700, 500, "node 5"],
+      [700, 100, "node 6"],
       [300, 100, "node 7"],
-      [500, 700, "node 8"],
-      [500, 500, "node 9"],
-      [500, 300, "node 10"],
-      [500, 100, "node 11"],
-      [700, 700, "node 12"],
-      [700, 500, "node 13"],
-      [700, 300, "node 14"],
-      [700, 100, "node 15"],
     ];
 
     // Create all nodes and keep reference by name
-    const nodes = {};
-    nodeGrid.forEach(([x, y, name, customFill]) => {
-      nodes[name] = this.animation.createShape("circle", {
+    
+    const nodes = nodeGrid.map(([x, y, name, customFill]) => {
+      return this.animation.createShape("circle", {
         x,
         y,
         size: 80,
@@ -1420,45 +1412,37 @@ class ToolbarPanel {
 
     const flowPaths = [
       // [startNode, endNode, startConnection, endConnection]
-      ["node 0", "node 4", "right", "left"],
-      ["node 4", "node 8", "right", "left"],
-      ["node 8", "node 12", "right", "left"],
 
-      ["node 1", "node 5", "right", "left"],
-      ["node 5", "node 9", "right", "left"],
-      ["node 9", "node 13", "right", "left"],
 
-      ["node 2", "node 6", "right", "left"],
-      ["node 6", "node 10", "right", "left"],
-      ["node 10", "node 14", "right", "left"],
+      [0, 4, "center", "center"],
+      [2, 6, "center", "center"],
+      [1, 5, "center", "center"],
+      [3, 7, "center", "center"],
 
-      ["node 3", "node 7", "right", "left"],
-      ["node 7", "node 11", "right", "left"],
-      ["node 11", "node 15", "right", "left"],
+      [0, 1, "center", "center"],
+      [1, 2, "center", "center"],
+      [2, 3, "center", "center"],
+      [3, 0, "center", "center"],
 
-      ["node 0", "node 1", "top", "bottom"],
-      ["node 1", "node 2", "top", "bottom"],
-      ["node 2", "node 3", "top", "bottom"],
-      ["node 4", "node 5", "top", "bottom"],
-      ["node 5", "node 6", "top", "bottom"],
-      ["node 6", "node 7", "top", "bottom"],
-      ["node 8", "node 9", "top", "bottom"],
-      ["node 9", "node 10", "top", "bottom"],
-      ["node 10", "node 11", "top", "bottom"],
-      ["node 12", "node 13", "top", "bottom"],
-      ["node 13", "node 14", "top", "bottom"],
-      ["node 14", "node 15", "top", "bottom"],
+
+      [4, 5, "center", "center"],
+      [5, 6, "center", "center"],
+      [6, 7, "center", "center"],
+      [7, 4, "center", "center"],
     ];
 
-    flowPaths.forEach(([start, end, startConn, endConn]) => {
+    const flows = flowPaths.map(([startIdx, endIdx, startConn, endConn]) => {
       this.animation.createShape("flowpath", {
         ...flowDefaults,
-        startShape: nodes[start],
-        endShape: nodes[end],
+        startShape: nodes[startIdx],
+        endShape: nodes[endIdx],
         startConnection: startConn,
         endConnection: endConn,
       });
     });
-    
+
+
+    this.animation.reset();
+    this.animation.play(true);
   }
 }
