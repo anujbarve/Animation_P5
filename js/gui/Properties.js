@@ -25,12 +25,6 @@ class PropertiesPanel {
     this.shapeFolder = this.gui.addFolder("Shape Properties");
     this.styleFolder = this.gui.addFolder("Style Properties");
     this.animationFolder = this.gui.addFolder("Animation");
-
-    // Open folders by default
-    this.shapeFolder.open();
-    this.styleFolder.open();
-    this.animationFolder.open();
-
     // Add empty message when no object is selected
     this.updateForSelectedObject();
   }

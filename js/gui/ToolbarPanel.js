@@ -20,8 +20,6 @@ class ToolbarPanel {
     this.toolsFolder = this.gui.addFolder("Tools");
     this.projectFolder = this.gui.addFolder("Project");
     // Open folders by default
-    this.toolsFolder.open();
-    this.projectFolder.open();
     // Add tools
     this.addShapeTools();
     this.addCanvasSettings();
@@ -347,7 +345,9 @@ class ToolbarPanel {
       matrixMultiplication: () => this.matrixMultiplication(),
       meshBroadCastOneToAll: () => this.meshBroadCastOneToAll(),
       hyperCubeBroadcastOneToAll: () => this.hyperCubeBroadcastOneToAll(),
-      binaryTreeBroadcast: () => this.binaryTreeBroadcast()
+      binaryTreeBroadcast: () => this.binaryTreeBroadcast(),
+      allToAllBroadcastRing: () => this.allToAllBroadcastRing(),
+      allToAllBroadcastMesh: () => this.allToAllBroadcastMesh(),
     };
 
     this.templatesFolder
@@ -368,10 +368,15 @@ class ToolbarPanel {
     this.templatesFolder
       .add(templates, "hyperCubeBroadcastOneToAll")
       .name("HyperCube Broadcast One to All");
-      this.templatesFolder
+    this.templatesFolder
       .add(templates, "binaryTreeBroadcast")
       .name("Binary Tree One to All");
-      
+    this.templatesFolder
+      .add(templates, "allToAllBroadcastRing")
+      .name("All to All Broadcast Ring");
+    this.templatesFolder
+      .add(templates, "allToAllBroadcastMesh")
+      .name("All to All Broadcast Mesh");
 
     this.templatesFolder.open();
   }
@@ -876,7 +881,7 @@ class ToolbarPanel {
       particleSize: 3,
       fill: colors.steelBlue,
       animationSpeed: 1,
-      lineStyle : "dashed"
+      lineStyle: "dashed",
     };
 
     const flowPaths = [
@@ -966,7 +971,7 @@ class ToolbarPanel {
       particleSize: 3,
       fill: colors.steelBlue,
       animationSpeed: 1,
-      lineStyle : "dashed"
+      lineStyle: "dashed",
     };
 
     // Define flows [startIndex, endIndex, startConnection, endConnection]
@@ -1122,7 +1127,7 @@ class ToolbarPanel {
       particleSize: 3,
       fill: colors.steelBlue,
       animationSpeed: 1,
-      lineStyle : "dashed"
+      lineStyle: "dashed",
     };
 
     // Define flows [startIndex, endIndex, startConnection, endConnection]
@@ -1539,7 +1544,7 @@ class ToolbarPanel {
       particleSize: 3,
       fill: colors.steelBlue,
       animationSpeed: 1,
-      lineStyle : "dashed"
+      lineStyle: "dashed",
     };
 
     // Define flows **by index**, not name
@@ -1675,7 +1680,6 @@ class ToolbarPanel {
   }
 
   hyperCubeBroadcastOneToAll() {
-
     const duration = 10;
     const fps = 60;
     const totalFPS = duration * fps;
@@ -1743,7 +1747,7 @@ class ToolbarPanel {
       particleSize: 3,
       fill: colors.steelBlue,
       animationSpeed: 1,
-      lineStyle : "dashed"
+      lineStyle: "dashed",
     };
 
     const flowPaths = [
@@ -1756,19 +1760,16 @@ class ToolbarPanel {
       [1, 3, "center", "center"],
       [1, 5, "center", "center"],
 
-
       [2, 6, "center", "center"],
       [2, 3, "center", "center"],
       [2, 3, "center", "center"],
       [3, 7, "center", "center"],
-
 
       [5, 7, "center", "center"],
       [5, 4, "center", "center"],
 
       [6, 4, "center", "center"],
       [6, 7, "center", "center"],
-
     ];
 
     const flows = flowPaths.map(([startIdx, endIdx, startConn, endConn]) => {
@@ -1780,7 +1781,6 @@ class ToolbarPanel {
         endConnection: endConn,
       });
     });
-
 
     for (
       let startFrame = 0;
@@ -1846,12 +1846,7 @@ class ToolbarPanel {
       startFrame += pulseInterval
     ) {
       this.animation.animateGroup(
-        [
-          nodes[1],
-          nodes[3],
-          nodes[5],
-          nodes[7],
-        ],
+        [nodes[1], nodes[3], nodes[5], nodes[7]],
         "fill",
         [
           { frame: startFrame, value: colors.steelBlue },
@@ -1863,7 +1858,7 @@ class ToolbarPanel {
     }
   }
 
-  binaryTreeBroadcast(){
+  binaryTreeBroadcast() {
     const duration = 10;
     const fps = 60;
     const totalFPS = duration * fps;
@@ -1897,26 +1892,25 @@ class ToolbarPanel {
 
     // Node coordinates and names
     const nodeGrid = [
-    [width / 2, 80, "node 0"],                // Root
+      [width / 2, 80, "node 0"], // Root
 
-    [width / 4, 200, "node 1"],               // Level 1 - Left
-    [3 * width / 4, 200, "node 2"],           // Level 1 - Right
+      [width / 4, 200, "node 1"], // Level 1 - Left
+      [(3 * width) / 4, 200, "node 2"], // Level 1 - Right
 
-    [width / 8, 350, "node 3"],               // Level 2 - Left-Left
-    [width / 4 + width / 8, 350, "node 4"],   // Level 2 - Left-Right
-    [3 * width / 4 - width / 8, 350, "node 5"], // Level 2 - Right-Left
-    [7 * width / 8, 350, "node 6"],           // Level 2 - Right-Right
+      [width / 8, 350, "node 3"], // Level 2 - Left-Left
+      [width / 4 + width / 8, 350, "node 4"], // Level 2 - Left-Right
+      [(3 * width) / 4 - width / 8, 350, "node 5"], // Level 2 - Right-Left
+      [(7 * width) / 8, 350, "node 6"], // Level 2 - Right-Right
 
-    [width / 16, 500, "node 7"],              // Level 3 (optional deeper level)
-    [width / 8 + width / 16, 500, "node 8"],
-    [width / 4 + width / 16, 500, "node 9"],
-    [width / 2 - width / 16, 500, "node 10"],
-    [width / 2 + width / 16, 500, "node 11"],
-    [3 * width / 4 - width / 16, 500, "node 12"],
-    [7 * width / 8 - width / 16, 500, "node 13"],
-    [15 * width / 16, 500, "node 14"],
-  ];
-    
+      [width / 16, 500, "node 7"], // Level 3 (optional deeper level)
+      [width / 8 + width / 16, 500, "node 8"],
+      [width / 4 + width / 16, 500, "node 9"],
+      [width / 2 - width / 16, 500, "node 10"],
+      [width / 2 + width / 16, 500, "node 11"],
+      [(3 * width) / 4 - width / 16, 500, "node 12"],
+      [(7 * width) / 8 - width / 16, 500, "node 13"],
+      [(15 * width) / 16, 500, "node 14"],
+    ];
 
     // Create all nodes and keep reference by name
 
@@ -1941,32 +1935,31 @@ class ToolbarPanel {
       particleSize: 3,
       fill: colors.steelBlue,
       animationSpeed: 1,
-      lineStyle : "dashed"
+      lineStyle: "dashed",
     };
 
     const flowPaths = [
       [0, 1, "left", "top"],
       [0, 2, "right", "top"],
-    
+
       [1, 3, "left", "top"],
       [1, 4, "right", "top"],
-    
+
       [2, 5, "left", "top"],
       [2, 6, "right", "top"],
-    
+
       [3, 7, "left", "top"],
       [3, 8, "right", "top"],
-    
+
       [4, 9, "left", "top"],
-      [4,10, "right", "top"],
-    
-      [5,11, "left", "top"],
-      [5,12, "right", "top"],
-    
-      [6,13, "left", "top"],
-      [6,14, "right", "top"],
+      [4, 10, "right", "top"],
+
+      [5, 11, "left", "top"],
+      [5, 12, "right", "top"],
+
+      [6, 13, "left", "top"],
+      [6, 14, "right", "top"],
     ];
-    
 
     const flows = flowPaths.map(([startIdx, endIdx, startConn, endConn]) => {
       this.animation.createShape("flowpath", {
@@ -1977,7 +1970,6 @@ class ToolbarPanel {
         endConnection: endConn,
       });
     });
-
 
     for (
       let startFrame = 0;
@@ -2014,7 +2006,7 @@ class ToolbarPanel {
       startFrame += pulseInterval
     ) {
       this.animation.animateGroup(
-        [nodes[3],nodes[4], nodes[5],nodes[6],],
+        [nodes[3], nodes[4], nodes[5], nodes[6]],
         "fill",
         [
           { frame: startFrame, value: colors.steelBlue },
@@ -2031,7 +2023,16 @@ class ToolbarPanel {
       startFrame += pulseInterval
     ) {
       this.animation.animateGroup(
-        [nodes[7],nodes[8], nodes[9],nodes[10],nodes[11],nodes[12], nodes[13],nodes[14],],
+        [
+          nodes[7],
+          nodes[8],
+          nodes[9],
+          nodes[10],
+          nodes[11],
+          nodes[12],
+          nodes[13],
+          nodes[14],
+        ],
         "fill",
         [
           { frame: startFrame, value: colors.steelBlue },
@@ -2041,5 +2042,419 @@ class ToolbarPanel {
         0
       );
     }
+  }
+
+  allToAllBroadcastRing() {
+    const colors = {
+      limeGreen: [50, 205, 50],
+      goldenRod: [218, 165, 32],
+      steelBlue: [70, 130, 180],
+    };
+
+    const duration = 20;
+    const fps = 60;
+    const height = 1000;
+    const width = 1900;
+    const totalFrames = duration * fps; // Get total frames = duration × fps
+    const pulseInterval = fps / 1.5; // 60 frames for one pulse cycle (steelBlue → goldenRod → steelBlue)
+    const interval = 120;
+
+    this.animation.clearAll();
+    this.animation.setDuration(duration);
+    this.animation.setFPS(fps);
+    this.engine.setCanvasSize(width, height);
+
+    // Node coordinates and optional custom colors
+    const nodeGrid = [
+      [100, 600], // node 0 (highlighted)
+      [500, 600], // node 1
+      [900, 600], // node 2
+      [1300, 600], // node 3
+      [1300, 200], // node 4
+      [900, 200], // node 5
+      [500, 200], // node 6
+      [100, 200], // node 7
+    ];
+
+    // Create all nodes and store them as an array of shapes
+    const nodes = nodeGrid.map(([x, y, customFill], index) => {
+      return this.animation.createShape("circle", {
+        x,
+        y,
+        size: 80,
+        fill: customFill || colors.steelBlue,
+        name: `node ${index}`,
+      });
+    });
+
+    const data = nodeGrid.map(([x, y, customFill], index) => {
+      return this.animation.createShape("rectangle", {
+        x: x + 50,
+        y: y + 50,
+        height: 50,
+        width: 100,
+        fill: customFill || colors.goldenRod,
+        name: `data ${index}`,
+        cornerRadius: 10,
+      });
+    });
+
+    const flowDefaults = {
+      pathStyle: "bezier",
+      curveIntensity: 0,
+      arrowEnd: false,
+      arrowSize: 8,
+      stroke: colors.steelBlue,
+      strokeWeight: 3,
+      flowParticles: 8,
+      particleSize: 3,
+      fill: colors.steelBlue,
+      animationSpeed: 1,
+      lineStyle: "dashed",
+    };
+
+    // Define flows [startIndex, endIndex, startConnection, endConnection]
+    const flowPaths = [
+      [0, 1, "right", "left"],
+      [1, 2, "right", "left"],
+      [2, 3, "right", "left"],
+      [3, 4, "top", "bottom"],
+      [4, 5, "left", "right"],
+      [5, 6, "left", "right"],
+      [6, 7, "left", "right"],
+      [7, 0, "bottom", "top"],
+    ];
+
+    // Create flows using direct index reference
+    flowPaths.forEach(([startIdx, endIdx, startConn, endConn]) => {
+      this.animation.createShape("flowpath", {
+        ...flowDefaults,
+        startShape: nodes[startIdx],
+        endShape: nodes[endIdx],
+        startConnection: startConn,
+        endConnection: endConn,
+      });
+    });
+
+    // this.animation.animateMultiple(data[0],{
+    //   x : [
+    //     {
+    //       frame : 0,
+    //       value : nodes[0].x + 50
+    //     },
+    //     {
+    //       frame : interval,
+    //       value : nodes[1].x + 50
+    //     },
+    //     {
+    //       frame : interval * 2,
+    //       value : nodes[2].x + 50
+    //     },
+    //     {
+    //       frame : interval * 3,
+    //       value : nodes[3].x + 50
+    //     },
+    //     {
+    //       frame : interval * 4,
+    //       value : nodes[4].x + 50
+    //     },
+    //     {
+    //       frame : interval * 5,
+    //       value : nodes[5].x + 50
+    //     },
+    //     {
+    //       frame : interval * 6,
+    //       value : nodes[6].x + 50
+    //     },
+    //     {
+    //       frame : interval * 7,
+    //       value : nodes[7].x + 50
+    //     },
+    //     {
+    //       frame : interval * 8,
+    //       value : nodes[0].x + 50
+    //     }
+    //   ],
+    //   y : [
+    //     {
+    //       frame : 0,
+    //       value : nodes[0].y + 50
+    //     },
+    //     {
+    //       frame : interval,
+    //       value : nodes[1].y + 50
+    //     },
+    //     {
+    //       frame : interval * 2,
+    //       value : nodes[2].y + 50
+    //     },
+    //     {
+    //       frame : interval * 3,
+    //       value : nodes[3].y + 50
+    //     },
+    //     {
+    //       frame : interval * 4,
+    //       value : nodes[4].y + 50
+    //     },
+    //     {
+    //       frame : interval * 5,
+    //       value : nodes[5].y + 50
+    //     },
+    //     {
+    //       frame : interval * 6,
+    //       value : nodes[6].y + 50
+    //     },
+    //     {
+    //       frame : interval * 7,
+    //       value : nodes[7].y + 50
+    //     },
+    //     {
+    //       frame : interval * 8,
+    //       value : nodes[0].y + 50
+    //     }
+    //   ]
+    // });
+
+    // Animation logic with accumulating journey text
+    const numNodes = nodes.length;
+
+    data.forEach((dataItem, i) => {
+      const xKeyframes = [];
+      const yKeyframes = [];
+      const textKeyframes = [];
+
+      // Initial position and text (starting at its own node)
+      xKeyframes.push({ frame: 0, value: nodes[i].x + 50 });
+      yKeyframes.push({ frame: 0, value: nodes[i].y + 50 });
+      textKeyframes.push({ frame: 0, value: `${i}` }); // Start with just the data number
+
+      // Keep track of the journey text as it accumulates
+      let journeyText = `${i}`;
+
+      // Generate keyframes for data[i] to traverse the entire ring
+      for (let step = 0; step < numNodes; step++) {
+        // The target node for this step
+        const targetNodeIndex = (i + step + 1) % numNodes;
+
+        xKeyframes.push({
+          frame: (step + 1) * interval,
+          value: nodes[targetNodeIndex].x + 50,
+        });
+
+        yKeyframes.push({
+          frame: (step + 1) * interval,
+          value: nodes[targetNodeIndex].y + 50,
+        });
+
+        // Append the next node to the journey text
+        journeyText += `,${targetNodeIndex}`;
+
+        textKeyframes.push({
+          frame: (step + 1) * interval,
+          value: journeyText,
+        });
+      }
+
+      this.animation.animateMultiple(dataItem, {
+        x: xKeyframes,
+        y: yKeyframes,
+        text: textKeyframes,
+      });
+    });
+  }
+
+  allToAllBroadcastMesh() {
+    const colors = {
+      skyBlue: [135, 206, 235],
+      coral: [255, 127, 80],
+      limeGreen: [50, 205, 50],
+      goldenRod: [218, 165, 32],
+      orchid: [218, 112, 214],
+      slateGray: [112, 128, 144],
+      tomato: [255, 99, 71],
+      steelBlue: [70, 130, 180],
+      mediumPurple: [147, 112, 219],
+      seaGreen: [46, 139, 87],
+      deepPink: [255, 20, 147],
+      turquoise: [64, 224, 208],
+      fireBrick: [178, 34, 34],
+      darkOrange: [255, 140, 0],
+      lightSlateGray: [119, 136, 153],
+    };
+  
+    const duration = 20;
+    const fps = 60;
+    const interval = 60; // Frames between movement steps
+    
+    this.animation.clearAll();
+    this.animation.setDuration(duration);
+    this.animation.setFPS(fps);
+    this.engine.setCanvasSize(1900, 1000);
+  
+    // Node coordinates arranged in the requested grid:
+    // 6 7 8
+    // 3 4 5
+    // 0 1 2
+    const nodeGrid = [
+      [300, 700], // 0
+      [600, 700], // 1
+      [900, 700], // 2
+      [300, 400], // 3
+      [600, 400], // 4
+      [900, 400], // 5
+      [300, 100], // 6
+      [600, 100], // 7
+      [900, 100], // 8
+    ];
+  
+    // Create all nodes and store them as an array of shapes
+    const nodes = nodeGrid.map(([x, y], index) => {
+      return this.animation.createShape("circle", {
+        x,
+        y,
+        size: 100,
+        fill: colors.steelBlue,
+        name: `node ${index}`,
+        text: `${index}`,
+        fontSize: 24,
+        textColor: [255, 255, 255]
+      });
+    });
+    
+    // Create data packets, one associated with each node initially
+    const data = nodeGrid.map(([x, y], index) => {
+      return this.animation.createShape("rectangle", {
+        x: x,
+        y: y + 20, // Position slightly below center of node
+        height: 40,
+        width: 100,
+        fill: colors.coral,
+        name: `data ${index}`,
+        cornerRadius: 10,
+        text: `${index}`,
+        fontSize: 18,
+        textColor: [0, 0, 0]
+      });
+    });
+  
+    const flowDefaults = {
+      pathStyle: "bezier",
+      curveIntensity: 0,
+      arrowEnd: false,
+      arrowSize: 8,
+      stroke: colors.steelBlue,
+      strokeWeight: 2,
+      flowParticles: 8,
+      particleSize: 6,
+      fill: colors.steelBlue,
+      animationSpeed: 2,
+    };
+  
+    // Define flows by index - connections between adjacent nodes
+    const flowPaths = [
+      // Horizontal connections
+      [0, 1, "right", "left"],
+      [1, 2, "right", "left"],
+      [3, 4, "right", "left"],
+      [4, 5, "right", "left"],
+      [6, 7, "right", "left"],
+      [7, 8, "right", "left"],
+      
+      // Vertical connections
+      [0, 3, "top", "bottom"],
+      [3, 6, "top", "bottom"],
+      [1, 4, "top", "bottom"],
+      [4, 7, "top", "bottom"],
+      [2, 5, "top", "bottom"],
+      [5, 8, "top", "bottom"],
+    ];
+  
+    // Create flows using direct index reference
+    const flows = flowPaths.map(([startIdx, endIdx, startConn, endConn]) => {
+      return this.animation.createShape("flowpath", {
+        ...flowDefaults,
+        startShape: nodes[startIdx],
+        endShape: nodes[endIdx],
+        startConnection: startConn,
+        endConnection: endConn,
+      });
+    });
+  
+    // For each data packet, create animation to visit all other nodes
+    data.forEach((dataItem, sourceIndex) => {
+      const xKeyframes = [];
+      const yKeyframes = [];
+      const textKeyframes = [];
+      
+      // Start at the original position
+      xKeyframes.push({ frame: 0, value: nodes[sourceIndex].x });
+      yKeyframes.push({ frame: 0, value: nodes[sourceIndex].y + 20 });
+      textKeyframes.push({ frame: 0, value: `${sourceIndex}` });
+      
+      let journeyText = `${sourceIndex}`;
+      let frameOffset = 0;
+      
+      // Create a visit sequence to all other nodes
+      const visitsInOrder = [];
+      
+      // Add all node indices except the source
+      for (let i = 0; i < nodes.length; i++) {
+        if (i !== sourceIndex) {
+          visitsInOrder.push(i);
+        }
+      }
+      
+      // Visit each node in the grid
+      for (let i = 0; i < visitsInOrder.length; i++) {
+        const targetNodeIndex = visitsInOrder[i];
+        frameOffset += interval;
+        
+        // Add animation keyframes
+        xKeyframes.push({ 
+          frame: frameOffset, 
+          value: nodes[targetNodeIndex].x 
+        });
+        
+        yKeyframes.push({ 
+          frame: frameOffset, 
+          value: nodes[targetNodeIndex].y + 20 
+        });
+        
+        // Update journey text
+        journeyText += `,${targetNodeIndex}`;
+        textKeyframes.push({ 
+          frame: frameOffset, 
+          value: journeyText 
+        });
+      }
+      
+      // Return to the original node
+      frameOffset += interval;
+      xKeyframes.push({ 
+        frame: frameOffset, 
+        value: nodes[sourceIndex].x + 50
+      });
+      
+      yKeyframes.push({ 
+        frame: frameOffset, 
+        value: nodes[sourceIndex].y + 50 
+      });
+      
+      journeyText += `,${sourceIndex}`;
+      textKeyframes.push({ 
+        frame: frameOffset, 
+        value: journeyText 
+      });
+      
+      // Apply animation
+      this.animation.animateMultiple(dataItem, {
+        x: xKeyframes,
+        y: yKeyframes,
+        text: textKeyframes
+      });
+    });
+  
+    this.animation.reset();
+    this.animation.play(true);
   }
 }
