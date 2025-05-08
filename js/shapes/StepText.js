@@ -1,158 +1,208 @@
-class StepsDisplay extends BaseShape {
+class StepText extends Text {
     constructor(x, y, steps = []) {
-        super(x, y);
-        this.steps = steps;
-        this.width = 300;
-        this.height = 400;
-        this.padding = 15;
-        this.stepHeight = 80;
-        this.scrollY = 0;
-        this.maxScroll = 0;
-        this.isDragging = false;
-        this.lastY = 0;
-        this.name = "Steps Display";
-        this.backgroundColor = color(240, 240, 240);
-        this.stepColor = color(255, 255, 255);
-        this.textColor = color(50, 50, 50);
-        this.stepNumberColor = color(70, 130, 180);
-        this.cornerRadius = 10;
+        super(x, y, "");
+        this.steps = Array.isArray(steps) ? steps : [];
+        this.currentStep = 0; // Track the currently highlighted step
+        this.name = "StepText";
+        this.textAlign = "left"; // Step text works better left-aligned
+        this.highlightColor = '#FFCC00'; // Color for highlighting the current step
+        this.stepNumberColor = '#4A90E2'; // Color for step numbers
+        this.stepPadding = 10; // Padding between steps
+        this.updateStepText(); // Initialize text content
     }
     
-    _renderShape() {
-        // Calculate max scroll based on content height
-        const contentHeight = this.steps.length * this.stepHeight;
-        this.maxScroll = Math.max(0, contentHeight - (this.height - this.padding * 2));
+    // Method to add a new step
+    addStep(stepText) {
+        this.steps.push(stepText);
+        this.updateStepText();
+        return this.steps.length - 1; // Return the index of the added step
+    }
+    
+    // Method to remove a step
+    removeStep(index) {
+        if (index >= 0 && index < this.steps.length) {
+            this.steps.splice(index, 1);
+            this.updateStepText();
+            return true;
+        }
+        return false;
+    }
+    
+    // Method to update a step's text
+    updateStep(index, newText) {
+        if (index >= 0 && index < this.steps.length) {
+            this.steps[index] = newText;
+            this.updateStepText();
+            return true;
+        }
+        return false;
+    }
+    
+    // Set the current highlighted step
+    setCurrentStep(index) {
+        if (index >= 0 && index < this.steps.length) {
+            this.currentStep = index;
+            return true;
+        } else if (index === -1) { // -1 means no step highlighted
+            this.currentStep = -1;
+            return true;
+        }
+        return false;
+    }
+    
+    // Go to next step
+    nextStep() {
+        if (this.currentStep < this.steps.length - 1) {
+            this.currentStep++;
+            return true;
+        }
+        return false;
+    }
+    
+    // Go to previous step
+    previousStep() {
+        if (this.currentStep > 0) {
+            this.currentStep--;
+            return true;
+        }
+        return false;
+    }
+    
+    // Generate formatted text from steps array
+    updateStepText() {
+        if (this.steps.length === 0) {
+            this.text = "No steps defined";
+            return;
+        }
         
-        // Constrain scroll
-        this.scrollY = constrain(this.scrollY, 0, this.maxScroll);
-        
-        // Draw container background
-        fill(this.backgroundColor);
-        stroke(200);
-        strokeWeight(1);
-        rect(-this.width/2, -this.height/2, this.width, this.height, this.cornerRadius);
-        
-        // Create clip region for scrolling
-        push();
-        // Set up clipping area for scrolling content
-        const clipX = -this.width/2 + this.padding;
-        const clipY = -this.height/2 + this.padding;
-        const clipWidth = this.width - this.padding * 2;
-        const clipHeight = this.height - this.padding * 2;
-        
-        // Note: p5.js doesn't have built-in clipping, so we create a mask
-        drawingContext.save();
-        drawingContext.beginPath();
-        drawingContext.rect(clipX, clipY, clipWidth, clipHeight);
-        drawingContext.clip();
-        
-        // Draw steps
-        const startY = clipY - this.scrollY;
-        textAlign(LEFT, TOP);
-        textSize(16);
-        noStroke();
-        
+        let formattedText = "";
         for (let i = 0; i < this.steps.length; i++) {
-            const yPos = startY + i * this.stepHeight;
-            
-            // Only render steps that are visible
-            if (yPos + this.stepHeight >= clipY && yPos <= clipY + clipHeight) {
-                // Step background
-                fill(this.stepColor);
-                rect(clipX, yPos, clipWidth, this.stepHeight - 10, 5);
-                
-                // Step number
-                fill(this.stepNumberColor);
-                textStyle(BOLD);
-                text(`Step ${i + 1}:`, clipX + 10, yPos + 10);
-                
-                // Step text
-                fill(this.textColor);
-                textStyle(NORMAL);
-                text(this.steps[i].split(":").slice(1).join(":").trim(), 
-                     clipX + 10, yPos + 35);
+            formattedText += `Step ${i + 1}: ${this.steps[i]}`;
+            if (i < this.steps.length - 1) {
+                formattedText += '\n';
             }
         }
         
-        // Restore drawing context
-        drawingContext.restore();
-        pop();
+        this.text = formattedText;
+    }
+    
+    // Override the render method to add custom styling
+    _renderShape() {
+        if (this.steps.length === 0) {
+            // Use parent class rendering for "No steps defined" message
+            super._renderShape();
+            return;
+        }
         
-        // Draw scroll indicator if needed
-        if (this.maxScroll > 0) {
-            const scrollRatio = this.scrollY / this.maxScroll;
-            const scrollBarHeight = Math.max(30, (this.height - this.padding * 2) * 
-                                  ((this.height - this.padding * 2) / contentHeight));
-            
-            const scrollBarY = map(
-                scrollRatio, 
-                0, 1, 
-                -this.height/2 + this.padding, 
-                this.height/2 - this.padding - scrollBarHeight
-            );
-            
-            fill(180);
-            noStroke();
-            rect(
-                this.width/2 - 10, 
-                scrollBarY, 
-                5, 
-                scrollBarHeight, 
-                2
-            );
+        textSize(this.fontSize);
+        textFont(this.fontFamily);
+        
+        // Apply text style
+        if (this.textStyle === "bold") {
+            textStyle(BOLD);
+        } else if (this.textStyle === "italic") {
+            textStyle(ITALIC);
+        } else {
+            textStyle(NORMAL);
         }
+        
+        const lines = this.text.split('\n');
+        const lineHeightPixels = this.fontSize * this.lineHeight;
+        
+        // Calculate total height to center vertically
+        const totalHeight = lineHeightPixels * (lines.length - 1);
+        let yPos = -totalHeight / 2;
+        
+        for (let i = 0; i < lines.length; i++) {
+            const isCurrentStep = i === this.currentStep;
+            const line = lines[i];
+            
+            // Find where the colon is to separate "Step X:" from the content
+            const colonIndex = line.indexOf(':');
+            if (colonIndex !== -1) {
+                const stepPart = line.substring(0, colonIndex + 1);
+                const contentPart = line.substring(colonIndex + 1);
+                
+                // Set alignment
+                textAlign(LEFT, CENTER);
+                
+                // Draw background highlight for current step
+                if (isCurrentStep) {
+                    push();
+                    fill(this.highlightColor + '40'); // 40 = 25% opacity
+                    noStroke();
+                    
+                    // Calculate the width of the entire line for the highlight
+                    const lineWidth = textWidth(line) + this.stepPadding * 2;
+                    const lineHeight = lineHeightPixels * 0.9;
+                    
+                    let xPos = 0;
+                    if (this.textAlign === "center") {
+                        xPos = -lineWidth / 2;
+                    } else if (this.textAlign === "right") {
+                        xPos = -lineWidth;
+                    } else { // left
+                        xPos = -this.stepPadding; 
+                    }
+                    
+                    rect(xPos, yPos - lineHeight/2, lineWidth, lineHeight, 5);
+                    pop();
+                }
+                
+                // Draw the "Step X:" part with special color
+                push();
+                fill(this.stepNumberColor);
+                textStyle(BOLD);
+                text(stepPart, 0, yPos);
+                pop();
+                
+                // Draw the content part with normal color
+                push();
+                fill(this.fillColor || '#000000');
+                text(contentPart, textWidth(stepPart), yPos);
+                pop();
+            } else {
+                // Just in case there's no colon, render normally
+                textAlign(this._getTextAlignValue(), CENTER);
+                text(line, 0, yPos);
+            }
+            
+            yPos += lineHeightPixels;
+        }
+        
+        // Reset text style
+        textStyle(NORMAL);
     }
     
-    _pointInShape(localX, localY) {
-        return (
-            localX >= -this.width/2 &&
-            localX <= this.width/2 &&
-            localY >= -this.height/2 &&
-            localY <= this.height/2
-        );
-    }
-    
-    getBoundingBox() {
-        return {
-            x: this.x - this.width/2,
-            y: this.y - this.height/2,
-            width: this.width,
-            height: this.height
-        };
-    }
-    
-    handleMousePressed(x, y) {
-        if (this._pointInShape(x - this.x, y - this.y)) {
-            this.isDragging = true;
-            this.lastY = y;
+    // Method to move all steps (up/down) as a group
+    moveSteps(direction, amount = 1) {
+        if (direction === "up" && this.currentStep > 0) {
+            // Move the highlighted step up
+            const step = this.steps[this.currentStep];
+            this.steps.splice(this.currentStep, 1);
+            this.steps.splice(this.currentStep - amount, 0, step);
+            this.currentStep -= amount;
+            this.updateStepText();
+            return true;
+        } else if (direction === "down" && this.currentStep < this.steps.length - 1) {
+            // Move the highlighted step down
+            const step = this.steps[this.currentStep];
+            this.steps.splice(this.currentStep, 1);
+            this.steps.splice(this.currentStep + amount, 0, step);
+            this.currentStep += amount;
+            this.updateStepText();
             return true;
         }
         return false;
     }
     
-    handleMouseDragged(x, y) {
-        if (this.isDragging) {
-            const deltaY = this.lastY - y;
-            this.scrollY += deltaY;
-            this.lastY = y;
-            return true;
-        }
-        return false;
-    }
-    
-    handleMouseReleased() {
-        this.isDragging = false;
-        return false;
-    }
-    
-    // Method to set steps
-    setSteps(steps) {
-        this.steps = steps;
-        this.scrollY = 0; // Reset scroll position
-    }
-    
-    // Method to add a step
-    addStep(step) {
-        this.steps.push(step);
+    // Create a new instance with sample steps
+    static createWithSampleSteps(x, y) {
+        return new StepText(x, y, [
+            "Created animation",
+            "Added first object",
+            "Set up timeline",
+            "Finalized composition"
+        ]);
     }
 }

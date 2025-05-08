@@ -871,11 +871,12 @@ class ToolbarPanel {
       arrowEnd: false,
       arrowSize: 8,
       stroke: colors.steelBlue,
-      strokeWeight: 2,
+      strokeWeight: 3,
       flowParticles: 8,
-      particleSize: 6,
+      particleSize: 3,
       fill: colors.steelBlue,
-      animationSpeed: 2,
+      animationSpeed: 1,
+      lineStyle : "dashed"
     };
 
     const flowPaths = [
@@ -960,11 +961,12 @@ class ToolbarPanel {
       arrowEnd: false,
       arrowSize: 8,
       stroke: colors.steelBlue,
-      strokeWeight: 2,
+      strokeWeight: 3,
       flowParticles: 8,
-      particleSize: 6,
+      particleSize: 3,
       fill: colors.steelBlue,
-      animationSpeed: 2,
+      animationSpeed: 1,
+      lineStyle : "dashed"
     };
 
     // Define flows [startIndex, endIndex, startConnection, endConnection]
@@ -1115,11 +1117,12 @@ class ToolbarPanel {
       arrowEnd: false,
       arrowSize: 8,
       stroke: colors.steelBlue,
-      strokeWeight: 2,
+      strokeWeight: 3,
       flowParticles: 8,
-      particleSize: 6,
+      particleSize: 3,
       fill: colors.steelBlue,
-      animationSpeed: 2,
+      animationSpeed: 1,
+      lineStyle : "dashed"
     };
 
     // Define flows [startIndex, endIndex, startConnection, endConnection]
@@ -1531,11 +1534,12 @@ class ToolbarPanel {
       arrowEnd: false,
       arrowSize: 8,
       stroke: colors.steelBlue,
-      strokeWeight: 2,
+      strokeWeight: 3,
       flowParticles: 8,
-      particleSize: 6,
+      particleSize: 3,
       fill: colors.steelBlue,
-      animationSpeed: 2,
+      animationSpeed: 1,
+      lineStyle : "dashed"
     };
 
     // Define flows **by index**, not name
@@ -1734,11 +1738,12 @@ class ToolbarPanel {
       arrowEnd: false,
       arrowSize: 8,
       stroke: colors.steelBlue,
-      strokeWeight: 2,
+      strokeWeight: 3,
       flowParticles: 8,
-      particleSize: 6,
+      particleSize: 3,
       fill: colors.steelBlue,
-      animationSpeed: 2,
+      animationSpeed: 1,
+      lineStyle : "dashed"
     };
 
     const flowPaths = [
@@ -1748,7 +1753,6 @@ class ToolbarPanel {
       [0, 4, "center", "center"],
       [0, 1, "center", "center"],
 
-      [1, 0, "center", "center"],
       [1, 3, "center", "center"],
       [1, 5, "center", "center"],
 
@@ -1932,34 +1936,35 @@ class ToolbarPanel {
       arrowEnd: false,
       arrowSize: 8,
       stroke: colors.steelBlue,
-      strokeWeight: 2,
+      strokeWeight: 3,
       flowParticles: 8,
-      particleSize: 6,
+      particleSize: 3,
       fill: colors.steelBlue,
-      animationSpeed: 2,
+      animationSpeed: 1,
+      lineStyle : "dashed"
     };
 
     const flowPaths = [
-      [0, 1, "center", "center"],
-      [0, 2, "center", "center"],
+      [0, 1, "left", "top"],
+      [0, 2, "right", "top"],
     
-      [1, 3, "center", "center"],
-      [1, 4, "center", "center"],
+      [1, 3, "left", "top"],
+      [1, 4, "right", "top"],
     
-      [2, 5, "center", "center"],
-      [2, 6, "center", "center"],
+      [2, 5, "left", "top"],
+      [2, 6, "right", "top"],
     
-      [3, 7, "center", "center"],
-      [3, 8, "center", "center"],
+      [3, 7, "left", "top"],
+      [3, 8, "right", "top"],
     
-      [4, 9, "center", "center"],
-      [4,10, "center", "center"],
+      [4, 9, "left", "top"],
+      [4,10, "right", "top"],
     
-      [5,11, "center", "center"],
-      [5,12, "center", "center"],
+      [5,11, "left", "top"],
+      [5,12, "right", "top"],
     
-      [6,13, "center", "center"],
-      [6,14, "center", "center"],
+      [6,13, "left", "top"],
+      [6,14, "right", "top"],
     ];
     
 

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Advanced Animation Platform</title>
     <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="./libs/tailwind.js"></script>
     <!-- External Libraries -->
     <script src="./libs/p5.min.js"></script>
     <script src="./libs/dat.gui.min.js"></script>
@@ -63,9 +63,6 @@
     </style>
 </head>
 <body class="bg-gray-900 text-gray-100 font-sans overflow-hidden">
-    <header class="bg-gray-800 p-2 text-center shadow-md">
-        <h1 class="text-2xl font-bold">Animation Platform</h1>
-    </header>
     <div id="app-container" class="flex flex-col h-screen">
         <div id="canvas-container" class="flex-1 relative bg-gray-700 overflow-hidden"></div>
         <div id="ui-toggle-bar" class="fixed top-4 left-4 bg-gray-800 border border-gray-600 rounded-lg p-2 flex gap-2 z-50 shadow-lg">
