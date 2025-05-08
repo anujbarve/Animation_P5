@@ -343,7 +343,8 @@ class ToolbarPanel {
     const templates = {
       oneToAllBroadCast: () => this.createOneToAllBroadcast(),
       oneToAllRecursiveDoubling: () => this.oneToAllRecursiveDoubling(),
-      allToOneRecursiveDoubling: () => this.allToOneRecursiveDoubling() 
+      allToOneRecursiveDoubling: () => this.allToOneRecursiveDoubling(),
+      matrixMultiplication: () => this.matrixMultiplication(),
     };
 
     this.templatesFolder
@@ -355,6 +356,9 @@ class ToolbarPanel {
       this.templatesFolder
       .add(templates, "allToOneRecursiveDoubling")
       .name("Recursive Doubling All to One");
+      this.templatesFolder
+      .add(templates, "matrixMultiplication")
+      .name("Matrix Vector Multiplication");
     
 
     this.templatesFolder.open();
@@ -1087,6 +1091,115 @@ class ToolbarPanel {
     this.animation.play(true);
   }
 
+  matrixMultiplication(){
+    const colors = {
+      skyBlue: [135, 206, 235],
+      coral: [255, 127, 80],
+      limeGreen: [50, 205, 50],
+      goldenRod: [218, 165, 32],
+      orchid: [218, 112, 214],
+      slateGray: [112, 128, 144],
+      tomato: [255, 99, 71],
+      steelBlue: [70, 130, 180],
+      mediumPurple: [147, 112, 219],
+      seaGreen: [46, 139, 87],
+      deepPink: [255, 20, 147],
+      turquoise: [64, 224, 208],
+      fireBrick: [178, 34, 34],
+      darkOrange: [255, 140, 0],
+      lightSlateGray: [119, 136, 153],
+    };
+
+    this.animation.clearAll();
+    this.animation.setDuration(10);
+    this.animation.setFPS(60);
+    this.engine.setCanvasSize(1900, 1000);
+
+    // Node coordinates and names
+    const nodeGrid = [
+      // [x, y, name, highlightColor?]
+      [400, 300, "node 0", colors.goldenRod], // Highlighted node
+      [400, 400, "node 1"],
+      [400, 500, "node 2"],
+      [400, 600, "node 3"],
+      [500, 300, "node 4"],
+      [500, 400, "node 5"],
+      [500, 500, "node 6"],
+      [500, 600, "node 7"],
+      [600, 300, "node 8"],
+      [600, 400, "node 9"],
+      [600, 500, "node 10"],
+      [600, 600, "node 11"],
+      [700, 300, "node 12"],
+      [700, 400, "node 13"],
+      [700, 500, "node 14"],
+      [700, 600, "node 15"],
+
+      [200,300,"ov 1", colors.fireBrick],
+      [200,400,"ov 2", colors.fireBrick],
+      [200,500,"ov 3", colors.fireBrick],
+      [200,600,"ov 4", colors.fireBrick],
+
+      [400,100,"iv 1", colors.fireBrick],
+      [500,100,"iv 2", colors.fireBrick],
+      [600,100,"iv 3", colors.fireBrick],
+      [700,100,"iv 4", colors.fireBrick],
+
+      [400,100,"v1", colors.fireBrick],
+      [500,100,"v2", colors.fireBrick],
+      [600,100,"v3", colors.fireBrick],
+      [700,100,"v4", colors.fireBrick],
+
+      [400,100,"v1", colors.fireBrick],
+      [500,100,"v2", colors.fireBrick],
+      [600,100,"v3", colors.fireBrick],
+      [700,100,"v4", colors.fireBrick],
+
+      [400,100,"v1", colors.fireBrick],
+      [500,100,"v2", colors.fireBrick],
+      [600,100,"v3", colors.fireBrick],
+      [700,100,"v4", colors.fireBrick],
+    ];
+
+    // Create all nodes and keep reference by name
+    const nodes = nodeGrid.map(([x, y, name, customFill]) =>
+      this.animation.createShape("rectangle", {
+        x,
+        y,
+        height : 100,
+        width : 100,
+        fill: customFill || colors.steelBlue,
+        name,
+      })
+    );
+
+    this.animation.animateGroupMultiple([nodes[20],nodes[21],nodes[22],nodes[23]],{
+      y : [
+        {
+          frame : 0,
+          value : nodes[20].y,
+        },
+        {
+          frame : 200,
+          value : nodes[15].y
+        }
+      ],
+    },10);
+
+    this.animation.animateGroupMultiple([nodes[24],nodes[25],nodes[26],nodes[27]],{
+      y : [
+        {
+          frame : 0,
+          value : nodes[20].y,
+        },
+        {
+          frame : 200,
+          value : nodes[14].y
+        }
+      ],
+    },10);
+    
+  }
   
   
 
