@@ -353,13 +353,12 @@ class ToolbarPanel {
     this.templatesFolder
       .add(templates, "oneToAllRecursiveDoubling")
       .name("Recursive Doubling One to All");
-      this.templatesFolder
+    this.templatesFolder
       .add(templates, "allToOneRecursiveDoubling")
       .name("Recursive Doubling All to One");
-      this.templatesFolder
+    this.templatesFolder
       .add(templates, "matrixMultiplication")
       .name("Matrix Vector Multiplication");
-    
 
     this.templatesFolder.open();
   }
@@ -804,6 +803,101 @@ class ToolbarPanel {
   //   }
   // }
 
+  createOneToAllBroadcast() {
+    const colors = {
+      skyBlue: [135, 206, 235],
+      coral: [255, 127, 80],
+      limeGreen: [50, 205, 50],
+      goldenRod: [218, 165, 32],
+      orchid: [218, 112, 214],
+      slateGray: [112, 128, 144],
+      tomato: [255, 99, 71],
+      steelBlue: [70, 130, 180],
+      mediumPurple: [147, 112, 219],
+      seaGreen: [46, 139, 87],
+      deepPink: [255, 20, 147],
+      turquoise: [64, 224, 208],
+      fireBrick: [178, 34, 34],
+      darkOrange: [255, 140, 0],
+      lightSlateGray: [119, 136, 153],
+    };
+
+    this.animation.clearAll();
+    this.animation.setDuration(10);
+    this.animation.setFPS(60);
+    this.engine.setCanvasSize(1900, 1000);
+
+    // Node coordinates and names
+    const nodeGrid = [
+      // [x, y, name, highlightColor?]
+      [100, 700, "node 0", colors.goldenRod], // Highlighted node
+      [500, 700, "node 1"],
+      [500, 300, "node 2"],
+      [100, 300, "node 3"],
+      [300, 500, "node 4"],
+      [700, 500, "node 5"],
+      [700, 100, "node 6"],
+      [300, 100, "node 7"],
+    ];
+
+    // Create all nodes and keep reference by name
+
+    const nodes = nodeGrid.map(([x, y, name, customFill]) => {
+      return this.animation.createShape("circle", {
+        x,
+        y,
+        size: 80,
+        fill: customFill || colors.steelBlue,
+        name,
+      });
+    });
+
+    const flowDefaults = {
+      pathStyle: "bezier",
+      curveIntensity: 0,
+      arrowEnd: false,
+      arrowSize: 8,
+      stroke: colors.steelBlue,
+      strokeWeight: 2,
+      flowParticles: 8,
+      particleSize: 6,
+      fill: colors.steelBlue,
+      animationSpeed: 2,
+    };
+
+    const flowPaths = [
+      // [startNode, endNode, startConnection, endConnection]
+
+      [0, 4, "center", "center"],
+      [2, 6, "center", "center"],
+      [1, 5, "center", "center"],
+      [3, 7, "center", "center"],
+
+      [0, 1, "center", "center"],
+      [1, 2, "center", "center"],
+      [2, 3, "center", "center"],
+      [3, 0, "center", "center"],
+
+      [4, 5, "center", "center"],
+      [5, 6, "center", "center"],
+      [6, 7, "center", "center"],
+      [7, 4, "center", "center"],
+    ];
+
+    const flows = flowPaths.map(([startIdx, endIdx, startConn, endConn]) => {
+      this.animation.createShape("flowpath", {
+        ...flowDefaults,
+        startShape: nodes[startIdx],
+        endShape: nodes[endIdx],
+        startConnection: startConn,
+        endConnection: endConn,
+      });
+    });
+
+    this.animation.reset();
+    this.animation.play(true);
+  }
+
   oneToAllRecursiveDoubling() {
     const colors = {
       limeGreen: [50, 205, 50],
@@ -959,7 +1053,6 @@ class ToolbarPanel {
     this.animation.play(true);
   }
 
-
   allToOneRecursiveDoubling() {
     const colors = {
       limeGreen: [50, 205, 50],
@@ -1044,11 +1137,25 @@ class ToolbarPanel {
       startFrame < interval;
       startFrame += pulseInterval
     ) {
-      this.animation.animateGroup([nodes[0],nodes[1],nodes[2],nodes[3],nodes[4],nodes[5],nodes[6],nodes[7]], "fill", [
-        { frame: startFrame, value: colors.steelBlue },
-        { frame: startFrame + pulseInterval / 2, value: colors.limeGreen },
-        { frame: startFrame + pulseInterval, value: colors.steelBlue },
-      ],0);
+      this.animation.animateGroup(
+        [
+          nodes[0],
+          nodes[1],
+          nodes[2],
+          nodes[3],
+          nodes[4],
+          nodes[5],
+          nodes[6],
+          nodes[7],
+        ],
+        "fill",
+        [
+          { frame: startFrame, value: colors.steelBlue },
+          { frame: startFrame + pulseInterval / 2, value: colors.limeGreen },
+          { frame: startFrame + pulseInterval, value: colors.steelBlue },
+        ],
+        0
+      );
     }
 
     for (
@@ -1056,11 +1163,16 @@ class ToolbarPanel {
       startFrame < interval * 2;
       startFrame += pulseInterval
     ) {
-      this.animation.animateGroup([nodes[0],nodes[2],nodes[4],nodes[6]], "fill", [
-        { frame: startFrame, value: colors.steelBlue },
-        { frame: startFrame + pulseInterval / 2, value: colors.limeGreen },
-        { frame: startFrame + pulseInterval, value: colors.steelBlue },
-      ],0);
+      this.animation.animateGroup(
+        [nodes[0], nodes[2], nodes[4], nodes[6]],
+        "fill",
+        [
+          { frame: startFrame, value: colors.steelBlue },
+          { frame: startFrame + pulseInterval / 2, value: colors.limeGreen },
+          { frame: startFrame + pulseInterval, value: colors.steelBlue },
+        ],
+        0
+      );
     }
 
     for (
@@ -1068,11 +1180,16 @@ class ToolbarPanel {
       startFrame < interval * 3;
       startFrame += pulseInterval
     ) {
-      this.animation.animateGroup([nodes[0],nodes[4]], "fill", [
-        { frame: startFrame, value: colors.steelBlue },
-        { frame: startFrame + pulseInterval / 2, value: colors.limeGreen },
-        { frame: startFrame + pulseInterval, value: colors.steelBlue },
-      ],0);
+      this.animation.animateGroup(
+        [nodes[0], nodes[4]],
+        "fill",
+        [
+          { frame: startFrame, value: colors.steelBlue },
+          { frame: startFrame + pulseInterval / 2, value: colors.limeGreen },
+          { frame: startFrame + pulseInterval, value: colors.steelBlue },
+        ],
+        0
+      );
     }
 
     for (
@@ -1080,18 +1197,30 @@ class ToolbarPanel {
       startFrame < interval * 4;
       startFrame += pulseInterval
     ) {
-      this.animation.animateGroup([nodes[0]], "fill", [
-        { frame: startFrame, value: colors.steelBlue },
-        { frame: startFrame + pulseInterval / 2, value: colors.limeGreen },
-        { frame: startFrame + pulseInterval, value: colors.steelBlue },
-      ],0);
+      this.animation.animateGroup(
+        [nodes[0]],
+        "fill",
+        [
+          { frame: startFrame, value: colors.steelBlue },
+          { frame: startFrame + pulseInterval / 2, value: colors.limeGreen },
+          { frame: startFrame + pulseInterval, value: colors.steelBlue },
+        ],
+        0
+      );
     }
 
     this.animation.reset();
     this.animation.play(true);
   }
 
-  matrixMultiplication(){
+  matrixMultiplication() {
+    const duration = 10;
+    const fps = 60;
+    const totalFPS = duration * fps;
+    const height = 1000;
+    const width = 1900;
+    const interval = 2 * fps;
+
     const colors = {
       skyBlue: [135, 206, 235],
       coral: [255, 127, 80],
@@ -1111,54 +1240,59 @@ class ToolbarPanel {
     };
 
     this.animation.clearAll();
-    this.animation.setDuration(10);
-    this.animation.setFPS(60);
-    this.engine.setCanvasSize(1900, 1000);
+    this.animation.setDuration(duration);
+    this.animation.setFPS(fps);
+    this.engine.setCanvasSize(width, height);
 
     // Node coordinates and names
     const nodeGrid = [
       // [x, y, name, highlightColor?]
-      [400, 300, "node 0", colors.goldenRod], // Highlighted node
-      [400, 400, "node 1"],
-      [400, 500, "node 2"],
-      [400, 600, "node 3"],
-      [500, 300, "node 4"],
-      [500, 400, "node 5"],
-      [500, 500, "node 6"],
-      [500, 600, "node 7"],
-      [600, 300, "node 8"],
-      [600, 400, "node 9"],
-      [600, 500, "node 10"],
-      [600, 600, "node 11"],
-      [700, 300, "node 12"],
-      [700, 400, "node 13"],
-      [700, 500, "node 14"],
-      [700, 600, "node 15"],
+      [400, 300, "P1"], // Highlighted node
+      [400, 400, "P2"],
+      [400, 500, "P3"],
+      [400, 600, "P4"],
+      [500, 300, "P5"],
+      [500, 400, "P6"],
+      [500, 500, "P7"],
+      [500, 600, "P8"],
+      [600, 300, "P9"],
+      [600, 400, "P10"],
+      [600, 500, "P11"],
+      [600, 600, "P12"],
+      [700, 300, "P13"],
+      [700, 400, "P14"],
+      [700, 500, "P15"],
+      [700, 600, "P16"],
 
-      [200,300,"ov 1", colors.fireBrick],
-      [200,400,"ov 2", colors.fireBrick],
-      [200,500,"ov 3", colors.fireBrick],
-      [200,600,"ov 4", colors.fireBrick],
+      [200, 300, "OV1"],
+      [200, 400, "OV2"],
+      [200, 500, "OV3"],
+      [200, 600, "OV4"],
 
-      [400,100,"iv 1", colors.fireBrick],
-      [500,100,"iv 2", colors.fireBrick],
-      [600,100,"iv 3", colors.fireBrick],
-      [700,100,"iv 4", colors.fireBrick],
+      [400, 100, "IV1"],
+      [500, 100, "IV2"],
+      [600, 100, "IV3"],
+      [700, 100, "IV4"],
 
-      [400,100,"v1", colors.fireBrick],
-      [500,100,"v2", colors.fireBrick],
-      [600,100,"v3", colors.fireBrick],
-      [700,100,"v4", colors.fireBrick],
+      [400, 100, "1",colors.goldenRod],
+      [500, 100, "2",colors.goldenRod],
+      [600, 100, "3",colors.goldenRod],
+      [700, 100, "4",colors.goldenRod],
 
-      [400,100,"v1", colors.fireBrick],
-      [500,100,"v2", colors.fireBrick],
-      [600,100,"v3", colors.fireBrick],
-      [700,100,"v4", colors.fireBrick],
+      [400, 100, "1",colors.goldenRod],
+      [500, 100, "2",colors.goldenRod],
+      [600, 100, "3",colors.goldenRod],
+      [700, 100, "4",colors.goldenRod],
 
-      [400,100,"v1", colors.fireBrick],
-      [500,100,"v2", colors.fireBrick],
-      [600,100,"v3", colors.fireBrick],
-      [700,100,"v4", colors.fireBrick],
+      [400, 100, "1",colors.goldenRod],
+      [500, 100, "2",colors.goldenRod],
+      [600, 100, "3",colors.goldenRod],
+      [700, 100, "4",colors.goldenRod],
+
+      [400, 100, "1",colors.goldenRod],
+      [500, 100, "2",colors.goldenRod],
+      [600, 100, "3",colors.goldenRod],
+      [700, 100, "4",colors.goldenRod],
     ];
 
     // Create all nodes and keep reference by name
@@ -1166,133 +1300,150 @@ class ToolbarPanel {
       this.animation.createShape("rectangle", {
         x,
         y,
-        height : 100,
-        width : 100,
+        height: 100,
+        width: 100,
         fill: customFill || colors.steelBlue,
         name,
       })
     );
 
-    this.animation.animateGroupMultiple([nodes[20],nodes[21],nodes[22],nodes[23]],{
-      y : [
+    this.animation.animateGroupMultiple(
+      [nodes[24], nodes[25], nodes[26], nodes[27]],
+      {
+        y: [
+          {
+            frame: 0,
+            value: nodes[20].y,
+          },
+          {
+            frame: interval,
+            value: nodes[15].y,
+          },
+        ],
+      },
+      10
+    );
+
+    this.animation.animateGroupMultiple(
+      [nodes[28], nodes[29], nodes[30], nodes[31]],
+      {
+        y: [
+          {
+            frame: 0,
+            value: nodes[20].y,
+          },
+          {
+            frame: interval,
+            value: nodes[14].y,
+          },
+        ],
+      },
+      10
+    );
+
+    this.animation.animateGroupMultiple(
+      [nodes[32], nodes[33], nodes[34], nodes[35]],
+      {
+        y: [
+          {
+            frame: 0,
+            value: nodes[20].y,
+          },
+          {
+            frame: interval,
+            value: nodes[13].y,
+          },
+        ],
+      },
+      10
+    );
+
+    this.animation.animateGroupMultiple(
+      [nodes[36], nodes[37], nodes[38], nodes[39]],
+      {
+        y: [
+          {
+            frame: 0,
+            value: nodes[20].y,
+          },
+          {
+            frame: interval,
+            value: nodes[12].y,
+          },
+        ],
+      },
+      10
+    );
+
+    const data = nodes.slice(24, 40);
+
+    this.animation.animateGroup(
+      data,
+      "fill",
+      [
         {
-          frame : 0,
-          value : nodes[20].y,
+          frame: interval,
+          value: data[0].fill,
         },
         {
-          frame : 200,
-          value : nodes[15].y
-        }
+          frame: interval * 2,
+          value: colors.limeGreen,
+        },
       ],
-    },10);
+      0
+    );
 
-    this.animation.animateGroupMultiple([nodes[24],nodes[25],nodes[26],nodes[27]],{
-      y : [
+    for (let i = 24; i < 28; i++) {
+      this.animation.animate(nodes[i], "x", [
         {
-          frame : 0,
-          value : nodes[20].y,
+          frame: interval * 3,
+          value: nodes[i].x,
         },
         {
-          frame : 200,
-          value : nodes[14].y
-        }
-      ],
-    },10);
-    
-  }
-  
-  
+          frame: interval * 4,
+          value: nodes[16].x,
+        },
+      ]);
+    }
 
-  createOneToAllBroadcast() {
-    const colors = {
-      skyBlue: [135, 206, 235],
-      coral: [255, 127, 80],
-      limeGreen: [50, 205, 50],
-      goldenRod: [218, 165, 32],
-      orchid: [218, 112, 214],
-      slateGray: [112, 128, 144],
-      tomato: [255, 99, 71],
-      steelBlue: [70, 130, 180],
-      mediumPurple: [147, 112, 219],
-      seaGreen: [46, 139, 87],
-      deepPink: [255, 20, 147],
-      turquoise: [64, 224, 208],
-      fireBrick: [178, 34, 34],
-      darkOrange: [255, 140, 0],
-      lightSlateGray: [119, 136, 153],
-    };
+    for (let i = 28; i < 32; i++) {
+      this.animation.animate(nodes[i], "x", [
+        {
+          frame: interval * 3,
+          value: nodes[i].x,
+        },
+        {
+          frame: interval * 4,
+          value: nodes[17].x,
+        },
+      ]);
+    }
 
-    this.animation.clearAll();
-    this.animation.setDuration(10);
-    this.animation.setFPS(60);
-    this.engine.setCanvasSize(1900, 1000);
+    for (let i = 32; i < 36; i++) {
+      this.animation.animate(nodes[i], "x", [
+        {
+          frame: interval * 3,
+          value: nodes[i].x,
+        },
+        {
+          frame: interval * 4,
+          value: nodes[18].x,
+        },
+      ]);
+    }
 
-    // Node coordinates and names
-    const nodeGrid = [
-      // [x, y, name, highlightColor?]
-      [100, 700, "node 0", colors.goldenRod], // Highlighted node
-      [500, 700, "node 1"],
-      [500, 300, "node 2"],
-      [100, 300, "node 3"],
-      [300, 500, "node 4"],
-      [700, 500, "node 5"],
-      [700, 100, "node 6"],
-      [300, 100, "node 7"],
-    ];
-
-    // Create all nodes and keep reference by name
-
-    const nodes = nodeGrid.map(([x, y, name, customFill]) => {
-      return this.animation.createShape("circle", {
-        x,
-        y,
-        size: 80,
-        fill: customFill || colors.steelBlue,
-        name,
-      });
-    });
-
-    const flowDefaults = {
-      pathStyle: "bezier",
-      curveIntensity: 0,
-      arrowEnd: false,
-      arrowSize: 8,
-      stroke: colors.steelBlue,
-      strokeWeight: 2,
-      flowParticles: 8,
-      particleSize: 6,
-      fill: colors.steelBlue,
-      animationSpeed: 2,
-    };
-
-    const flowPaths = [
-      // [startNode, endNode, startConnection, endConnection]
-
-      [0, 4, "center", "center"],
-      [2, 6, "center", "center"],
-      [1, 5, "center", "center"],
-      [3, 7, "center", "center"],
-
-      [0, 1, "center", "center"],
-      [1, 2, "center", "center"],
-      [2, 3, "center", "center"],
-      [3, 0, "center", "center"],
-
-      [4, 5, "center", "center"],
-      [5, 6, "center", "center"],
-      [6, 7, "center", "center"],
-      [7, 4, "center", "center"],
-    ];
-
-    const flows = flowPaths.map(([startIdx, endIdx, startConn, endConn]) => {
-      this.animation.createShape("flowpath", {
-        ...flowDefaults,
-        startShape: nodes[startIdx],
-        endShape: nodes[endIdx],
-        startConnection: startConn,
-        endConnection: endConn,
-      });
-    });
+    for (let i = 36; i < 40; i++) {
+      this.animation.animate(nodes[i], "x", [
+        {
+          frame: interval * 3,
+          value: nodes[i].x,
+        },
+        {
+          frame: interval * 4,
+          value: nodes[19].x,
+        },
+      ]);
+    }
 
     this.animation.reset();
     this.animation.play(true);
