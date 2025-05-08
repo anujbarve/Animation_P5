@@ -15,6 +15,7 @@ class ToolbarPanel {
   }
 
   initialize() {
+    this.addAnimationTemplates();
     // Create folders
     this.toolsFolder = this.gui.addFolder("Tools");
     this.projectFolder = this.gui.addFolder("Project");
@@ -25,7 +26,6 @@ class ToolbarPanel {
     this.addShapeTools();
     this.addCanvasSettings();
     this.addProjectSettings();
-    this.addAnimationTemplates();
   }
 
   addShapeTools() {
@@ -342,25 +342,20 @@ class ToolbarPanel {
 
     const templates = {
       oneToAllBroadCast: () => this.createOneToAllBroadcast(),
-      typingAnimation: () => this.createTypingAnimation(),
-      fadeInOut: () => this.createFadeInOutAnimation(),
-      particleExplosion: () => this.createParticleAnimation(),
-      waveAnimation: () => this.createWaveAnimation(),
-      logoReveal: () => this.createLogoRevealAnimation(),
-      recursive: () => this.createRecursiveDoublingAnimation(),
+      oneToAllRecursiveDoubling: () => this.oneToAllRecursiveDoubling(),
+      allToOneRecursiveDoubling: () => this.allToOneRecursiveDoubling() 
     };
 
     this.templatesFolder
       .add(templates, "oneToAllBroadCast")
       .name("One To All Broadcast");
-    this.templatesFolder.add(templates, "typingAnimation").name("Typing Text");
-    this.templatesFolder.add(templates, "fadeInOut").name("Fade In/Out");
     this.templatesFolder
-      .add(templates, "particleExplosion")
-      .name("Particle Effect");
-    this.templatesFolder.add(templates, "waveAnimation").name("Wave Animation");
-    this.templatesFolder.add(templates, "logoReveal").name("Logo Reveal");
-    this.templatesFolder.add(templates, "recursive").name("Recursive Reveal");
+      .add(templates, "oneToAllRecursiveDoubling")
+      .name("Recursive Doubling One to All");
+      this.templatesFolder
+      .add(templates, "allToOneRecursiveDoubling")
+      .name("Recursive Doubling All to One");
+    
 
     this.templatesFolder.open();
   }
@@ -805,550 +800,297 @@ class ToolbarPanel {
   //   }
   // }
 
-  createRecursiveDoublingAnimation() {
+  oneToAllRecursiveDoubling() {
+    const colors = {
+      limeGreen: [50, 205, 50],
+      goldenRod: [218, 165, 32],
+      steelBlue: [70, 130, 180],
+    };
+
+    const duration = 20;
+    const fps = 60;
+    const height = 1000;
+    const width = 1900;
+    const totalFrames = duration * fps; // Get total frames = duration × fps
+    const pulseInterval = fps / 1.5; // 60 frames for one pulse cycle (steelBlue → goldenRod → steelBlue)
+    const interval = 240;
+
     this.animation.clearAll();
-    this.animation.setDuration(20);
-    this.animation.setFPS(60);
-    this.engine.setCanvasSize(1900, 1000);
+    this.animation.setDuration(duration);
+    this.animation.setFPS(fps);
+    this.engine.setCanvasSize(width, height);
 
-    const n1 = this.animation.createShape("circle", {
-      x: 200,
-      y: 200,
-      width: 120,
-      height: 120,
-      fill: [0, 0, 250],
-      name: "node 1",
+    // Node coordinates and optional custom colors
+    const nodeGrid = [
+      [200, 400, colors.goldenRod], // node 0 (highlighted)
+      [400, 400], // node 1
+      [600, 400], // node 2
+      [800, 400], // node 3
+      [800, 200], // node 4
+      [600, 200], // node 5
+      [400, 200], // node 6
+      [200, 200], // node 7
+    ];
+
+    // Create all nodes and store them as an array of shapes
+    const nodes = nodeGrid.map(([x, y, customFill], index) => {
+      return this.animation.createShape("circle", {
+        x,
+        y,
+        size: 80,
+        fill: customFill || colors.steelBlue,
+        name: `node ${index}`,
+      });
     });
 
-    const n2 = this.animation.createShape("circle", {
-      x: 600,
-      y: 200,
-      width: 120,
-      height: 120,
-      fill: [0, 0, 250],
-      name: "node 2",
-    });
-
-    const n3 = this.animation.createShape("circle", {
-      x: 600,
-      y: 600,
-      width: 120,
-      height: 120,
-      fill: [0, 0, 250],
-      name: "node 3",
-    });
-
-    const n4 = this.animation.createShape("circle", {
-      x: 200,
-      y: 600,
-      width: 120,
-      height: 120,
-      fill: [0, 0, 250],
-      name: "node 4",
-    });
-
-    const n5 = this.animation.createShape("circle", {
-      x: 400,
-      y: 500,
-      width: 120,
-      height: 120,
-      fill: [0, 0, 200],
-      name: "node 5",
-    });
-
-    const n6 = this.animation.createShape("circle", {
-      x: 800,
-      y: 500,
-      width: 120,
-      height: 120,
-      fill: [0, 0, 200],
-      name: "node 6",
-    });
-
-    const n7 = this.animation.createShape("circle", {
-      x: 800,
-      y: 100,
-      width: 120,
-      height: 120,
-      fill: [0, 0, 200],
-      name: "node 7",
-    });
-
-    const n8 = this.animation.createShape("circle", {
-      x: 400,
-      y: 100,
-      width: 120,
-      height: 120,
-      fill: [0, 0, 200],
-      name: "node 8",
-    });
-
-    const fp1 = this.animation.createShape("flowpath", {
-      startShape: n1,
-      endShape: n2,
-      startConnection: "right",
-      endConnection: "left",
+    const flowDefaults = {
       pathStyle: "bezier",
       curveIntensity: 0,
       arrowEnd: false,
       arrowSize: 8,
-      stroke: [100, 200, 250],
+      stroke: colors.steelBlue,
       strokeWeight: 2,
-      flowParticles: 8, // Add flowing particles
-      particleSize: 6, // Size of particles
-      fill: [150, 220, 255], // Particle color
-      animationSpeed: 2, // Speed of flow
+      flowParticles: 8,
+      particleSize: 6,
+      fill: colors.steelBlue,
+      animationSpeed: 2,
+    };
+
+    // Define flows [startIndex, endIndex, startConnection, endConnection]
+    const flowPaths = [
+      [0, 1, "right", "left"],
+      [1, 2, "right", "left"],
+      [2, 3, "right", "left"],
+      [3, 4, "top", "bottom"],
+      [4, 5, "left", "right"],
+      [5, 6, "left", "right"],
+      [6, 7, "left", "right"],
+      [7, 0, "bottom", "top"],
+    ];
+
+    // Create flows using direct index reference
+    flowPaths.forEach(([startIdx, endIdx, startConn, endConn]) => {
+      this.animation.createShape("flowpath", {
+        ...flowDefaults,
+        startShape: nodes[startIdx],
+        endShape: nodes[endIdx],
+        startConnection: startConn,
+        endConnection: endConn,
+      });
     });
 
-    const fp2 = this.animation.createShape("flowpath", {
-      startShape: n2,
-      endShape: n3,
-      startConnection: "bottom",
-      endConnection: "top",
-      pathStyle: "bezier",
-      curveIntensity: 0,
-      arrowEnd: false,
-      arrowSize: 8,
-      stroke: [100, 200, 250],
-      strokeWeight: 2,
-      flowParticles: 8, // Add flowing particles
-      particleSize: 6, // Size of particles
-      fill: [150, 220, 255], // Particle color
-      animationSpeed: 2, // Speed of flow
-    });
+    for (
+      let startFrame = 0;
+      startFrame < totalFrames;
+      startFrame += pulseInterval
+    ) {
+      this.animation.animate(nodes[0], "fill", [
+        { frame: startFrame, value: colors.steelBlue },
+        { frame: startFrame + pulseInterval / 2, value: colors.limeGreen },
+        { frame: startFrame + pulseInterval, value: colors.steelBlue },
+      ]);
+    }
 
-    const fp3 = this.animation.createShape("flowpath", {
-      startShape: n3,
-      endShape: n4,
-      startConnection: "left",
-      endConnection: "right",
-      pathStyle: "bezier",
-      curveIntensity: 0,
-      arrowEnd: false,
-      arrowSize: 8,
-      stroke: [100, 200, 250],
-      strokeWeight: 2,
-      flowParticles: 8, // Add flowing particles
-      particleSize: 6, // Size of particles
-      fill: [150, 220, 255], // Particle color
-      animationSpeed: 2, // Speed of flow
-    });
+    for (
+      let startFrame = interval;
+      startFrame < totalFrames;
+      startFrame += pulseInterval
+    ) {
+      this.animation.animate(nodes[4], "fill", [
+        { frame: startFrame, value: colors.steelBlue },
+        { frame: startFrame + pulseInterval / 2, value: colors.limeGreen },
+        { frame: startFrame + pulseInterval, value: colors.steelBlue },
+      ]);
+    }
 
-    const fp4 = this.animation.createShape("flowpath", {
-      startShape: n4,
-      endShape: n1,
-      startConnection: "top",
-      endConnection: "bottom",
-      pathStyle: "bezier",
-      curveIntensity: 0,
-      arrowEnd: false,
-      arrowSize: 8,
-      stroke: [100, 200, 250],
-      strokeWeight: 2,
-      flowParticles: 8, // Add flowing particles
-      particleSize: 6, // Size of particles
-      fill: [150, 220, 255], // Particle color
-      animationSpeed: 2, // Speed of flow
-    });
+    for (
+      let startFrame = interval * 2;
+      startFrame < totalFrames;
+      startFrame += pulseInterval
+    ) {
+      this.animation.animate(nodes[6], "fill", [
+        { frame: startFrame, value: colors.steelBlue },
+        { frame: startFrame + pulseInterval / 2, value: colors.limeGreen },
+        { frame: startFrame + pulseInterval, value: colors.steelBlue },
+      ]);
 
-    const fp5 = this.animation.createShape("flowpath", {
-      startShape: n5,
-      endShape: n6,
-      startConnection: "right",
-      endConnection: "left",
-      pathStyle: "bezier",
-      curveIntensity: 0,
-      arrowEnd: false,
-      arrowSize: 8,
-      stroke: [100, 200, 250],
-      strokeWeight: 2,
-      flowParticles: 8, // Add flowing particles
-      particleSize: 6, // Size of particles
-      fill: [150, 220, 255], // Particle color
-      animationSpeed: 2, // Speed of flow
-    });
+      this.animation.animate(nodes[2], "fill", [
+        { frame: startFrame, value: colors.steelBlue },
+        { frame: startFrame + pulseInterval / 2, value: colors.limeGreen },
+        { frame: startFrame + pulseInterval, value: colors.steelBlue },
+      ]);
+    }
 
-    const fp6 = this.animation.createShape("flowpath", {
-      startShape: n6,
-      endShape: n7,
-      startConnection: "top",
-      endConnection: "bottom",
-      pathStyle: "bezier",
-      curveIntensity: 0,
-      arrowEnd: false,
-      arrowSize: 8,
-      stroke: [100, 200, 250],
-      strokeWeight: 2,
-      flowParticles: 8, // Add flowing particles
-      particleSize: 6, // Size of particles
-      fill: [150, 220, 255], // Particle color
-      animationSpeed: 2, // Speed of flow
-    });
+    for (
+      let startFrame = interval * 3;
+      startFrame < totalFrames;
+      startFrame += pulseInterval
+    ) {
+      this.animation.animate(nodes[1], "fill", [
+        { frame: startFrame, value: colors.steelBlue },
+        { frame: startFrame + pulseInterval / 2, value: colors.limeGreen },
+        { frame: startFrame + pulseInterval, value: colors.steelBlue },
+      ]);
 
-    const fp7 = this.animation.createShape("flowpath", {
-      startShape: n7,
-      endShape: n8,
-      startConnection: "left",
-      endConnection: "right",
-      pathStyle: "bezier",
-      curveIntensity: 0,
-      arrowEnd: false,
-      arrowSize: 8,
-      stroke: [100, 200, 250],
-      strokeWeight: 2,
-      flowParticles: 8, // Add flowing particles
-      particleSize: 6, // Size of particles
-      fill: [150, 220, 255], // Particle color
-      animationSpeed: 2, // Speed of flow
-    });
+      this.animation.animate(nodes[3], "fill", [
+        { frame: startFrame, value: colors.steelBlue },
+        { frame: startFrame + pulseInterval / 2, value: colors.limeGreen },
+        { frame: startFrame + pulseInterval, value: colors.steelBlue },
+      ]);
 
-    const fp8 = this.animation.createShape("flowpath", {
-      startShape: n8,
-      endShape: n5,
-      pathStyle: "bezier",
-      curveIntensity: 0,
-      arrowEnd: false,
-      arrowSize: 8,
-      stroke: [100, 200, 250],
-      strokeWeight: 2,
-      flowParticles: 8, // Add flowing particles
-      particleSize: 6, // Size of particles
-      fill: [150, 220, 255], // Particle color
-      animationSpeed: 2, // Speed of flow
-    });
+      this.animation.animate(nodes[5], "fill", [
+        { frame: startFrame, value: colors.steelBlue },
+        { frame: startFrame + pulseInterval / 2, value: colors.limeGreen },
+        { frame: startFrame + pulseInterval, value: colors.steelBlue },
+      ]);
 
-    const fp9 = this.animation.createShape("flowpath", {
-      startShape: n1,
-      endShape: n8,
-      pathStyle: "bezier",
-      curveIntensity: 0,
-      arrowEnd: false,
-      arrowSize: 8,
-      stroke: [100, 200, 250],
-      strokeWeight: 2,
-      flowParticles: 8, // Add flowing particles
-      particleSize: 6, // Size of particles
-      fill: [150, 220, 255], // Particle color
-      animationSpeed: 2, // Speed of flow
-    });
-
-    const fp10 = this.animation.createShape("flowpath", {
-      startShape: n2,
-      endShape: n7,
-      pathStyle: "bezier",
-      curveIntensity: 0,
-      arrowEnd: false,
-      arrowSize: 8,
-      stroke: [100, 200, 250],
-      strokeWeight: 2,
-      flowParticles: 8, // Add flowing particles
-      particleSize: 6, // Size of particles
-      fill: [150, 220, 255], // Particle color
-      animationSpeed: 2, // Speed of flow
-    });
-
-    const fp11 = this.animation.createShape("flowpath", {
-      startShape: n3,
-      endShape: n6,
-      pathStyle: "bezier",
-      curveIntensity: 0,
-      arrowEnd: false,
-      arrowSize: 8,
-      stroke: [100, 200, 250],
-      strokeWeight: 2,
-      flowParticles: 8, // Add flowing particles
-      particleSize: 6, // Size of particles
-      fill: [150, 220, 255], // Particle color
-      animationSpeed: 2, // Speed of flow
-    });
-
-    const fp12 = this.animation.createShape("flowpath", {
-      startShape: n4,
-      endShape: n5,
-      pathStyle: "bezier",
-      curveIntensity: 0,
-      arrowEnd: false,
-      arrowSize: 8,
-      stroke: [100, 200, 250],
-      strokeWeight: 2,
-      flowParticles: 8, // Add flowing particles
-      particleSize: 6, // Size of particles
-      fill: [150, 220, 255], // Particle color
-      animationSpeed: 2, // Speed of flow
-    });
-
-    const data = this.animation.createShape("rectangle", {
-      x: n1.x + 50,
-      y: n1.y + 50,
-      height: 50,
-      width: 100,
-      cornerRadius: 10,
-      fill: [255, 255, 255],
-      name: "",
-      visible: true,
-    });
-
-    const data2 = this.animation.createShape("rectangle", {
-      x: n2.x + 50,
-      y: n2.y + 50,
-      height: 50,
-      width: 100,
-      cornerRadius: 10,
-      fill: [255, 255, 255],
-      name: "",
-      visible: false,
-    });
-
-    const data3 = this.animation.createShape("rectangle", {
-      x: n3.x + 50,
-      y: n3.y + 50,
-      height: 50,
-      width: 100,
-      cornerRadius: 10,
-      fill: [255, 255, 255],
-      name: "",
-      visible: false,
-    });
-
-    const data4 = this.animation.createShape("rectangle", {
-      x: n4.x + 50,
-      y: n4.y + 50,
-      height: 50,
-      width: 100,
-      cornerRadius: 10,
-      fill: [255, 255, 255],
-      name: "",
-      visible: false,
-    });
-
-    const data5 = this.animation.createShape("rectangle", {
-      x: n5.x + 50,
-      y: n5.y + 50,
-      height: 50,
-      width: 100,
-      cornerRadius: 10,
-      fill: [255, 255, 255],
-      name: "",
-      visible: false,
-    });
-
-    const data6 = this.animation.createShape("rectangle", {
-      x: n6.x + 50,
-      y: n6.y + 50,
-      height: 50,
-      width: 100,
-      cornerRadius: 10,
-      fill: [255, 255, 255],
-      name: "",
-      visible: false,
-    });
-
-    const data7 = this.animation.createShape("rectangle", {
-      x: n7.x + 50,
-      y: n7.y + 50,
-      height: 50,
-      width: 100,
-      cornerRadius: 10,
-      fill: [255, 255, 255],
-      name: "",
-      visible: false,
-    });
-
-    const data8 = this.animation.createShape("rectangle", {
-      x: n8.x + 50,
-      y: n8.y + 50,
-      height: 50,
-      width: 100,
-      cornerRadius: 10,
-      fill: [255, 255, 255],
-      name: "",
-      visible: false,
-    });
-
-    this.animation.animateMultiple(data, {
-      text: [
-        {
-          frame: 0,
-          value: "1,2,3,4,5,6,7,8",
-        },
-        {
-          frame: 300,
-          value: "1,2,3,4",
-        },
-        {
-          frame: 600,
-          value: "1,4",
-        },
-        {
-          frame: 1200,
-          value: "1",
-        },
-      ],
-    });
-
-    this.animation.animateMultiple(data8, {
-      text: [
-        {
-          frame: 300,
-          value: "5,6,7,8",
-        },
-        {
-          frame: 600,
-          value: "5,8",
-        },
-        {
-          frame: 1200,
-          value: "8",
-        },
-      ],
-      visible: [
-        {
-          frame: 0,
-          value: false,
-        },
-        {
-          frame: 300,
-          value: true,
-        },
-      ],
-    });
-
-    this.animation.animateMultiple(data2, {
-      text: [
-        {
-          frame: 600,
-          value: "2,3",
-        },
-        {
-          frame: 1200,
-          value: "2",
-        },
-      ],
-      visible: [
-        {
-          frame: 0,
-          value: false,
-        },
-        {
-          frame: 600,
-          value: true,
-        },
-        {
-          frame: 1200,
-          value: true,
-        },
-      ],
-    });
-
-    this.animation.animateMultiple(data7, {
-      text: [
-        {
-          frame: 600,
-          value: "6,7",
-        },
-        {
-          frame: 1200,
-          value: "7",
-        },
-      ],
-      visible: [
-        {
-          frame: 0,
-          value: false,
-        },
-        {
-          frame: 600,
-          value: true,
-        },
-        {
-          frame: 1200,
-          value: true,
-        },
-      ],
-    });
-
-    this.animation.animateMultiple(data5, {
-      text: [
-        {
-          frame: 1200,
-          value: "5",
-        },
-      ],
-      visible: [
-        {
-          frame: 0,
-          value: false,
-        },
-        {
-          frame: 1200,
-          value: true,
-        },
-      ],
-    });
-
-    this.animation.animateMultiple(data4, {
-      text: [
-        {
-          frame: 1200,
-          value: "4",
-        },
-      ],
-      visible: [
-        {
-          frame: 0,
-          value: false,
-        },
-        {
-          frame: 1200,
-          value: true,
-        },
-      ],
-    });
-
-    this.animation.animateMultiple(data3, {
-      text: [
-        {
-          frame: 1200,
-          value: "3",
-        },
-      ],
-      visible: [
-        {
-          frame: 0,
-          value: false,
-        },
-        {
-          frame: 1200,
-          value: true,
-        },
-      ],
-    });
-
-    this.animation.animateMultiple(data6, {
-      text: [
-        {
-          frame: 1200,
-          value: "6",
-        },
-      ],
-      visible: [
-        {
-          frame: 0,
-          value: false,
-        },
-        {
-          frame: 1200,
-          value: true,
-        },
-      ],
-    });
+      this.animation.animate(nodes[7], "fill", [
+        { frame: startFrame, value: colors.steelBlue },
+        { frame: startFrame + pulseInterval / 2, value: colors.limeGreen },
+        { frame: startFrame + pulseInterval, value: colors.steelBlue },
+      ]);
+    }
 
     this.animation.reset();
     this.animation.play(true);
   }
 
-  createOneToAllBroadcast() {
 
+  allToOneRecursiveDoubling() {
+    const colors = {
+      limeGreen: [50, 205, 50],
+      goldenRod: [218, 165, 32],
+      steelBlue: [70, 130, 180],
+    };
+
+    const duration = 20;
+    const fps = 60;
+    const height = 1000;
+    const width = 1900;
+    const totalFrames = duration * fps; // Get total frames = duration × fps
+    const pulseInterval = fps / 1.5; // 60 frames for one pulse cycle (steelBlue → goldenRod → steelBlue)
+    const interval = 240;
+
+    this.animation.clearAll();
+    this.animation.setDuration(duration);
+    this.animation.setFPS(fps);
+    this.engine.setCanvasSize(width, height);
+
+    // Node coordinates and optional custom colors
+    const nodeGrid = [
+      [200, 400, colors.goldenRod], // node 0 (highlighted)
+      [400, 400], // node 1
+      [600, 400], // node 2
+      [800, 400], // node 3
+      [800, 200], // node 4
+      [600, 200], // node 5
+      [400, 200], // node 6
+      [200, 200], // node 7
+    ];
+
+    // Create all nodes and store them as an array of shapes
+    const nodes = nodeGrid.map(([x, y, customFill], index) => {
+      return this.animation.createShape("circle", {
+        x,
+        y,
+        size: 80,
+        fill: customFill || colors.steelBlue,
+        name: `node ${index}`,
+      });
+    });
+
+    const flowDefaults = {
+      pathStyle: "bezier",
+      curveIntensity: 0,
+      arrowEnd: false,
+      arrowSize: 8,
+      stroke: colors.steelBlue,
+      strokeWeight: 2,
+      flowParticles: 8,
+      particleSize: 6,
+      fill: colors.steelBlue,
+      animationSpeed: 2,
+    };
+
+    // Define flows [startIndex, endIndex, startConnection, endConnection]
+    const flowPaths = [
+      [0, 1, "right", "left"],
+      [1, 2, "right", "left"],
+      [2, 3, "right", "left"],
+      [3, 4, "top", "bottom"],
+      [4, 5, "left", "right"],
+      [5, 6, "left", "right"],
+      [6, 7, "left", "right"],
+      [7, 0, "bottom", "top"],
+    ];
+
+    // Create flows using direct index reference
+    flowPaths.forEach(([startIdx, endIdx, startConn, endConn]) => {
+      this.animation.createShape("flowpath", {
+        ...flowDefaults,
+        startShape: nodes[startIdx],
+        endShape: nodes[endIdx],
+        startConnection: startConn,
+        endConnection: endConn,
+      });
+    });
+
+    for (
+      let startFrame = 0;
+      startFrame < interval;
+      startFrame += pulseInterval
+    ) {
+      this.animation.animateGroup([nodes[0],nodes[1],nodes[2],nodes[3],nodes[4],nodes[5],nodes[6],nodes[7]], "fill", [
+        { frame: startFrame, value: colors.steelBlue },
+        { frame: startFrame + pulseInterval / 2, value: colors.limeGreen },
+        { frame: startFrame + pulseInterval, value: colors.steelBlue },
+      ],0);
+    }
+
+    for (
+      let startFrame = interval;
+      startFrame < interval * 2;
+      startFrame += pulseInterval
+    ) {
+      this.animation.animateGroup([nodes[0],nodes[2],nodes[4],nodes[6]], "fill", [
+        { frame: startFrame, value: colors.steelBlue },
+        { frame: startFrame + pulseInterval / 2, value: colors.limeGreen },
+        { frame: startFrame + pulseInterval, value: colors.steelBlue },
+      ],0);
+    }
+
+    for (
+      let startFrame = interval * 2;
+      startFrame < interval * 3;
+      startFrame += pulseInterval
+    ) {
+      this.animation.animateGroup([nodes[0],nodes[4]], "fill", [
+        { frame: startFrame, value: colors.steelBlue },
+        { frame: startFrame + pulseInterval / 2, value: colors.limeGreen },
+        { frame: startFrame + pulseInterval, value: colors.steelBlue },
+      ],0);
+    }
+
+    for (
+      let startFrame = interval * 3;
+      startFrame < interval * 4;
+      startFrame += pulseInterval
+    ) {
+      this.animation.animateGroup([nodes[0]], "fill", [
+        { frame: startFrame, value: colors.steelBlue },
+        { frame: startFrame + pulseInterval / 2, value: colors.limeGreen },
+        { frame: startFrame + pulseInterval, value: colors.steelBlue },
+      ],0);
+    }
+
+    this.animation.reset();
+    this.animation.play(true);
+  }
+
+  
+  
+
+  createOneToAllBroadcast() {
     const colors = {
       skyBlue: [135, 206, 235],
       coral: [255, 127, 80],
@@ -1386,7 +1128,7 @@ class ToolbarPanel {
     ];
 
     // Create all nodes and keep reference by name
-    
+
     const nodes = nodeGrid.map(([x, y, name, customFill]) => {
       return this.animation.createShape("circle", {
         x,
@@ -1413,7 +1155,6 @@ class ToolbarPanel {
     const flowPaths = [
       // [startNode, endNode, startConnection, endConnection]
 
-
       [0, 4, "center", "center"],
       [2, 6, "center", "center"],
       [1, 5, "center", "center"],
@@ -1423,7 +1164,6 @@ class ToolbarPanel {
       [1, 2, "center", "center"],
       [2, 3, "center", "center"],
       [3, 0, "center", "center"],
-
 
       [4, 5, "center", "center"],
       [5, 6, "center", "center"],
@@ -1440,7 +1180,6 @@ class ToolbarPanel {
         endConnection: endConn,
       });
     });
-
 
     this.animation.reset();
     this.animation.play(true);

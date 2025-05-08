@@ -29,14 +29,15 @@ class UIManager {
         
         // Initialize panel components
         this.timelinePanel = new TimelinePanel(this.engine, this.keyframeManager);
-        this.propertiesPanel = new PropertiesPanel(this.engine, this.gui, this.keyframeManager);
         this.toolbarPanel = new ToolbarPanel(this.engine, this.gui);
+        this.propertiesPanel = new PropertiesPanel(this.engine, this.gui, this.keyframeManager);
         this.codeEditorPanel = new CodeEditorPanel(this.engine);
         
         // Initialize each panel
         this.timelinePanel.initialize();
-        this.propertiesPanel.initialize();
+        
         this.toolbarPanel.initialize();
+        this.propertiesPanel.initialize();
         this.codeEditorPanel.initialize();
         
         // Create UI toggle controls

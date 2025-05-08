@@ -3,9 +3,12 @@
  * Perfect for showing data flow or connections in diagrams
  */
 class FlowPath extends BaseShape {
-  constructor(startX, startY, endX, endY) {
+  constructor(startX, startY, endX, endY, animationEngine = null) {
     // Use the midpoint as the object center
     super((startX + endX) / 2, (startY + endY) / 2);
+
+    // Reference to animation engine
+    this.animationEngine = animationEngine;
 
     // Start and end positions
     this.startX = startX;
@@ -31,12 +34,31 @@ class FlowPath extends BaseShape {
     // Animation state for flowing effects
     this._animationOffset = 0;
     this._particles = [];
+    this._lastFrameTime = Date.now(); // Track time between frames for smooth animation
 
     // Update dimensions based on points
     this._updateDimensions();
 
     // Initialize flow particles if needed
     this._initializeParticles();
+  }
+
+  /**
+   * Set the animation engine reference
+   */
+  setAnimationEngine(engine) {
+    this.animationEngine = engine;
+  }
+
+  /**
+   * Check if animation is currently playing
+   */
+  isAnimationPlaying() {
+    if (this.animationEngine) {
+      return this.animationEngine.isPlaying;
+    }
+    // Default to true if no animation engine is attached
+    return true;
   }
 
   /**
@@ -149,7 +171,37 @@ class FlowPath extends BaseShape {
   }
 
   /**
-   * Render the path
+   * Render the shape with animation engine state awareness
+   */
+  render() {
+    push();
+    translate(this.x, this.y);
+    rotate(this.rotation);
+    scale(this.scaleX, this.scaleY);
+    
+    // Apply stroke properties
+    if (this.strokeWeight > 0) {
+      stroke(this.stroke);
+      strokeWeight(this.strokeWeight);
+    } else {
+      noStroke();
+    }
+    
+    // Apply fill
+    if (this.fill) {
+      fill(this.fill);
+    } else {
+      noFill();
+    }
+    
+    // Render the actual shape with animation state
+    this._renderShape();
+    
+    pop();
+  }
+
+  /**
+   * Render the path with animation state awareness
    */
   _renderShape() {
     // Save local coordinates relative to the center
@@ -205,7 +257,7 @@ class FlowPath extends BaseShape {
       this._drawArrowHead(localStartX, localStartY, points[1].x, points[1].y);
     }
 
-    // Update particle positions for the next frame
+    // Update particle positions for the next frame - only if animation is playing
     if (this.flowParticles > 0 && this.animationSpeed > 0) {
       this._updateParticlePositions();
     }
@@ -431,16 +483,26 @@ class FlowPath extends BaseShape {
 
   /**
    * Update particle positions for animation
+   * Now respects animation engine state
    */
   _updateParticlePositions() {
     if (this.animationSpeed <= 0) return;
+    
+    // Only animate if the animation engine is playing
+    const isPlaying = this.isAnimationPlaying();
+    if (!isPlaying) return;
 
-    // Update global animation offset
-    this._animationOffset += 0.01 * this.animationSpeed;
+    // Calculate time delta for smooth animation
+    const now = Date.now();
+    const deltaTime = (now - this._lastFrameTime) / 1000; // in seconds
+    this._lastFrameTime = now;
+
+    // Update global animation offset - normalized to 60fps equivalent
+    this._animationOffset += 0.01 * this.animationSpeed * Math.min(deltaTime * 60, 2);
 
     // Update each particle position
     for (const particle of this._particles) {
-      particle.t += 0.005 * this.animationSpeed;
+      particle.t += 0.005 * this.animationSpeed * Math.min(deltaTime * 60, 2);
       if (particle.t > 1) {
         particle.t = 0;
         particle.size = this.particleSize * (0.7 + Math.random() * 0.6);
@@ -501,9 +563,6 @@ class FlowPath extends BaseShape {
     return Math.sqrt(dx * dx + dy * dy);
   }
 
-  /**
-   * Draw arrow head at the end of a line
-   */
   /**
    * Draw arrow head at the end of a line
    */
@@ -660,5 +719,19 @@ class FlowPath extends BaseShape {
       width: maxX - minX + padding * 2,
       height: maxY - minY + padding * 2,
     };
+  }
+
+  /**
+   * Handle updating to a specific timeline frame
+   * This integrates with the animation engine's timeline functionality
+   */
+  updateToFrame(frame) {
+    // Implement keyframe-based animation here if needed
+    // This allows the FlowPath to respond to timeline animations
+    
+    // Call the parent class method if it exists
+    if (super.updateToFrame) {
+      super.updateToFrame(frame);
+    }
   }
 }
