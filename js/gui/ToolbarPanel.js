@@ -348,6 +348,7 @@ class ToolbarPanel {
       binaryTreeBroadcast: () => this.binaryTreeBroadcast(),
       allToAllBroadcastRing: () => this.allToAllBroadcastRing(),
       allToAllBroadcastMesh: () => this.allToAllBroadcastMesh(),
+      hyperCubeBroadcastAllToAll: () => this.hyperCubeBroadcastAllToAll(),
     };
 
     this.templatesFolder
@@ -377,6 +378,9 @@ class ToolbarPanel {
     this.templatesFolder
       .add(templates, "allToAllBroadcastMesh")
       .name("All to All Broadcast Mesh");
+    this.templatesFolder
+      .add(templates, "hyperCubeBroadcastAllToAll")
+      .name("HyperCube All to All Broadcast");
 
     this.templatesFolder.open();
   }
@@ -2136,85 +2140,6 @@ class ToolbarPanel {
       });
     });
 
-    // this.animation.animateMultiple(data[0],{
-    //   x : [
-    //     {
-    //       frame : 0,
-    //       value : nodes[0].x + 50
-    //     },
-    //     {
-    //       frame : interval,
-    //       value : nodes[1].x + 50
-    //     },
-    //     {
-    //       frame : interval * 2,
-    //       value : nodes[2].x + 50
-    //     },
-    //     {
-    //       frame : interval * 3,
-    //       value : nodes[3].x + 50
-    //     },
-    //     {
-    //       frame : interval * 4,
-    //       value : nodes[4].x + 50
-    //     },
-    //     {
-    //       frame : interval * 5,
-    //       value : nodes[5].x + 50
-    //     },
-    //     {
-    //       frame : interval * 6,
-    //       value : nodes[6].x + 50
-    //     },
-    //     {
-    //       frame : interval * 7,
-    //       value : nodes[7].x + 50
-    //     },
-    //     {
-    //       frame : interval * 8,
-    //       value : nodes[0].x + 50
-    //     }
-    //   ],
-    //   y : [
-    //     {
-    //       frame : 0,
-    //       value : nodes[0].y + 50
-    //     },
-    //     {
-    //       frame : interval,
-    //       value : nodes[1].y + 50
-    //     },
-    //     {
-    //       frame : interval * 2,
-    //       value : nodes[2].y + 50
-    //     },
-    //     {
-    //       frame : interval * 3,
-    //       value : nodes[3].y + 50
-    //     },
-    //     {
-    //       frame : interval * 4,
-    //       value : nodes[4].y + 50
-    //     },
-    //     {
-    //       frame : interval * 5,
-    //       value : nodes[5].y + 50
-    //     },
-    //     {
-    //       frame : interval * 6,
-    //       value : nodes[6].y + 50
-    //     },
-    //     {
-    //       frame : interval * 7,
-    //       value : nodes[7].y + 50
-    //     },
-    //     {
-    //       frame : interval * 8,
-    //       value : nodes[0].y + 50
-    //     }
-    //   ]
-    // });
-
     // Animation logic with accumulating journey text
     const numNodes = nodes.length;
 
@@ -2263,6 +2188,201 @@ class ToolbarPanel {
     });
   }
 
+  // allToAllBroadcastMesh() {
+  //   const colors = {
+  //     skyBlue: [135, 206, 235],
+  //     coral: [255, 127, 80],
+  //     limeGreen: [50, 205, 50],
+  //     goldenRod: [218, 165, 32],
+  //     orchid: [218, 112, 214],
+  //     slateGray: [112, 128, 144],
+  //     tomato: [255, 99, 71],
+  //     steelBlue: [70, 130, 180],
+  //     mediumPurple: [147, 112, 219],
+  //     seaGreen: [46, 139, 87],
+  //     deepPink: [255, 20, 147],
+  //     turquoise: [64, 224, 208],
+  //     fireBrick: [178, 34, 34],
+  //     darkOrange: [255, 140, 0],
+  //     lightSlateGray: [119, 136, 153],
+  //   };
+
+  //   const duration = 20;
+  //   const fps = 60;
+  //   const interval = 60; // Frames between movement steps
+
+  //   this.animation.clearAll();
+  //   this.animation.setDuration(duration);
+  //   this.animation.setFPS(fps);
+  //   this.engine.setCanvasSize(1900, 1000);
+
+  //   // Node coordinates arranged in the requested grid:
+  //   // 6 7 8
+  //   // 3 4 5
+  //   // 0 1 2
+  //   const nodeGrid = [
+  //     [300, 700], // 0
+  //     [600, 700], // 1
+  //     [900, 700], // 2
+  //     [300, 400], // 3
+  //     [600, 400], // 4
+  //     [900, 400], // 5
+  //     [300, 100], // 6
+  //     [600, 100], // 7
+  //     [900, 100], // 8
+  //   ];
+
+  //   // Create all nodes and store them as an array of shapes
+  //   const nodes = nodeGrid.map(([x, y], index) => {
+  //     return this.animation.createShape("circle", {
+  //       x,
+  //       y,
+  //       size: 100,
+  //       fill: colors.steelBlue,
+  //       name: `node ${index}`,
+  //       text: `${index}`,
+  //       fontSize: 24,
+  //       textColor: [255, 255, 255]
+  //     });
+  //   });
+
+  //   // Create data packets, one associated with each node initially
+  //   const data = nodeGrid.map(([x, y], index) => {
+  //     return this.animation.createShape("rectangle", {
+  //       x: x,
+  //       y: y + 20, // Position slightly below center of node
+  //       height: 40,
+  //       width: 100,
+  //       fill: colors.coral,
+  //       name: `data ${index}`,
+  //       cornerRadius: 10,
+  //       text: `${index}`,
+  //       fontSize: 18,
+  //       textColor: [0, 0, 0]
+  //     });
+  //   });
+
+  //   const flowDefaults = {
+  //     pathStyle: "bezier",
+  //     curveIntensity: 0,
+  //     arrowEnd: false,
+  //     arrowSize: 8,
+  //     stroke: colors.steelBlue,
+  //     strokeWeight: 2,
+  //     flowParticles: 8,
+  //     particleSize: 6,
+  //     fill: colors.steelBlue,
+  //     animationSpeed: 2,
+  //   };
+
+  //   // Define flows by index - connections between adjacent nodes
+  //   const flowPaths = [
+  //     // Horizontal connections
+  //     [0, 1, "right", "left"],
+  //     [1, 2, "right", "left"],
+  //     [3, 4, "right", "left"],
+  //     [4, 5, "right", "left"],
+  //     [6, 7, "right", "left"],
+  //     [7, 8, "right", "left"],
+
+  //     // Vertical connections
+  //     [0, 3, "top", "bottom"],
+  //     [3, 6, "top", "bottom"],
+  //     [1, 4, "top", "bottom"],
+  //     [4, 7, "top", "bottom"],
+  //     [2, 5, "top", "bottom"],
+  //     [5, 8, "top", "bottom"],
+  //   ];
+
+  //   // Create flows using direct index reference
+  //   const flows = flowPaths.map(([startIdx, endIdx, startConn, endConn]) => {
+  //     return this.animation.createShape("flowpath", {
+  //       ...flowDefaults,
+  //       startShape: nodes[startIdx],
+  //       endShape: nodes[endIdx],
+  //       startConnection: startConn,
+  //       endConnection: endConn,
+  //     });
+  //   });
+
+  //   // For each data packet, create animation to visit all other nodes
+  //   data.forEach((dataItem, sourceIndex) => {
+  //     const xKeyframes = [];
+  //     const yKeyframes = [];
+  //     const textKeyframes = [];
+
+  //     // Start at the original position
+  //     xKeyframes.push({ frame: 0, value: nodes[sourceIndex].x });
+  //     yKeyframes.push({ frame: 0, value: nodes[sourceIndex].y + 20 });
+  //     textKeyframes.push({ frame: 0, value: `${sourceIndex}` });
+
+  //     let journeyText = `${sourceIndex}`;
+  //     let frameOffset = 0;
+
+  //     // Create a visit sequence to all other nodes
+  //     const visitsInOrder = [];
+
+  //     // Add all node indices except the source
+  //     for (let i = 0; i < nodes.length; i++) {
+  //       if (i !== sourceIndex) {
+  //         visitsInOrder.push(i);
+  //       }
+  //     }
+
+  //     // Visit each node in the grid
+  //     for (let i = 0; i < visitsInOrder.length; i++) {
+  //       const targetNodeIndex = visitsInOrder[i];
+  //       frameOffset += interval;
+
+  //       // Add animation keyframes
+  //       xKeyframes.push({
+  //         frame: frameOffset,
+  //         value: nodes[targetNodeIndex].x
+  //       });
+
+  //       yKeyframes.push({
+  //         frame: frameOffset,
+  //         value: nodes[targetNodeIndex].y + 20
+  //       });
+
+  //       // Update journey text
+  //       journeyText += `,${targetNodeIndex}`;
+  //       textKeyframes.push({
+  //         frame: frameOffset,
+  //         value: journeyText
+  //       });
+  //     }
+
+  //     // Return to the original node
+  //     frameOffset += interval;
+  //     xKeyframes.push({
+  //       frame: frameOffset,
+  //       value: nodes[sourceIndex].x + 50
+  //     });
+
+  //     yKeyframes.push({
+  //       frame: frameOffset,
+  //       value: nodes[sourceIndex].y + 50
+  //     });
+
+  //     journeyText += `,${sourceIndex}`;
+  //     textKeyframes.push({
+  //       frame: frameOffset,
+  //       value: journeyText
+  //     });
+
+  //     // Apply animation
+  //     this.animation.animateMultiple(dataItem, {
+  //       x: xKeyframes,
+  //       y: yKeyframes,
+  //       text: textKeyframes
+  //     });
+  //   });
+
+  //   this.animation.reset();
+  //   this.animation.play(true);
+  // }
+
   allToAllBroadcastMesh() {
     const colors = {
       skyBlue: [135, 206, 235],
@@ -2281,16 +2401,16 @@ class ToolbarPanel {
       darkOrange: [255, 140, 0],
       lightSlateGray: [119, 136, 153],
     };
-  
+
     const duration = 20;
     const fps = 60;
     const interval = 60; // Frames between movement steps
-    
+
     this.animation.clearAll();
     this.animation.setDuration(duration);
     this.animation.setFPS(fps);
     this.engine.setCanvasSize(1900, 1000);
-  
+
     // Node coordinates arranged in the requested grid:
     // 6 7 8
     // 3 4 5
@@ -2306,7 +2426,7 @@ class ToolbarPanel {
       [600, 100], // 7
       [900, 100], // 8
     ];
-  
+
     // Create all nodes and store them as an array of shapes
     const nodes = nodeGrid.map(([x, y], index) => {
       return this.animation.createShape("circle", {
@@ -2317,10 +2437,10 @@ class ToolbarPanel {
         name: `node ${index}`,
         text: `${index}`,
         fontSize: 24,
-        textColor: [255, 255, 255]
+        textColor: [255, 255, 255],
       });
     });
-    
+
     // Create data packets, one associated with each node initially
     const data = nodeGrid.map(([x, y], index) => {
       return this.animation.createShape("rectangle", {
@@ -2333,10 +2453,10 @@ class ToolbarPanel {
         cornerRadius: 10,
         text: `${index}`,
         fontSize: 18,
-        textColor: [0, 0, 0]
+        textColor: [0, 0, 0],
       });
     });
-  
+
     const flowDefaults = {
       pathStyle: "bezier",
       curveIntensity: 0,
@@ -2349,7 +2469,7 @@ class ToolbarPanel {
       fill: colors.steelBlue,
       animationSpeed: 2,
     };
-  
+
     // Define flows by index - connections between adjacent nodes
     const flowPaths = [
       // Horizontal connections
@@ -2359,7 +2479,7 @@ class ToolbarPanel {
       [4, 5, "right", "left"],
       [6, 7, "right", "left"],
       [7, 8, "right", "left"],
-      
+
       // Vertical connections
       [0, 3, "top", "bottom"],
       [3, 6, "top", "bottom"],
@@ -2368,7 +2488,7 @@ class ToolbarPanel {
       [2, 5, "top", "bottom"],
       [5, 8, "top", "bottom"],
     ];
-  
+
     // Create flows using direct index reference
     const flows = flowPaths.map(([startIdx, endIdx, startConn, endConn]) => {
       return this.animation.createShape("flowpath", {
@@ -2379,82 +2499,336 @@ class ToolbarPanel {
         endConnection: endConn,
       });
     });
-  
-    // For each data packet, create animation to visit all other nodes
+
+    // Define rows and columns
+    const rows = [
+      [0, 1, 2], // Bottom row
+      [3, 4, 5], // Middle row
+      [6, 7, 8], // Top row
+    ];
+
+    const columns = [
+      [0, 3, 6], // Left column
+      [1, 4, 7], // Middle column
+      [2, 5, 8], // Right column
+    ];
+
+    // For each data packet, create animation for the two-phase broadcast
     data.forEach((dataItem, sourceIndex) => {
       const xKeyframes = [];
       const yKeyframes = [];
       const textKeyframes = [];
-      
+
       // Start at the original position
       xKeyframes.push({ frame: 0, value: nodes[sourceIndex].x });
       yKeyframes.push({ frame: 0, value: nodes[sourceIndex].y + 20 });
       textKeyframes.push({ frame: 0, value: `${sourceIndex}` });
-      
-      let journeyText = `${sourceIndex}`;
+
       let frameOffset = 0;
-      
-      // Create a visit sequence to all other nodes
-      const visitsInOrder = [];
-      
-      // Add all node indices except the source
-      for (let i = 0; i < nodes.length; i++) {
-        if (i !== sourceIndex) {
-          visitsInOrder.push(i);
+
+      // Find which row and column this node belongs to
+      const sourceRow = Math.floor(sourceIndex / 3);
+      const sourceCol = sourceIndex % 3;
+
+      // Phase 1: Row-wise broadcast
+      // Determine data that will be collected in this row
+      const rowData = new Set(rows[sourceRow]);
+      const rowDataText = Array.from(rowData)
+        .sort((a, b) => a - b)
+        .join(",");
+
+      // Visit each node in the same row (except self)
+      for (const targetIndex of rows[sourceRow]) {
+        if (targetIndex !== sourceIndex) {
+          frameOffset += interval;
+
+          // Add animation keyframes
+          xKeyframes.push({
+            frame: frameOffset,
+            value: nodes[targetIndex].x,
+          });
+
+          yKeyframes.push({
+            frame: frameOffset,
+            value: nodes[targetIndex].y + 20,
+          });
+
+          // All nodes in this row now have the same data
+          textKeyframes.push({
+            frame: frameOffset,
+            value: rowDataText,
+          });
         }
       }
-      
-      // Visit each node in the grid
-      for (let i = 0; i < visitsInOrder.length; i++) {
-        const targetNodeIndex = visitsInOrder[i];
-        frameOffset += interval;
-        
-        // Add animation keyframes
-        xKeyframes.push({ 
-          frame: frameOffset, 
-          value: nodes[targetNodeIndex].x 
-        });
-        
-        yKeyframes.push({ 
-          frame: frameOffset, 
-          value: nodes[targetNodeIndex].y + 20 
-        });
-        
-        // Update journey text
-        journeyText += `,${targetNodeIndex}`;
-        textKeyframes.push({ 
-          frame: frameOffset, 
-          value: journeyText 
-        });
-      }
-      
-      // Return to the original node
+
+      // Return to source node position after row broadcast
       frameOffset += interval;
-      xKeyframes.push({ 
-        frame: frameOffset, 
-        value: nodes[sourceIndex].x + 50
+      xKeyframes.push({
+        frame: frameOffset,
+        value: nodes[sourceIndex].x,
       });
-      
-      yKeyframes.push({ 
-        frame: frameOffset, 
-        value: nodes[sourceIndex].y + 50 
+
+      yKeyframes.push({
+        frame: frameOffset,
+        value: nodes[sourceIndex].y + 20,
       });
-      
-      journeyText += `,${sourceIndex}`;
-      textKeyframes.push({ 
-        frame: frameOffset, 
-        value: journeyText 
+
+      textKeyframes.push({
+        frame: frameOffset,
+        value: rowDataText,
       });
-      
+
+      // Phase 2: Column-wise broadcast
+      // Collect all data from all rows in this column
+      const colData = new Set();
+      for (const rowIdx of [0, 1, 2]) {
+        for (const nodeIdx of rows[rowIdx]) {
+          colData.add(nodeIdx);
+        }
+      }
+      const allDataText = Array.from(colData)
+        .sort((a, b) => a - b)
+        .join(",");
+
+      // Visit each node in the same column (except self)
+      for (const targetIndex of columns[sourceCol]) {
+        if (targetIndex !== sourceIndex) {
+          frameOffset += interval;
+
+          // Add animation keyframes
+          xKeyframes.push({
+            frame: frameOffset,
+            value: nodes[targetIndex].x,
+          });
+
+          yKeyframes.push({
+            frame: frameOffset,
+            value: nodes[targetIndex].y + 20,
+          });
+
+          // All nodes now have all data
+          textKeyframes.push({
+            frame: frameOffset,
+            value: allDataText,
+          });
+        }
+      }
+
+      // Final position slightly offset from the source node
+      frameOffset += interval;
+      xKeyframes.push({
+        frame: frameOffset,
+        value: nodes[sourceIndex].x + 50,
+      });
+
+      yKeyframes.push({
+        frame: frameOffset,
+        value: nodes[sourceIndex].y + 50,
+      });
+
+      textKeyframes.push({
+        frame: frameOffset,
+        value: allDataText,
+      });
+
       // Apply animation
       this.animation.animateMultiple(dataItem, {
         x: xKeyframes,
         y: yKeyframes,
-        text: textKeyframes
+        text: textKeyframes,
       });
     });
-  
+
     this.animation.reset();
     this.animation.play(true);
+  }
+
+  hyperCubeBroadcastAllToAll() {
+    const duration = 20;
+    const fps = 60;
+    const height = 1000;
+    const width = 1900;
+    const interval = 2 * fps;
+
+    const colors = {
+      skyBlue: [135, 206, 235],
+      coral: [255, 127, 80],
+      limeGreen: [50, 205, 50],
+      goldenRod: [218, 165, 32],
+      orchid: [218, 112, 214],
+      slateGray: [112, 128, 144],
+      tomato: [255, 99, 71],
+      steelBlue: [70, 130, 180],
+      mediumPurple: [147, 112, 219],
+      seaGreen: [46, 139, 87],
+      deepPink: [255, 20, 147],
+      turquoise: [64, 224, 208],
+      fireBrick: [178, 34, 34],
+      darkOrange: [255, 140, 0],
+      lightSlateGray: [119, 136, 153],
+    };
+
+    this.animation.clearAll();
+    this.animation.setDuration(duration);
+    this.animation.setFPS(fps);
+    this.engine.setCanvasSize(width, height);
+
+    const nodeGrid = [
+      [100, 700, "node 0"],
+      [500, 700, "node 1"],
+      [100, 300, "node 2"],
+      [500, 300, "node 3"],
+      [300, 500, "node 4"],
+      [700, 500, "node 5"],
+      [300, 100, "node 6"],
+      [700, 100, "node 7"],
+    ];
+
+    const nodes = nodeGrid.map(([x, y, name]) => {
+      return this.animation.createShape("circle", {
+        x,
+        y,
+        size: 80,
+        fill: colors.steelBlue,
+        name,
+      });
+    });
+
+    const data = nodeGrid.map(([x, y], index) => {
+      return this.animation.createShape("rectangle", {
+        x: x + 50,
+        y: y + 50,
+        height: 50,
+        width: 100,
+        fill: colors.coral,
+        name: `data ${index}`,
+        cornerRadius: 10,
+      });
+    });
+
+    const flowDefaults = {
+      pathStyle: "bezier",
+      curveIntensity: 0,
+      arrowEnd: false,
+      arrowSize: 8,
+      stroke: colors.steelBlue,
+      strokeWeight: 3,
+      flowParticles: 8,
+      particleSize: 3,
+      fill: colors.steelBlue,
+      animationSpeed: 1,
+      lineStyle: "dashed",
+    };
+
+    const flowPaths = [
+      [0, 2],
+      [0, 4],
+      [0, 1],
+      [1, 3],
+      [1, 5],
+      [2, 6],
+      [2, 3],
+      [3, 7],
+      [5, 7],
+      [5, 4],
+      [6, 4],
+      [6, 7],
+    ];
+
+    flowPaths.forEach(([startIdx, endIdx]) => {
+      this.animation.createShape("flowpath", {
+        ...flowDefaults,
+        startShape: nodes[startIdx],
+        endShape: nodes[endIdx],
+        startConnection: "center",
+        endConnection: "center",
+      });
+    });
+
+    const numNodes = nodes.length;
+    const dimensions = 3; // 3D hypercube
+
+    // Initialize: result[i] = {i}
+    const results = Array.from({ length: numNodes }, (_, i) => new Set([i]));
+
+    const broadcastSteps = []; // Store [sender, receiver, newDataSet] for each communication
+
+    // For i = 0 to d-1 (dimension loop)
+    for (let dim = 0; dim < dimensions; dim++) {
+      const exchanges = [];
+
+      // Each node computes partner = id XOR 2^dim
+      for (let nodeId = 0; nodeId < numNodes; nodeId++) {
+        const partnerId = nodeId ^ (1 << dim);
+
+        // Ensure only one pair (avoid double-counting reverse pairs)
+        if (nodeId < partnerId) {
+          exchanges.push([nodeId, partnerId]);
+        }
+      }
+
+      exchanges.forEach(([a, b]) => {
+        // Each sends their current result to the other
+        const union = new Set([...results[a], ...results[b]]);
+        results[a] = new Set(union);
+        results[b] = new Set(union);
+
+        broadcastSteps.push({
+          step: dim,
+          sender: a,
+          receiver: b,
+          newSet: new Set(union),
+        });
+      });
+    }
+
+    // Now animate each data block accordingly
+    data.forEach((dataItem, i) => {
+      const xKeyframes = [];
+      const yKeyframes = [];
+      const textKeyframes = [];
+
+      xKeyframes.push({ frame: 0, value: nodes[i].x + 50 });
+      yKeyframes.push({ frame: 0, value: nodes[i].y + 50 });
+      textKeyframes.push({ frame: 0, value: `${i}` });
+
+      let currentNode = i;
+      let currentSet = new Set([i]);
+
+      broadcastSteps.forEach(({ step, sender, receiver, newSet }) => {
+        const frameTime = (step + 1) * interval;
+
+        // If currentNode is involved in this step
+        if (currentNode === sender || currentNode === receiver) {
+          const partner = currentNode === sender ? receiver : sender;
+
+          // Move towards partner visually (optional, cycle visually)
+          xKeyframes.push({
+            frame: frameTime,
+            value: nodes[partner].x + 50,
+          });
+          yKeyframes.push({
+            frame: frameTime,
+            value: nodes[partner].y + 50,
+          });
+
+          // Update data content
+          const sortedSet = Array.from(newSet).sort((a, b) => a - b);
+          textKeyframes.push({
+            frame: frameTime,
+            value: sortedSet.join(","),
+          });
+
+          currentSet = newSet;
+          currentNode = partner;
+        }
+      });
+
+      this.animation.animateMultiple(dataItem, {
+        x: xKeyframes,
+        y: yKeyframes,
+        text: textKeyframes,
+      });
+    });
   }
 }
