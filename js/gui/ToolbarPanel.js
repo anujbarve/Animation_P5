@@ -349,6 +349,13 @@ class ToolbarPanel {
       allToAllBroadcastRing: () => this.allToAllBroadcastRing(),
       allToAllBroadcastMesh: () => this.allToAllBroadcastMesh(),
       hyperCubeBroadcastAllToAll: () => this.hyperCubeBroadcastAllToAll(),
+      hypercubePrefixSum: () => this.hypercubePrefixSum(),
+      hyperCubeScatter: () => this.hyperCubeScatter(),
+      matrixTransposePersonalized: () => this.matrixTransposePersonalized(),
+      personalizedAllToAllCommunicationRing: () =>
+        this.personalizedAllToAllCommunicationRing(),
+      personalizedAllToAllHyperCube: () => this.personalizedAllToAllHyperCube(),
+      personalizedAllToAllMesh: () => this.personalizedAllToAllMesh(0),
     };
 
     this.templatesFolder
@@ -381,6 +388,26 @@ class ToolbarPanel {
     this.templatesFolder
       .add(templates, "hyperCubeBroadcastAllToAll")
       .name("HyperCube All to All Broadcast");
+    this.templatesFolder
+      .add(templates, "hypercubePrefixSum")
+      .name("HyperCube Prefix Sum");
+    this.templatesFolder
+      .add(templates, "hyperCubeScatter")
+      .name("HyperCube Scatter Operation");
+    this.templatesFolder
+      .add(templates, "matrixTransposePersonalized")
+      .name("Matrix Transpose Personalized");
+    this.templatesFolder
+      .add(templates, "personalizedAllToAllCommunicationRing")
+      .name("Ring All to All Personalized");
+
+    this.templatesFolder
+      .add(templates, "personalizedAllToAllHyperCube")
+      .name("HyperCube All to All Personalized");
+
+    this.templatesFolder
+      .add(templates, "personalizedAllToAllMesh")
+      .name("Mesh All to All Personalized");
 
     this.templatesFolder.open();
   }
@@ -430,400 +457,6 @@ class ToolbarPanel {
         : "none";
     }
   }
-
-  // // Animation template methods using the AnimationAPI
-  // createBounceAnimation() {
-  //   // Clear existing objects if user confirms
-  //   if (confirm("This will create a new animation. Continue?")) {
-  //     this.animation.clearAll();
-
-  //     // Create a bouncing ball
-  //     const ball = this.animation.createShape("circle", {
-  //       x: this.engine.canvasWidth / 2,
-  //       y: 100,
-  //       size: 80,
-  //       fill: [255, 100, 100],
-  //       name: "Bouncing Ball",
-  //     });
-
-  //     // Create keyframes for bouncing
-  //     this.animation.animate(ball, "y", [
-  //       { frame: 0, value: 100, easing: "easeInQuad" },
-  //       {
-  //         frame: 20,
-  //         value: this.engine.canvasHeight - 40,
-  //         easing: "easeOutBounce",
-  //       },
-  //       {
-  //         frame: 45,
-  //         value: this.engine.canvasHeight - 40,
-  //         easing: "easeInQuad",
-  //       },
-  //       { frame: 60, value: 200, easing: "easeOutQuad" },
-  //       {
-  //         frame: 75,
-  //         value: this.engine.canvasHeight - 40,
-  //         easing: "easeOutBounce",
-  //       },
-  //       {
-  //         frame: 90,
-  //         value: this.engine.canvasHeight - 40,
-  //         easing: "easeInQuad",
-  //       },
-  //       { frame: 105, value: 300, easing: "easeOutQuad" },
-  //       {
-  //         frame: 120,
-  //         value: this.engine.canvasHeight - 40,
-  //         easing: "easeOutBounce",
-  //       },
-  //     ]);
-
-  //     // Squash and stretch
-  //     this.animation.animate(ball, "width", [
-  //       { frame: 0, value: 80, easing: "linear" },
-  //       { frame: 19, value: 90, easing: "easeInCubic" },
-  //       { frame: 20, value: 100, easing: "linear" },
-  //       { frame: 22, value: 60, easing: "easeOutCubic" },
-  //       { frame: 30, value: 80, easing: "easeInOutCubic" },
-  //       { frame: 59, value: 80, easing: "linear" },
-  //       { frame: 60, value: 90, easing: "easeInCubic" },
-  //       { frame: 74, value: 90, easing: "easeInCubic" },
-  //       { frame: 75, value: 100, easing: "linear" },
-  //       { frame: 77, value: 60, easing: "easeOutCubic" },
-  //       { frame: 85, value: 80, easing: "easeInOutCubic" },
-  //       { frame: 104, value: 80, easing: "linear" },
-  //       { frame: 105, value: 90, easing: "easeInCubic" },
-  //       { frame: 119, value: 90, easing: "easeInCubic" },
-  //       { frame: 120, value: 100, easing: "linear" },
-  //       { frame: 122, value: 60, easing: "easeOutCubic" },
-  //       { frame: 130, value: 80, easing: "easeInOutCubic" },
-  //     ]);
-
-  //     // Create a shadow with the AnimationAPI
-  //     const shadow = this.animation.createShape("circle", {
-  //       x: this.engine.canvasWidth / 2,
-  //       y: this.engine.canvasHeight - 10,
-  //       width: 100,
-  //       height: 20,
-  //       fill: [0, 0, 0, 100],
-  //       name: "Ball Shadow",
-  //     });
-
-  //     // Shadow animation
-  //     this.animation.animate(shadow, "width", [
-  //       { frame: 0, value: 60, easing: "linear" },
-  //       { frame: 20, value: 100, easing: "easeOutQuad" },
-  //       { frame: 45, value: 100, easing: "linear" },
-  //       { frame: 60, value: 70, easing: "easeInOutQuad" },
-  //       { frame: 75, value: 90, easing: "easeOutQuad" },
-  //       { frame: 90, value: 90, easing: "linear" },
-  //       { frame: 105, value: 80, easing: "easeInOutQuad" },
-  //       { frame: 120, value: 85, easing: "easeOutQuad" },
-  //     ]);
-
-  //     this.animation.animate(shadow, "opacity", [
-  //       { frame: 0, value: 150, easing: "linear" },
-  //       { frame: 20, value: 100, easing: "easeOutQuad" },
-  //       { frame: 60, value: 180, easing: "easeInQuad" },
-  //       { frame: 75, value: 120, easing: "easeOutQuad" },
-  //       { frame: 105, value: 150, easing: "easeInQuad" },
-  //       { frame: 120, value: 130, easing: "easeOutQuad" },
-  //     ]);
-
-  //     // Set object order
-  //     this.engine.sendToBack(shadow);
-  //     this.engine.bringToFront(ball);
-
-  //     // Start the animation
-  //     this.animation.reset();
-  //     this.animation.play();
-  //   }
-  // }
-
-  // createTypingAnimation() {
-  //   // Clear existing objects if user confirms
-  //   if (confirm("This will create a new animation. Continue?")) {
-  //     this.animation.clearAll();
-
-  //     // Create text object using the AnimationAPI
-  //     const text = this.animation.createShape("text", {
-  //       x: this.engine.canvasWidth / 2,
-  //       y: this.engine.canvasHeight / 2,
-  //       text: "",
-  //       fontSize: 36,
-  //       fill: [255, 255, 255],
-  //       name: "Typing Text",
-  //     });
-
-  //     // Use the AnimationAPI's typeText method
-  //     this.animation.typeText(
-  //       text,
-  //       0,
-  //       "Creating programmatic animations is fun!",
-  //       80,
-  //       "linear",
-  //       {
-  //         cursor: true,
-  //         cursorChar: "|",
-  //         cursorBlinkRate: 15,
-  //       }
-  //     );
-
-  //     // Start the animation
-  //     this.animation.reset();
-  //     this.animation.play();
-  //   }
-  // }
-
-  // createFadeInOutAnimation() {
-  //   // Clear existing objects if user confirms
-  //   if (confirm("This will create a new animation. Continue?")) {
-  //     this.animation.clearAll();
-
-  //     // Create a background with the AnimationAPI
-  //     const bg = this.animation.createShape("rectangle", {
-  //       x: this.engine.canvasWidth / 2,
-  //       y: this.engine.canvasHeight / 2,
-  //       width: this.engine.canvasWidth,
-  //       height: this.engine.canvasHeight,
-  //       fill: [30, 30, 30],
-  //       name: "Background",
-  //     });
-
-  //     // Create a centered text with the AnimationAPI
-  //     const text = this.animation.createShape("text", {
-  //       x: this.engine.canvasWidth / 2,
-  //       y: this.engine.canvasHeight / 2,
-  //       text: "FADE IN & OUT",
-  //       fontSize: 48,
-  //       fontFamily: "Arial",
-  //       textStyle: "bold",
-  //       fill: [255, 255, 255],
-  //       name: "Fading Text",
-  //     });
-
-  //     // Use the AnimationAPI's crossFade method
-  //     this.animation.fadeIn(text, 0, 30, "easeOutCubic");
-  //     this.animation.animate(text, "fontSize", [
-  //       { frame: 0, value: 36, easing: "easeOutQuad" },
-  //       { frame: 30, value: 48, easing: "easeOutQuad" },
-  //       { frame: 60, value: 48, easing: "linear" },
-  //       { frame: 90, value: 54, easing: "easeInQuad" },
-  //     ]);
-  //     this.animation.fadeOut(text, 60, 30, "easeInCubic");
-
-  //     // Set object order
-  //     this.engine.sendToBack(bg);
-  //     this.engine.bringToFront(text);
-
-  //     // Start the animation
-  //     this.animation.reset();
-  //     this.animation.play();
-  //   }
-  // }
-
-  // createParticleAnimation() {
-  //   // Clear existing objects if user confirms
-  //   if (confirm("This will create a new animation. Continue?")) {
-  //     this.animation.clearAll();
-
-  //     // Create a text that will explode into particles
-  //     const text = this.animation.createShape("text", {
-  //       x: this.engine.canvasWidth / 2,
-  //       y: this.engine.canvasHeight / 2,
-  //       text: "BOOM!",
-  //       fontSize: 72,
-  //       fontFamily: "Impact",
-  //       fill: [255, 100, 50],
-  //       name: "Exploding Text",
-  //     });
-
-  //     // Animate the text growing and then disappearing
-  //     this.animation.animate(text, "fontSize", [
-  //       { frame: 0, value: 10, easing: "easeOutElastic" },
-  //       { frame: 20, value: 72, easing: "easeOutElastic" },
-  //       { frame: 45, value: 90, easing: "easeInBack" },
-  //       { frame: 50, value: 0, easing: "linear" },
-  //     ]);
-
-  //     // Add a frame action to create particles after text explodes
-  //     this.animation.addFrameAction(50, () => {
-  //       // Create particle explosion using the AnimationAPI's particle system
-  //       this.animation.createParticleSystem(
-  //         this.engine.canvasWidth / 2,
-  //         this.engine.canvasHeight / 2,
-  //         30,
-  //         {
-  //           type: "circle",
-  //           size: 20,
-  //           sizeVariation: 10,
-  //           colorStart: [255, 100, 50],
-  //           colorEnd: [255, 255, 0],
-  //           duration: 70,
-  //           spread: 200,
-  //           gravity: 0.5,
-  //           startFrame: 50,
-  //           scaleDown: true,
-  //         }
-  //       );
-  //     });
-
-  //     // Start the animation
-  //     this.animation.reset();
-  //     this.animation.play();
-  //   }
-  // }
-
-  // createWaveAnimation() {
-  //   // Clear existing objects if user confirms
-  //   if (confirm("This will create a new animation. Continue?")) {
-  //     this.animation.clearAll();
-
-  //     // Create a group of circles in a circular arrangement using the AnimationAPI
-  //     const circleGroup = this.animation.createGroup(
-  //       12,
-  //       "circle",
-  //       {
-  //         centerX: this.engine.canvasWidth / 2,
-  //         centerY: this.engine.canvasHeight / 2,
-  //         radius: 150,
-  //         size: 30,
-  //         fill: [100, 200, 255],
-  //       },
-  //       "circle"
-  //     );
-
-  //     // Use the AnimationAPI's waveEffect to create a wave animation
-  //     this.animation.waveEffect(
-  //       circleGroup,
-  //       "width",
-  //       0,
-  //       120,
-  //       30,
-  //       60,
-  //       "easeInOutSine",
-  //       true
-  //     );
-
-  //     // Create a center circle
-  //     const centerCircle = this.animation.createShape("circle", {
-  //       x: this.engine.canvasWidth / 2,
-  //       y: this.engine.canvasHeight / 2,
-  //       size: 60,
-  //       fill: [50, 100, 255],
-  //       name: "Center Circle",
-  //     });
-
-  //     // Use the AnimationAPI to spin the center circle
-  //     this.animation.spin(centerCircle, 0, 120, 1, true, "linear");
-
-  //     // Pulse the center circle
-  //     this.animation.pulse(centerCircle, 0, 2, 120, 0.8, 1.2);
-
-  //     // Start the animation
-  //     this.animation.reset();
-  //     this.animation.play();
-  //   }
-  // }
-
-  // createLogoRevealAnimation() {
-  //   // Clear existing objects if user confirms
-  //   if (confirm("This will create a new animation. Continue?")) {
-  //     this.animation.clearAll();
-
-  //     // Define logo parts colors
-  //     const colors = [
-  //       [50, 100, 200],
-  //       [60, 160, 220],
-  //       [70, 180, 240],
-  //       [80, 200, 255],
-  //     ];
-
-  //     // Create a group of rectangles for the logo
-  //     const parts = [];
-  //     for (let i = 0; i < 4; i++) {
-  //       const rect = this.animation.createShape("rectangle", {
-  //         x: this.engine.canvasWidth / 2 - 120 + i * 80,
-  //         y: this.engine.canvasHeight / 2 - 100, // Start above final position
-  //         width: 80,
-  //         height: 80,
-  //         cornerRadius: 10,
-  //         fill: colors[i],
-  //         opacity: 0,
-  //         rotation: 45,
-  //         name: `Logo Part ${i + 1}`,
-  //       });
-
-  //       parts.push(rect);
-  //     }
-
-  //     // Create staggered animation for logo parts
-  //     for (let i = 0; i < parts.length; i++) {
-  //       const part = parts[i];
-  //       const delay = i * 5;
-
-  //       // Fade in, rotate and move down
-  //       this.animation.fadeIn(part, delay, 15, "easeOutQuad");
-
-  //       this.animation.animate(part, "rotation", [
-  //         { frame: delay, value: 45, easing: "easeOutBack" },
-  //         { frame: 20 + delay, value: 0, easing: "easeOutBack" },
-  //       ]);
-
-  //       this.animation.animate(part, "y", [
-  //         {
-  //           frame: delay,
-  //           value: this.engine.canvasHeight / 2 - 100,
-  //           easing: "easeOutBack",
-  //         },
-  //         {
-  //           frame: 20 + delay,
-  //           value: this.engine.canvasHeight / 2,
-  //           easing: "easeOutBack",
-  //         },
-  //       ]);
-
-  //       // Add bounce effect at the end
-  //       this.animation.pulse(part, 60 + delay, 1, 20, 0.8, 1.2, "easeOutBack");
-  //     }
-
-  //     // Add text using the AnimationAPI
-  //     const text = this.animation.createShape("text", {
-  //       x: this.engine.canvasWidth / 2,
-  //       y: this.engine.canvasHeight / 2 + 150, // Start below final position
-  //       text: "ANIMATOR",
-  //       fontSize: 48,
-  //       fontFamily: "Arial",
-  //       textStyle: "bold",
-  //       fill: [255, 255, 255],
-  //       opacity: 0,
-  //       name: "Logo Text",
-  //     });
-
-  //     // Animate the text
-  //     this.animation.fadeIn(text, 25, 15, "easeOutQuad");
-
-  //     this.animation.animate(text, "y", [
-  //       {
-  //         frame: 25,
-  //         value: this.engine.canvasHeight / 2 + 150,
-  //         easing: "easeOutQuad",
-  //       },
-  //       {
-  //         frame: 50,
-  //         value: this.engine.canvasHeight / 2 + 100,
-  //         easing: "easeOutQuad",
-  //       },
-  //     ]);
-
-  //     // Add text pulse
-  //     this.animation.pulse(text, 60, 1, 20, 0.95, 1.08, "easeInOutQuad");
-
-  //     // Start the animation
-  //     this.animation.reset();
-  //     this.animation.play();
-  //   }
-  // }
 
   createOneToAllBroadcast() {
     const colors = {
@@ -2448,7 +2081,7 @@ class ToolbarPanel {
         y: y + 20, // Position slightly below center of node
         height: 40,
         width: 100,
-        fill: colors.coral,
+        fill: colors.goldenRod,
         name: `data ${index}`,
         cornerRadius: 10,
         text: `${index}`,
@@ -2700,7 +2333,7 @@ class ToolbarPanel {
         y: y + 50,
         height: 50,
         width: 100,
-        fill: colors.coral,
+        fill: colors.goldenRod,
         name: `data ${index}`,
         cornerRadius: 10,
       });
@@ -2830,5 +2463,1818 @@ class ToolbarPanel {
         text: textKeyframes,
       });
     });
+  }
+
+  hypercubePrefixSum() {
+    const duration = 20;
+    const fps = 60;
+    const height = 1000;
+    const width = 1900;
+    const interval = 2 * fps;
+
+    const colors = {
+      skyBlue: [135, 206, 235],
+      coral: [255, 127, 80],
+      limeGreen: [50, 205, 50],
+      goldenRod: [218, 165, 32],
+      orchid: [218, 112, 214],
+      slateGray: [112, 128, 144],
+      tomato: [255, 99, 71],
+      steelBlue: [70, 130, 180],
+      mediumPurple: [147, 112, 219],
+      seaGreen: [46, 139, 87],
+      deepPink: [255, 20, 147],
+      turquoise: [64, 224, 208],
+      fireBrick: [178, 34, 34],
+      darkOrange: [255, 140, 0],
+      lightSlateGray: [119, 136, 153],
+    };
+
+    this.animation.clearAll();
+    this.animation.setDuration(duration);
+    this.animation.setFPS(fps);
+    this.engine.setCanvasSize(width, height);
+
+    const nodeGrid = [
+      [100, 700, "node 0"],
+      [500, 700, "node 1"],
+      [100, 300, "node 2"],
+      [500, 300, "node 3"],
+      [300, 500, "node 4"],
+      [700, 500, "node 5"],
+      [300, 100, "node 6"],
+      [700, 100, "node 7"],
+    ];
+
+    const nodes = nodeGrid.map(([x, y, name], index) => {
+      return this.animation.createShape("circle", {
+        x,
+        y,
+        size: 80,
+        fill: colors.steelBlue,
+        name,
+        text: `${index}`,
+        fontSize: 24,
+        textColor: [255, 255, 255],
+      });
+    });
+
+    const data = nodeGrid.map(([x, y], index) => {
+      return this.animation.createShape("rectangle", {
+        x: x + 50,
+        y: y + 50,
+        height: 50,
+        width: 100,
+        fill: colors.goldenRod,
+        name: `data ${index}`,
+        cornerRadius: 10,
+      });
+    });
+
+    const flowDefaults = {
+      pathStyle: "bezier",
+      curveIntensity: 0,
+      arrowEnd: false,
+      arrowSize: 8,
+      stroke: colors.steelBlue,
+      strokeWeight: 3,
+      flowParticles: 8,
+      particleSize: 3,
+      fill: colors.steelBlue,
+      animationSpeed: 1,
+      lineStyle: "dashed",
+    };
+
+    const flowPaths = [
+      [0, 2],
+      [0, 4],
+      [0, 1],
+      [1, 3],
+      [1, 5],
+      [2, 6],
+      [2, 3],
+      [3, 7],
+      [5, 7],
+      [5, 4],
+      [6, 4],
+      [6, 7],
+    ];
+
+    flowPaths.forEach(([startIdx, endIdx]) => {
+      this.animation.createShape("flowpath", {
+        ...flowDefaults,
+        startShape: nodes[startIdx],
+        endShape: nodes[endIdx],
+        startConnection: "center",
+        endConnection: "center",
+      });
+    });
+
+    const numNodes = nodes.length;
+    const dimensions = 3; // 3D hypercube
+
+    // Initialize according to the PREFIX SUMS HCUBE algorithm
+    const nodeValues = Array.from({ length: numNodes }, (_, i) => i); // Each node's initial value is its ID
+    const results = [...nodeValues]; // Step 3: result := my_number
+    const messages = [...nodeValues]; // Step 4: msg := result
+
+    // Record the communication steps
+    const communicationSteps = [];
+
+    // Step 5: for i := 0 to d-1 do
+    for (let dim = 0; dim < dimensions; dim++) {
+      const stepExchanges = [];
+
+      // For each node in this dimension
+      for (let nodeId = 0; nodeId < numNodes; nodeId++) {
+        // Step 6: partner := my_id XOR 2^i
+        const partnerId = nodeId ^ (1 << dim);
+
+        // Ensure we record each exchange only once
+        if (nodeId < partnerId) {
+          stepExchanges.push([nodeId, partnerId]);
+        }
+      }
+
+      // Process all exchanges in this dimension
+      stepExchanges.forEach(([a, b]) => {
+        // Step 7-8: Send msg to partner and receive from partner
+        const msgA = messages[a];
+        const msgB = messages[b];
+
+        // Step 9: msg := msg + number
+        messages[a] += msgB;
+        messages[b] += msgA;
+
+        // Step 10: if (partner < my_id) then result := result + number
+        if (b < a) results[a] += msgB;
+        if (a < b) results[b] += msgA;
+
+        // Record both directions of communication for animation
+        communicationSteps.push({
+          step: dim,
+          sender: a,
+          receiver: b,
+          msgSent: msgA,
+          resultA: results[a],
+          msgA: messages[a],
+        });
+
+        communicationSteps.push({
+          step: dim,
+          sender: b,
+          receiver: a,
+          msgSent: msgB,
+          resultB: results[b],
+          msgB: messages[b],
+        });
+      });
+    }
+
+    // Now animate each data block according to the algorithm
+    data.forEach((dataItem, nodeId) => {
+      const xKeyframes = [];
+      const yKeyframes = [];
+      const textKeyframes = [];
+
+      // Initial position and value - show [result](msg)
+      xKeyframes.push({ frame: 0, value: nodes[nodeId].x + 50 });
+      yKeyframes.push({ frame: 0, value: nodes[nodeId].y + 50 });
+      textKeyframes.push({ frame: 0, value: `[${nodeId}](${nodeId})` });
+
+      let currentResult = nodeId;
+      let currentMsg = nodeId;
+
+      // Filter steps relevant to this node
+      const relevantSteps = communicationSteps.filter(
+        (step) => step.sender === nodeId || step.receiver === nodeId
+      );
+
+      // Process each step
+      relevantSteps.forEach((step) => {
+        const frameTime = (step.step + 1) * interval;
+        const partner = step.sender === nodeId ? step.receiver : step.sender;
+
+        // Move towards partner visually
+        xKeyframes.push({
+          frame: frameTime,
+          value: nodes[partner].x + 50,
+        });
+
+        yKeyframes.push({
+          frame: frameTime,
+          value: nodes[partner].y + 50,
+        });
+
+        // Update the node's data display
+        if (step.sender === nodeId) {
+          // This node is sending
+          if (step.hasOwnProperty("resultA")) {
+            currentResult = step.resultA;
+            currentMsg = step.msgA;
+          }
+        } else {
+          // This node is receiving
+          if (step.hasOwnProperty("resultB")) {
+            currentResult = step.resultB;
+            currentMsg = step.msgB;
+          }
+        }
+
+        // Update text to show [result](msg)
+        textKeyframes.push({
+          frame: frameTime,
+          value: `[${currentResult}](${currentMsg})`,
+        });
+      });
+
+      // Return to original position
+      const lastFrame = dimensions * interval + interval;
+      xKeyframes.push({
+        frame: lastFrame,
+        value: nodes[nodeId].x + 50,
+      });
+
+      yKeyframes.push({
+        frame: lastFrame,
+        value: nodes[nodeId].y + 50,
+      });
+
+      textKeyframes.push({
+        frame: lastFrame,
+        value: `[${currentResult}](${currentMsg})`,
+      });
+
+      // Apply animation
+      this.animation.animateMultiple(dataItem, {
+        x: xKeyframes,
+        y: yKeyframes,
+        text: textKeyframes,
+      });
+    });
+
+    this.animation.reset();
+    this.animation.play(true);
+  }
+
+  hyperCubeScatter() {
+    const duration = 20;
+    const fps = 60;
+    const height = 1000;
+    const width = 1900;
+    const interval = 2 * fps;
+
+    const colors = {
+      skyBlue: [135, 206, 235],
+      coral: [255, 127, 80],
+      limeGreen: [50, 205, 50],
+      goldenRod: [218, 165, 32],
+      orchid: [218, 112, 214],
+      slateGray: [112, 128, 144],
+      tomato: [255, 99, 71],
+      steelBlue: [70, 130, 180],
+      mediumPurple: [147, 112, 219],
+      seaGreen: [46, 139, 87],
+      deepPink: [255, 20, 147],
+      turquoise: [64, 224, 208],
+      fireBrick: [178, 34, 34],
+      darkOrange: [255, 140, 0],
+      lightSlateGray: [119, 136, 153],
+    };
+
+    this.animation.clearAll();
+    this.animation.setDuration(duration);
+    this.animation.setFPS(fps);
+    this.engine.setCanvasSize(width, height);
+
+    const nodeGrid = [
+      [100, 700, "node 0"],
+      [500, 700, "node 1"],
+      [100, 300, "node 2"],
+      [500, 300, "node 3"],
+      [300, 500, "node 4"],
+      [700, 500, "node 5"],
+      [300, 100, "node 6"],
+      [700, 100, "node 7"],
+    ];
+
+    const nodes = nodeGrid.map(([x, y, name]) => {
+      return this.animation.createShape("circle", {
+        x,
+        y,
+        size: 80,
+        fill: colors.steelBlue,
+        name,
+      });
+    });
+
+    const data = nodeGrid.map(([x, y], index) => {
+      return this.animation.createShape("rectangle", {
+        x: x + 50,
+        y: y + 50,
+        height: 50,
+        width: 100,
+        fill: colors.goldenRod,
+        name: `data ${index}`,
+        cornerRadius: 10,
+      });
+    });
+
+    const flowDefaults = {
+      pathStyle: "bezier",
+      curveIntensity: 0,
+      arrowEnd: false,
+      arrowSize: 8,
+      stroke: colors.steelBlue,
+      strokeWeight: 3,
+      flowParticles: 8,
+      particleSize: 3,
+      fill: colors.steelBlue,
+      animationSpeed: 1,
+      lineStyle: "dashed",
+    };
+
+    const flowPaths = [
+      [0, 2],
+      [0, 4],
+      [0, 1],
+      [1, 3],
+      [1, 5],
+      [2, 6],
+      [2, 3],
+      [3, 7],
+      [5, 7],
+      [5, 4],
+      [6, 4],
+      [6, 7],
+    ];
+
+    flowPaths.forEach(([startIdx, endIdx]) => {
+      this.animation.createShape("flowpath", {
+        ...flowDefaults,
+        startShape: nodes[startIdx],
+        endShape: nodes[endIdx],
+        startConnection: "center",
+        endConnection: "center",
+      });
+    });
+
+    this.animation.animateGroup(
+      [data[0]],
+      "text",
+      [
+        {
+          frame: 0,
+          value: "0,1,2,3,4,5,6,7",
+        },
+        {
+          frame: interval,
+          value: "0,1,2,3",
+        },
+        {
+          frame: interval * 2,
+          value: "0,1",
+        },
+        {
+          frame: interval * 3,
+          value: "1",
+        },
+      ],
+      0
+    );
+
+    this.animation.animateGroup(
+      [data[4]],
+      "text",
+      [
+        {
+          frame: 0,
+          value: "",
+        },
+        {
+          frame: interval,
+          value: "4,5,6,7",
+        },
+        {
+          frame: interval * 2,
+          value: "4,5",
+        },
+        {
+          frame: interval * 3,
+          value: "4",
+        },
+      ],
+      0
+    );
+
+    this.animation.animateGroup(
+      [data[2]],
+      "text",
+      [
+        {
+          frame: 0,
+          value: "",
+        },
+        {
+          frame: interval,
+          value: "",
+        },
+        {
+          frame: interval * 2,
+          value: "2,3",
+        },
+        {
+          frame: interval * 3,
+          value: "2",
+        },
+      ],
+      0
+    );
+
+    this.animation.animateGroup(
+      [data[6]],
+      "text",
+      [
+        {
+          frame: 0,
+          value: "",
+        },
+        {
+          frame: interval,
+          value: "",
+        },
+        {
+          frame: interval * 2,
+          value: "6,7",
+        },
+        {
+          frame: interval * 3,
+          value: "6",
+        },
+      ],
+      0
+    );
+
+    this.animation.animateGroup(
+      [data[3]],
+      "text",
+      [
+        {
+          frame: 0,
+          value: "",
+        },
+        {
+          frame: interval,
+          value: "",
+        },
+        {
+          frame: interval * 2,
+          value: "",
+        },
+        {
+          frame: interval * 3,
+          value: "3",
+        },
+      ],
+      0
+    );
+
+    this.animation.animateGroup(
+      [data[5]],
+      "text",
+      [
+        {
+          frame: 0,
+          value: "",
+        },
+        {
+          frame: interval,
+          value: "",
+        },
+        {
+          frame: interval * 2,
+          value: "",
+        },
+        {
+          frame: interval * 3,
+          value: "5",
+        },
+      ],
+      0
+    );
+
+    this.animation.animateGroup(
+      [data[1]],
+      "text",
+      [
+        {
+          frame: 0,
+          value: "",
+        },
+        {
+          frame: interval,
+          value: "",
+        },
+        {
+          frame: interval * 2,
+          value: "",
+        },
+        {
+          frame: interval * 3,
+          value: "1",
+        },
+      ],
+      0
+    );
+
+    this.animation.animateGroup(
+      [data[7]],
+      "text",
+      [
+        {
+          frame: 0,
+          value: "",
+        },
+        {
+          frame: interval,
+          value: "",
+        },
+        {
+          frame: interval * 2,
+          value: "",
+        },
+        {
+          frame: interval * 3,
+          value: "7",
+        },
+      ],
+      0
+    );
+  }
+
+  matrixTransposePersonalized() {
+    const duration = 15;
+    const fps = 60;
+    const totalFPS = duration * fps;
+    const height = 1000;
+    const width = 1900;
+    const interval = 2 * fps; // duration of each swap (in frames)
+    const swapDelay = interval; // delay between swaps
+
+    const colors = {
+      skyBlue: [135, 206, 235],
+      coral: [255, 127, 80],
+      limeGreen: [50, 205, 50],
+      goldenRod: [218, 165, 32],
+      orchid: [218, 112, 214],
+      slateGray: [112, 128, 144],
+      tomato: [255, 99, 71],
+      steelBlue: [70, 130, 180],
+      mediumPurple: [147, 112, 219],
+      seaGreen: [46, 139, 87],
+      deepPink: [255, 20, 147],
+      turquoise: [64, 224, 208],
+      fireBrick: [178, 34, 34],
+      darkOrange: [255, 140, 0],
+      lightSlateGray: [119, 136, 153],
+    };
+
+    this.animation.clearAll();
+    this.animation.setDuration(duration);
+    this.animation.setFPS(fps);
+    this.engine.setCanvasSize(width, height);
+
+    const nodeGrid = [
+      [400, 300, "P00"],
+      [400, 400, "P10"],
+      [400, 500, "P20"],
+      [400, 600, "P30"],
+      [500, 300, "P01"],
+      [500, 400, "P11"],
+      [500, 500, "P21"],
+      [500, 600, "P31"],
+      [600, 300, "P02"],
+      [600, 400, "P12"],
+      [600, 500, "P22"],
+      [600, 600, "P32"],
+      [700, 300, "P03"],
+      [700, 400, "P13"],
+      [700, 500, "P23"],
+      [700, 600, "P33"],
+    ];
+
+    const nodes = nodeGrid.map(([x, y, name, customFill]) =>
+      this.animation.createShape("rectangle", {
+        x,
+        y,
+        height: 100,
+        width: 100,
+        fill: customFill || colors.steelBlue,
+        name,
+      })
+    );
+
+    // Swap pairs [indexA, indexB] for matrix transpose (upper triangle only)
+    const swapPairs = [
+      [1, 4], // P10 <-> P01
+      [2, 8], // P20 <-> P02
+      [6, 9], // P21 <-> P12
+      [3, 12], // P30 <-> P03
+      [7, 13], // P31 <-> P13
+      [11, 14], // P32 <-> P23
+    ];
+
+    // Helper to animate one swap
+    const swapNodes = (nodeA, nodeB, startFrame) => {
+      const endFrame = startFrame + interval;
+      this.animation.animateMultiple(nodeA, {
+        x: [
+          { frame: startFrame, value: nodeA.x },
+          { frame: endFrame, value: nodeB.x },
+        ],
+        y: [
+          { frame: startFrame, value: nodeA.y },
+          { frame: endFrame, value: nodeB.y },
+        ],
+      });
+
+      this.animation.animateMultiple(nodeB, {
+        x: [
+          { frame: startFrame, value: nodeB.x },
+          { frame: endFrame, value: nodeA.x },
+        ],
+        y: [
+          { frame: startFrame, value: nodeB.y },
+          { frame: endFrame, value: nodeA.y },
+        ],
+      });
+    };
+
+    // Sequential swaps with incremental delays
+    swapPairs.forEach(([indexA, indexB], i) => {
+      const startFrame = i * swapDelay;
+      swapNodes(nodes[indexA], nodes[indexB], startFrame);
+    });
+
+    // const animateSwap = (nodeA, nodeB) => {
+    //   this.animation.animateMultiple(nodeA, {
+    //     x: [
+    //       { frame: 0, value: nodeA.x },
+    //       { frame: interval, value: nodeB.x },
+    //     ],
+    //     y: [
+    //       { frame: 0, value: nodeA.y },
+    //       { frame: interval, value: nodeB.y },
+    //     ],
+    //   });
+
+    //   this.animation.animateMultiple(nodeB, {
+    //     x: [
+    //       { frame: 0, value: nodeB.x },
+    //       { frame: interval, value: nodeA.x },
+    //     ],
+    //     y: [
+    //       { frame: 0, value: nodeB.y },
+    //       { frame: interval, value: nodeA.y },
+    //     ],
+    //   });
+    // };
+
+    // swapPairs.forEach(([indexA, indexB]) => {
+    //   animateSwap(nodes[indexA], nodes[indexB]);
+    // });
+
+    this.animation.reset();
+    this.animation.play(true);
+  }
+
+  personalizedAllToAllCommunicationRing(sourceNodeOption = -1) {
+    // Common constants and settings
+    const colors = {
+      limeGreen: [50, 205, 50],
+      goldenRod: [218, 165, 32],
+      steelBlue: [70, 130, 180],
+      // Add colors for each node to differentiate them
+      nodeColors: [
+        [255, 99, 71], // Tomato (Node 0)
+        [255, 165, 0], // Orange (Node 1)
+        [154, 205, 50], // YellowGreen (Node 2)
+        [0, 191, 255], // DeepSkyBlue (Node 3)
+        [138, 43, 226], // BlueViolet (Node 4)
+        [255, 20, 147], // DeepPink (Node 5)
+      ],
+    };
+
+    const duration = 15;
+    const fps = 60;
+    const height = 1000;
+    const width = 1900;
+    const interval = 120;
+    const nodeCount = 6;
+
+    // Determine mode: all-to-all or one-to-all
+    const isOneToAll = sourceNodeOption >= 0 && sourceNodeOption < nodeCount;
+
+    // Set title based on mode
+    const title = isOneToAll
+      ? `Node ${sourceNodeOption} to All Communication`
+      : "Simultaneous All-to-All Communication";
+
+    // Initialize animation
+    this.animation.clearAll();
+    this.animation.setDuration(duration);
+    this.animation.setFPS(fps);
+    this.engine.setCanvasSize(width, height);
+
+    // Track frame-to-remove mapping for all nodes
+    const removalFrames = {};
+
+    // Helper function to schedule a node for removal at a specific frame
+    const scheduleRemoval = (node, frame) => {
+      if (!removalFrames[frame]) {
+        removalFrames[frame] = [];
+      }
+      removalFrames[frame].push(node);
+    };
+
+    // Override the frame render method to check for node removal
+    const originalRenderFrame = this.animation.engine.renderFrame;
+    this.animation.engine.renderFrame = (frameNumber) => {
+      // Call the original render method first
+      originalRenderFrame.call(this.animation.engine, frameNumber);
+
+      // Check if any nodes need to be removed at this frame
+      if (removalFrames[frameNumber]) {
+        removalFrames[frameNumber].forEach((node) => {
+          this.engine.removeObject(node);
+        });
+        // Clear the list after processing
+        delete removalFrames[frameNumber];
+      }
+    };
+
+    // Node positions
+    const nodeGrid = [
+      [100, 600], // node 0
+      [700, 600], // node 1
+      [1300, 600], // node 2
+      [1300, 200], // node 3
+      [700, 200], // node 4
+      [100, 200], // node 5
+    ];
+
+    // Flow connections between consecutive nodes
+    const flowConnections = [
+      ["right", "left"], // 0 -> 1
+      ["right", "left"], // 1 -> 2
+      ["top", "bottom"], // 2 -> 3
+      ["left", "right"], // 3 -> 4
+      ["left", "right"], // 4 -> 5
+      ["bottom", "top"], // 5 -> 0
+    ];
+
+    // Create all nodes
+    const nodes = nodeGrid.map(([x, y], index) => {
+      return this.animation.createShape("circle", {
+        x,
+        y,
+        size: 80,
+        fill:
+          isOneToAll && index === sourceNodeOption
+            ? colors.nodeColors[sourceNodeOption] // Highlight source node
+            : colors.steelBlue,
+        name: `node ${index}`,
+      });
+    });
+
+    // Track collected messages for each node
+    const collectedMessages = Array(nodeCount)
+      .fill()
+      .map(() => ({}));
+
+    // Create data rectangles
+    const data = nodeGrid.map(([x, y], index) => {
+      return this.animation.createShape("rectangle", {
+        x: x + 50,
+        y: y + 50,
+        height: 50,
+        width: 100,
+        fill: colors.goldenRod,
+        name: ``,
+        cornerRadius: 10,
+      });
+    });
+
+    // Display mode as text
+    const modeText = this.animation.createShape("text", {
+      x: width / 2,
+      y: 50,
+      fill: colors.steelBlue,
+      text: title,
+      fontSize: 24,
+    });
+
+    // Create flow paths
+    const flowDefaults = {
+      pathStyle: "bezier",
+      curveIntensity: 0,
+      arrowEnd: false,
+      arrowSize: 8,
+      stroke: colors.steelBlue,
+      strokeWeight: 3,
+      flowParticles: 8,
+      particleSize: 3,
+      fill: colors.steelBlue,
+      animationSpeed: 1,
+      lineStyle: "dashed",
+    };
+
+    // Create flows between consecutive nodes
+    for (let i = 0; i < nodeCount; i++) {
+      const nextNode = (i + 1) % nodeCount;
+      this.animation.createShape("flowpath", {
+        ...flowDefaults,
+        startShape: nodes[i],
+        endShape: nodes[nextNode],
+        startConnection: flowConnections[i][0],
+        endConnection: flowConnections[i][1],
+      });
+    }
+
+    // Helper function to create data transfer packets for a source node with custom color
+    const createDataTransfers = (sourceNodeIdx) => {
+      return nodeGrid.map(([x, y], targetIdx) => {
+        if (sourceNodeIdx === targetIdx) return null; // Skip self
+
+        return this.animation.createShape("rectangle", {
+          x: nodes[sourceNodeIdx].x + 50,
+          y: nodes[sourceNodeIdx].y + 50,
+          height: 50,
+          width: 100,
+          fill: colors.nodeColors[sourceNodeIdx],
+          name: `{${sourceNodeIdx},${targetIdx}}`,
+          cornerRadius: 10,
+        });
+      });
+    };
+
+    // Determine which source nodes to include
+    const sourceNodeIndices = isOneToAll
+      ? [sourceNodeOption]
+      : Array.from({ length: nodeCount }, (_, i) => i);
+
+    // Create all data transfers for the selected source nodes
+    const allDataTransfers = [];
+    sourceNodeIndices.forEach((i) => {
+      allDataTransfers[i] = createDataTransfers(i);
+    });
+
+    // Track completion frames for each target
+    const completionFrames = {};
+
+    // Determine direction for each source-target pair to avoid congestion
+    const getDirection = (source, target) => {
+      // Calculate clockwise and counter-clockwise distances
+      const clockwiseDist = (target - source + nodeCount) % nodeCount;
+      const counterClockwiseDist = (source - target + nodeCount) % nodeCount;
+
+      // Choose the shorter path
+      return clockwiseDist <= counterClockwiseDist
+        ? "clockwise"
+        : "counterclockwise";
+    };
+
+    // Helper function to get next node in the ring
+    const getNextNode = (currentNode, direction) => {
+      if (direction === "clockwise") {
+        return (currentNode + 1) % nodeCount;
+      } else {
+        return (currentNode - 1 + nodeCount) % nodeCount;
+      }
+    };
+
+    // Calculate packet travel distance for each source-target pair
+    const getDistance = (source, target) => {
+      const clockwiseDist = (target - source + nodeCount) % nodeCount;
+      const counterClockwiseDist = (source - target + nodeCount) % nodeCount;
+      return Math.min(clockwiseDist, counterClockwiseDist);
+    };
+
+    // Calculate all paths simultaneously
+    sourceNodeIndices.forEach((sourceIdx) => {
+      for (let targetIdx = 0; targetIdx < nodeCount; targetIdx++) {
+        if (sourceIdx === targetIdx) continue; // Skip self
+
+        const dataNode = allDataTransfers[sourceIdx][targetIdx];
+        const direction = getDirection(sourceIdx, targetIdx);
+        const distance = getDistance(sourceIdx, targetIdx);
+
+        // Stagger the start times slightly to reduce visual congestion
+        // (only matters in all-to-all mode)
+        const startOffset = isOneToAll ? 0 : sourceIdx * 5;
+        let currentFrame = startOffset;
+        let currentNodeIdx = sourceIdx;
+
+        // Animate the path hop by hop
+        for (let step = 0; step < distance; step++) {
+          const nextNodeIdx = getNextNode(currentNodeIdx, direction);
+
+          this.animation.animate(dataNode, "x", [
+            { frame: currentFrame, value: data[currentNodeIdx].x },
+            { frame: currentFrame + interval, value: data[nextNodeIdx].x },
+          ]);
+
+          this.animation.animate(dataNode, "y", [
+            { frame: currentFrame, value: data[currentNodeIdx].y + 50 },
+            { frame: currentFrame + interval, value: data[nextNodeIdx].y + 50 },
+          ]);
+
+          currentFrame += interval;
+          currentNodeIdx = nextNodeIdx;
+        }
+
+        // Record when this packet reaches its destination
+        const finalFrame = currentFrame;
+
+        // Track the completion for updating target node's data
+        if (!completionFrames[targetIdx]) {
+          completionFrames[targetIdx] = {};
+        }
+        completionFrames[targetIdx][sourceIdx] = finalFrame;
+
+        // Schedule removal of this data node
+        scheduleRemoval(dataNode, finalFrame + 5);
+      }
+    });
+
+    const datas = [];
+
+    // Update data displays when all messages for a node arrive
+    for (let nodeIdx = 0; nodeIdx < nodeCount; nodeIdx++) {
+      // Skip if this node is not a target of any transfers
+      if (!completionFrames[nodeIdx]) continue;
+
+      // Find the latest arrival frame for this node
+      let lastArrivalFrame = 0;
+      for (const sourceIdx in completionFrames[nodeIdx]) {
+        lastArrivalFrame = Math.max(
+          lastArrivalFrame,
+          completionFrames[nodeIdx][sourceIdx]
+        );
+      }
+
+      // Build the complete message string
+      let fullMessage = "";
+
+      for (const sourceIdx in completionFrames[nodeIdx]) {
+        const msgPrefix = fullMessage ? ", " : "";
+        fullMessage += `${msgPrefix}{${sourceIdx},${nodeIdx}}`;
+        datas.push(fullMessage);
+      }
+
+      // Update the data display
+      this.animation.animate(data[nodeIdx], "text", [
+        { frame: lastArrivalFrame + 10, value: fullMessage },
+      ]);
+
+      // Visual feedback for message arrival completion
+      this.animation.animate(data[nodeIdx], "fill", [
+        { frame: lastArrivalFrame + 5, value: colors.goldenRod },
+        { frame: lastArrivalFrame + 15, value: colors.limeGreen },
+        { frame: lastArrivalFrame + 30, value: colors.goldenRod },
+      ]);
+
+      // Resize the data rectangle to fit the text
+      this.animation.animate(data[nodeIdx], "width", [
+        { frame: lastArrivalFrame + 5, value: 100 },
+        {
+          frame: lastArrivalFrame + 15,
+          value: Math.min(300, 100 + fullMessage.length * 3),
+        },
+      ]);
+
+      // Highlight the node itself (if not the source in one-to-all mode)
+      if (!(isOneToAll && nodeIdx === sourceNodeOption)) {
+        this.animation.animate(nodes[nodeIdx], "fill", [
+          { frame: lastArrivalFrame + 5, value: colors.steelBlue },
+          { frame: lastArrivalFrame + 15, value: colors.nodeColors[nodeIdx] },
+          { frame: lastArrivalFrame + 30, value: colors.steelBlue },
+        ]);
+      }
+    }
+
+    // Find the global completion frame (when all transfers are done)
+    let completionFrame = 0;
+    for (let nodeIdx = 0; nodeIdx < nodeCount; nodeIdx++) {
+      if (!completionFrames[nodeIdx]) continue;
+
+      for (const sourceIdx in completionFrames[nodeIdx]) {
+        completionFrame = Math.max(
+          completionFrame,
+          completionFrames[nodeIdx][sourceIdx]
+        );
+      }
+    }
+
+    // Final animation to show completion
+    completionFrame += 60; // Add margin
+    nodes.forEach((node, idx) => {
+      // Skip the source node in one-to-all mode as it's already highlighted
+      if (isOneToAll && idx === sourceNodeOption) return;
+
+      this.animation.animate(node, "fill", [
+        { frame: completionFrame, value: colors.steelBlue },
+        { frame: completionFrame + interval / 2, value: colors.limeGreen },
+        { frame: completionFrame + interval, value: colors.steelBlue },
+      ]);
+    });
+
+    // Add a summary text at the end showing completion
+    const summaryText = this.animation.createShape("text", {
+      x: width / 2,
+      y: height - 100,
+      fill: colors.steelBlue,
+      text: `${title} Complete`,
+      fontSize: 24,
+      opacity: 0,
+    });
+
+    this.animation.animate(summaryText, "opacity", [
+      { frame: completionFrame, value: 0 },
+      { frame: completionFrame + 30, value: 1 },
+    ]);
+
+    this.animation.reset();
+    this.animation.play(true);
+  }
+
+  personalizedAllToAllHyperCube(sourceNodeOption = -1) {
+    // Common constants and settings
+    const colors = {
+      limeGreen: [50, 205, 50],
+      goldenRod: [218, 165, 32],
+      steelBlue: [70, 130, 180],
+      // Add colors for each node to differentiate them
+      nodeColors: [
+        [255, 99, 71], // Tomato (Node 0)
+        [255, 165, 0], // Orange (Node 1)
+        [154, 205, 50], // YellowGreen (Node 2)
+        [0, 191, 255], // DeepSkyBlue (Node 3)
+        [138, 43, 226], // BlueViolet (Node 4)
+        [255, 20, 147], // DeepPink (Node 5)
+        [0, 128, 128], // Teal (Node 6)
+        [128, 0, 128], // Purple (Node 7)
+      ],
+    };
+
+    const duration = 15;
+    const fps = 60;
+    const height = 1000;
+    const width = 1900;
+    const interval = 120;
+    const nodeCount = 8; // Hypercube has 8 nodes
+
+    // Determine mode: all-to-all or one-to-all
+    const isOneToAll = sourceNodeOption >= 0 && sourceNodeOption < nodeCount;
+
+    // Set title based on mode
+    const title = isOneToAll
+      ? `Node ${sourceNodeOption} to All Communication (Hypercube)`
+      : "Simultaneous All-to-All Communication (Hypercube)";
+
+    // Initialize animation
+    this.animation.clearAll();
+    this.animation.setDuration(duration);
+    this.animation.setFPS(fps);
+    this.engine.setCanvasSize(width, height);
+
+    // Track frame-to-remove mapping for all nodes
+    const removalFrames = {};
+
+    // Helper function to schedule a node for removal at a specific frame
+    const scheduleRemoval = (node, frame) => {
+      if (!removalFrames[frame]) {
+        removalFrames[frame] = [];
+      }
+      removalFrames[frame].push(node);
+    };
+
+    // Override the frame render method to check for node removal
+    const originalRenderFrame = this.animation.engine.renderFrame;
+    this.animation.engine.renderFrame = (frameNumber) => {
+      // Call the original render method first
+      originalRenderFrame.call(this.animation.engine, frameNumber);
+
+      // Check if any nodes need to be removed at this frame
+      if (removalFrames[frameNumber]) {
+        removalFrames[frameNumber].forEach((node) => {
+          this.engine.removeObject(node);
+        });
+        // Clear the list after processing
+        delete removalFrames[frameNumber];
+      }
+    };
+
+    // Node positions for hypercube
+    const nodeGrid = [
+      [100, 700], // node 0
+      [500, 700], // node 1
+      [500, 300], // node 2
+      [100, 300], // node 3
+      [300, 500], // node 4
+      [700, 500], // node 5
+      [700, 100], // node 6
+      [300, 100], // node 7
+    ];
+
+    // Create all nodes
+    const nodes = nodeGrid.map(([x, y], index) => {
+      return this.animation.createShape("circle", {
+        x,
+        y,
+        size: 80,
+        fill:
+          isOneToAll && index === sourceNodeOption
+            ? colors.nodeColors[sourceNodeOption] // Highlight source node
+            : colors.steelBlue,
+        name: `node ${index}`,
+      });
+    });
+
+    // Define hypercube connections for routing
+    const hypercubeConnections = [
+      [1, 3, 4], // neighbors of node 0
+      [0, 2, 5], // neighbors of node 1
+      [1, 3, 6], // neighbors of node 2
+      [0, 2, 7], // neighbors of node 3
+      [0, 5, 7], // neighbors of node 4
+      [1, 4, 6], // neighbors of node 5
+      [2, 5, 7], // neighbors of node 6
+      [3, 4, 6], // neighbors of node 7
+    ];
+
+    // Create data rectangles
+    const data = nodeGrid.map(([x, y], index) => {
+      return this.animation.createShape("rectangle", {
+        x: x + 100,
+        y: y,
+        height: 50,
+        width: 100,
+        fill: colors.goldenRod,
+        name: ``,
+        cornerRadius: 10,
+      });
+    });
+
+    // Display mode as text
+    const modeText = this.animation.createShape("text", {
+      x: width / 2,
+      y: 50,
+      fill: colors.steelBlue,
+      text: title,
+      fontSize: 24,
+    });
+
+    // Create flow paths for hypercube
+    const flowDefaults = {
+      pathStyle: "bezier",
+      curveIntensity: 0,
+      arrowEnd: false,
+      arrowSize: 8,
+      stroke: colors.steelBlue,
+      strokeWeight: 3,
+      flowParticles: 8,
+      particleSize: 3,
+      fill: colors.steelBlue,
+      animationSpeed: 1,
+      lineStyle: "dashed",
+    };
+
+    // Create flows between connected nodes in the hypercube
+    const flows = [];
+    for (let i = 0; i < nodeCount; i++) {
+      for (let j of hypercubeConnections[i]) {
+        if (i < j) {
+          // Avoid duplicate connections
+          flows.push(
+            this.animation.createShape("flowpath", {
+              ...flowDefaults,
+              startShape: nodes[i],
+              endShape: nodes[j],
+              startConnection: "center",
+              endConnection: "center",
+            })
+          );
+        }
+      }
+    }
+
+    // Helper function to create data transfer packets for a source node with custom color
+    const createDataTransfers = (sourceNodeIdx) => {
+      return nodeGrid.map(([x, y], targetIdx) => {
+        if (sourceNodeIdx === targetIdx) return null; // Skip self
+
+        return this.animation.createShape("rectangle", {
+          x: nodes[sourceNodeIdx].x + 50,
+          y: nodes[sourceNodeIdx].y + 50,
+          height: 50,
+          width: 100,
+          fill: colors.nodeColors[sourceNodeIdx],
+          name: `{${sourceNodeIdx},${targetIdx}}`,
+          cornerRadius: 10,
+        });
+      });
+    };
+
+    // Determine which source nodes to include
+    const sourceNodeIndices = isOneToAll
+      ? [sourceNodeOption]
+      : Array.from({ length: nodeCount }, (_, i) => i);
+
+    // Create all data transfers for the selected source nodes
+    const allDataTransfers = [];
+    sourceNodeIndices.forEach((i) => {
+      allDataTransfers[i] = createDataTransfers(i);
+    });
+
+    // Track completion frames for each target
+    const completionFrames = {};
+
+    // Find shortest path in hypercube using breadth-first search
+    const findShortestPath = (start, end) => {
+      if (start === end) return [start];
+
+      const visited = new Set([start]);
+      const queue = [[start]];
+
+      while (queue.length > 0) {
+        const path = queue.shift();
+        const currentNode = path[path.length - 1];
+
+        for (const neighbor of hypercubeConnections[currentNode]) {
+          if (neighbor === end) {
+            return [...path, end];
+          }
+
+          if (!visited.has(neighbor)) {
+            visited.add(neighbor);
+            queue.push([...path, neighbor]);
+          }
+        }
+      }
+
+      return null; // No path found (shouldn't happen in a connected hypercube)
+    };
+
+    // Calculate all paths and animate data transfers
+    sourceNodeIndices.forEach((sourceIdx) => {
+      for (let targetIdx = 0; targetIdx < nodeCount; targetIdx++) {
+        if (sourceIdx === targetIdx) continue; // Skip self
+
+        const dataNode = allDataTransfers[sourceIdx][targetIdx];
+        const path = findShortestPath(sourceIdx, targetIdx);
+
+        // Calculate initial delay based on source node (for all-to-all mode)
+        const startOffset = isOneToAll ? 0 : sourceIdx * 5;
+        let currentFrame = startOffset;
+
+        // Animate the packet along the path
+        for (let i = 0; i < path.length - 1; i++) {
+          const currentNodeIdx = path[i];
+          const nextNodeIdx = path[i + 1];
+
+          this.animation.animate(dataNode, "x", [
+            { frame: currentFrame, value: data[currentNodeIdx].x },
+            { frame: currentFrame + interval, value: data[nextNodeIdx].x },
+          ]);
+
+          this.animation.animate(dataNode, "y", [
+            { frame: currentFrame, value: data[currentNodeIdx].y + 50 },
+            { frame: currentFrame + interval, value: data[nextNodeIdx].y + 50 },
+          ]);
+
+          currentFrame += interval;
+        }
+
+        // Record when this packet reaches its destination
+        const finalFrame = currentFrame;
+
+        // Track the completion for updating target node's data
+        if (!completionFrames[targetIdx]) {
+          completionFrames[targetIdx] = {};
+        }
+        completionFrames[targetIdx][sourceIdx] = finalFrame;
+
+        // Schedule removal of this data node
+        scheduleRemoval(dataNode, finalFrame + 5);
+      }
+    });
+
+    const datas = [];
+
+    // Update data displays when all messages for a node arrive
+    for (let nodeIdx = 0; nodeIdx < nodeCount; nodeIdx++) {
+      // Skip if this node is not a target of any transfers
+      if (!completionFrames[nodeIdx]) continue;
+
+      // Find the latest arrival frame for this node
+      let lastArrivalFrame = 0;
+      for (const sourceIdx in completionFrames[nodeIdx]) {
+        lastArrivalFrame = Math.max(
+          lastArrivalFrame,
+          completionFrames[nodeIdx][sourceIdx]
+        );
+      }
+
+      // Build the complete message string
+      let fullMessage = "";
+
+      for (const sourceIdx in completionFrames[nodeIdx]) {
+        const msgPrefix = fullMessage ? ", " : "";
+        fullMessage += `${msgPrefix}{${sourceIdx},${nodeIdx}}`;
+        datas.push(fullMessage);
+      }
+
+      // Update the data display
+      this.animation.animate(data[nodeIdx], "text", [
+        { frame: lastArrivalFrame + 10, value: fullMessage },
+      ]);
+
+      // Visual feedback for message arrival completion
+      this.animation.animate(data[nodeIdx], "fill", [
+        { frame: lastArrivalFrame + 5, value: colors.goldenRod },
+        { frame: lastArrivalFrame + 15, value: colors.limeGreen },
+        { frame: lastArrivalFrame + 30, value: colors.goldenRod },
+      ]);
+
+      // Resize the data rectangle to fit the text
+      this.animation.animate(data[nodeIdx], "width", [
+        { frame: lastArrivalFrame + 5, value: 100 },
+        {
+          frame: lastArrivalFrame + 15,
+          value: Math.min(300, 100 + fullMessage.length * 3),
+        },
+      ]);
+
+      // Highlight the node itself (if not the source in one-to-all mode)
+      if (!(isOneToAll && nodeIdx === sourceNodeOption)) {
+        this.animation.animate(nodes[nodeIdx], "fill", [
+          { frame: lastArrivalFrame + 5, value: colors.steelBlue },
+          { frame: lastArrivalFrame + 15, value: colors.nodeColors[nodeIdx] },
+          { frame: lastArrivalFrame + 30, value: colors.steelBlue },
+        ]);
+      }
+    }
+
+    // Find the global completion frame (when all transfers are done)
+    let completionFrame = 0;
+    for (let nodeIdx = 0; nodeIdx < nodeCount; nodeIdx++) {
+      if (!completionFrames[nodeIdx]) continue;
+
+      for (const sourceIdx in completionFrames[nodeIdx]) {
+        completionFrame = Math.max(
+          completionFrame,
+          completionFrames[nodeIdx][sourceIdx]
+        );
+      }
+    }
+
+    // Final animation to show completion
+    completionFrame += 60; // Add margin
+    nodes.forEach((node, idx) => {
+      // Skip the source node in one-to-all mode as it's already highlighted
+      if (isOneToAll && idx === sourceNodeOption) return;
+
+      this.animation.animate(node, "fill", [
+        { frame: completionFrame, value: colors.steelBlue },
+        { frame: completionFrame + interval / 2, value: colors.limeGreen },
+        { frame: completionFrame + interval, value: colors.steelBlue },
+      ]);
+    });
+
+    // Add a summary text at the end showing completion
+    const summaryText = this.animation.createShape("text", {
+      x: width / 2,
+      y: height - 100,
+      fill: colors.steelBlue,
+      text: `${title} Complete`,
+      fontSize: 24,
+      opacity: 0,
+    });
+
+    this.animation.animate(summaryText, "opacity", [
+      { frame: completionFrame, value: 0 },
+      { frame: completionFrame + 30, value: 1 },
+    ]);
+
+    this.animation.reset();
+    this.animation.play(true);
+  }
+
+  personalizedAllToAllMesh(sourceNodeOption = -1) {
+    // Common constants and settings
+    const colors = {
+      limeGreen: [50, 205, 50],
+      goldenRod: [218, 165, 32],
+      steelBlue: [70, 130, 180],
+      // Add colors for each node to differentiate them
+      nodeColors: [
+        [135, 206, 235],
+        [255, 127, 80],
+        [50, 205, 50],
+        [218, 165, 32],
+        [218, 112, 214],
+        [112, 128, 144],
+        [255, 99, 71],
+        [70, 130, 180],
+        [147, 112, 219],
+        [46, 139, 87],
+        [255, 20, 147],
+        [64, 224, 208],
+        [178, 34, 34],
+        [255, 140, 0],
+        [119, 136, 153],
+        [75, 0, 130], // Indigo (Node 15)
+      ],
+    };
+
+    const duration = 15;
+    const fps = 60;
+    const height = 1000;
+    const width = 1900;
+    const interval = 120;
+    const nodeCount = 9; // 3x3 mesh has 9 nodes
+
+
+
+    // Determine mode: all-to-all or one-to-all
+    const isOneToAll = sourceNodeOption >= 0 && sourceNodeOption < nodeCount;
+
+    // Set title based on mode
+    const title = isOneToAll
+      ? `Node ${sourceNodeOption} to All Communication (Mesh)`
+      : "Simultaneous All-to-All Communication (Mesh)";
+
+    // Initialize animation
+    this.animation.clearAll();
+    this.animation.setDuration(duration);
+    this.animation.setFPS(fps);
+    this.engine.setCanvasSize(width, height);
+
+    // Track frame-to-remove mapping for all nodes
+    const removalFrames = {};
+
+    // Helper function to schedule a node for removal at a specific frame
+    const scheduleRemoval = (node, frame) => {
+      if (!removalFrames[frame]) {
+        removalFrames[frame] = [];
+      }
+      removalFrames[frame].push(node);
+    };
+
+    // Override the frame render method to check for node removal
+    const originalRenderFrame = this.animation.engine.renderFrame;
+    this.animation.engine.renderFrame = (frameNumber) => {
+      // Call the original render method first
+      originalRenderFrame.call(this.animation.engine, frameNumber);
+
+      // Check if any nodes need to be removed at this frame
+      if (removalFrames[frameNumber]) {
+        removalFrames[frameNumber].forEach((node) => {
+          this.engine.removeObject(node);
+        });
+        // Clear the list after processing
+        delete removalFrames[frameNumber];
+      }
+    };
+
+    // Node positions for 4x4 mesh
+    // Node positions for 3x3 mesh
+const nodeGrid = [
+  [100, 500], // 0
+  [100, 300], // 1
+  [100, 100], // 2
+  [300, 500], // 3
+  [300, 300], // 4
+  [300, 100], // 5
+  [500, 500], // 6
+  [500, 300], // 7
+  [500, 100], // 8
+];
+
+
+    // Create all nodes
+    const nodes = nodeGrid.map(([x, y], index) => {
+      return this.animation.createShape("circle", {
+        x,
+        y,
+        height: 100,
+        width: 100,
+        fill:
+          isOneToAll && index === sourceNodeOption
+            ? colors.nodeColors[sourceNodeOption] // Highlight source node
+            : colors.steelBlue,
+        name: `node ${index}`,
+      });
+    });
+
+    // Define mesh connections for routing
+    const meshConnections = [];
+const rows = 3;
+const cols = 3;
+for (let i = 0; i < nodeCount; i++) {
+  meshConnections[i] = [];
+}
+
+// Add horizontal and vertical connections in the mesh
+for (let r = 0; r < rows; r++) {
+  for (let c = 0; c < cols; c++) {
+    const nodeIdx = r * cols + c;
+
+    // Connect to right neighbor if not on rightmost edge
+    if (c < cols - 1) {
+      meshConnections[nodeIdx].push(nodeIdx + 1);
+      meshConnections[nodeIdx + 1].push(nodeIdx);
+    }
+
+    // Connect to bottom neighbor if not on bottom edge
+    if (r < rows - 1) {
+      meshConnections[nodeIdx].push(nodeIdx + cols);
+      meshConnections[nodeIdx + cols].push(nodeIdx);
+    }
+  }
+}
+
+    // Create data rectangles
+    const data = nodeGrid.map(([x, y], index) => {
+      return this.animation.createShape("rectangle", {
+        x: x + 50,
+        y: y + 50,
+        height: 50,
+        width: 100,
+        fill: colors.goldenRod,
+        name: ``,
+        cornerRadius: 10,
+      });
+    });
+
+    // Display mode as text
+    const modeText = this.animation.createShape("text", {
+      x: width / 2,
+      y: 50,
+      fill: colors.steelBlue,
+      text: title,
+      fontSize: 24,
+    });
+
+    // Create flow paths for mesh
+    const flowDefaults = {
+      pathStyle: "bezier",
+      curveIntensity: 0,
+      arrowEnd: false,
+      arrowSize: 8,
+      stroke: colors.steelBlue,
+      strokeWeight: 3,
+      flowParticles: 8,
+      particleSize: 3,
+      fill: colors.steelBlue,
+      animationSpeed: 1,
+      lineStyle: "dashed",
+    };
+
+    // Define flow connections between mesh nodes
+   // Define flow connections between mesh nodes
+const flowPaths = [
+  // Horizontal connections (left to right)
+  [0, 3, "right", "left"],
+  [3, 6, "right", "left"],
+  [1, 4, "right", "left"],
+  [4, 7, "right", "left"],
+  [2, 5, "right", "left"],
+  [5, 8, "right", "left"],
+
+  // Vertical connections (top to bottom)
+  [0, 1, "top", "bottom"],
+  [1, 2, "top", "bottom"],
+  [3, 4, "top", "bottom"],
+  [4, 5, "top", "bottom"],
+  [6, 7, "top", "bottom"],
+  [7, 8, "top", "bottom"],
+];
+
+
+    // Create all the flow paths
+    const flows = flowPaths.map(([startIdx, endIdx, startConn, endConn]) => {
+      return this.animation.createShape("flowpath", {
+        ...flowDefaults,
+        startShape: nodes[startIdx],
+        endShape: nodes[endIdx],
+        startConnection: startConn,
+        endConnection: endConn,
+      });
+    });
+
+    // Helper function to create data transfer packets for a source node with custom color
+    const createDataTransfers = (sourceNodeIdx) => {
+      return nodeGrid.map(([x, y], targetIdx) => {
+        if (sourceNodeIdx === targetIdx) return null; // Skip self
+
+        return this.animation.createShape("rectangle", {
+          x: nodes[sourceNodeIdx].x + 50,
+          y: nodes[sourceNodeIdx].y + 50,
+          height: 50,
+          width: 100,
+          fill: colors.nodeColors[sourceNodeIdx],
+          name: `{${sourceNodeIdx},${targetIdx}}`,
+          cornerRadius: 10,
+        });
+      });
+    };
+
+    // Determine which source nodes to include
+    const sourceNodeIndices = isOneToAll
+      ? [sourceNodeOption]
+      : Array.from({ length: nodeCount }, (_, i) => i);
+
+    // Create all data transfers for the selected source nodes
+    const allDataTransfers = [];
+    sourceNodeIndices.forEach((i) => {
+      allDataTransfers[i] = createDataTransfers(i);
+    });
+
+    // Track completion frames for each target
+    const completionFrames = {};
+
+    // Find shortest path in mesh using breadth-first search
+    const findShortestPath = (start, end) => {
+      if (start === end) return [start];
+
+      const visited = new Set([start]);
+      const queue = [[start]];
+
+      while (queue.length > 0) {
+        const path = queue.shift();
+        const currentNode = path[path.length - 1];
+
+        for (const neighbor of meshConnections[currentNode]) {
+          if (neighbor === end) {
+            return [...path, end];
+          }
+
+          if (!visited.has(neighbor)) {
+            visited.add(neighbor);
+            queue.push([...path, neighbor]);
+          }
+        }
+      }
+
+      return null; // No path found (shouldn't happen in a connected mesh)
+    };
+
+    // Calculate all paths and animate data transfers
+    sourceNodeIndices.forEach((sourceIdx) => {
+      for (let targetIdx = 0; targetIdx < nodeCount; targetIdx++) {
+        if (sourceIdx === targetIdx) continue; // Skip self
+
+        const dataNode = allDataTransfers[sourceIdx][targetIdx];
+        const path = findShortestPath(sourceIdx, targetIdx);
+
+        // Calculate initial delay based on source node (for all-to-all mode)
+        const startOffset = isOneToAll ? 0 : sourceIdx * 5;
+        let currentFrame = startOffset;
+
+        // Animate the packet along the path
+        for (let i = 0; i < path.length - 1; i++) {
+          const currentNodeIdx = path[i];
+          const nextNodeIdx = path[i + 1];
+
+          this.animation.animate(dataNode, "x", [
+            { frame: currentFrame, value: data[currentNodeIdx].x },
+            { frame: currentFrame + interval, value: data[nextNodeIdx].x },
+          ]);
+
+          this.animation.animate(dataNode, "y", [
+            { frame: currentFrame, value: data[currentNodeIdx].y + 50 },
+            { frame: currentFrame + interval, value: data[nextNodeIdx].y + 50 },
+          ]);
+
+          currentFrame += interval;
+        }
+
+        // Record when this packet reaches its destination
+        const finalFrame = currentFrame;
+
+        // Track the completion for updating target node's data
+        if (!completionFrames[targetIdx]) {
+          completionFrames[targetIdx] = {};
+        }
+        completionFrames[targetIdx][sourceIdx] = finalFrame;
+
+        // Schedule removal of this data node
+        scheduleRemoval(dataNode, finalFrame + 5);
+      }
+    });
+
+    const datas = [];
+
+    // Update data displays when all messages for a node arrive
+    for (let nodeIdx = 0; nodeIdx < nodeCount; nodeIdx++) {
+      // Skip if this node is not a target of any transfers
+      if (!completionFrames[nodeIdx]) continue;
+
+      // Find the latest arrival frame for this node
+      let lastArrivalFrame = 0;
+      for (const sourceIdx in completionFrames[nodeIdx]) {
+        lastArrivalFrame = Math.max(
+          lastArrivalFrame,
+          completionFrames[nodeIdx][sourceIdx]
+        );
+      }
+
+      // Build the complete message string
+      let fullMessage = "";
+
+      for (const sourceIdx in completionFrames[nodeIdx]) {
+        const msgPrefix = fullMessage ? ", " : "";
+        fullMessage += `${msgPrefix}{${sourceIdx},${nodeIdx}}`;
+        datas.push(fullMessage);
+      }
+
+      // Update the data display
+      this.animation.animate(data[nodeIdx], "text", [
+        { frame: lastArrivalFrame + 10, value: fullMessage },
+      ]);
+
+      // Visual feedback for message arrival completion
+      this.animation.animate(data[nodeIdx], "fill", [
+        { frame: lastArrivalFrame + 5, value: colors.goldenRod },
+        { frame: lastArrivalFrame + 15, value: colors.limeGreen },
+        { frame: lastArrivalFrame + 30, value: colors.goldenRod },
+      ]);
+
+      // Resize the data rectangle to fit the text
+      this.animation.animate(data[nodeIdx], "width", [
+        { frame: lastArrivalFrame + 5, value: 100 },
+        {
+          frame: lastArrivalFrame + 15,
+          value: Math.min(300, 100 + fullMessage.length * 3),
+        },
+      ]);
+
+      // Highlight the node itself (if not the source in one-to-all mode)
+      if (!(isOneToAll && nodeIdx === sourceNodeOption)) {
+        this.animation.animate(nodes[nodeIdx], "fill", [
+          { frame: lastArrivalFrame + 5, value: colors.steelBlue },
+          { frame: lastArrivalFrame + 15, value: colors.nodeColors[nodeIdx] },
+          { frame: lastArrivalFrame + 30, value: colors.steelBlue },
+        ]);
+      }
+    }
+
+    // Find the global completion frame (when all transfers are done)
+    let completionFrame = 0;
+    for (let nodeIdx = 0; nodeIdx < nodeCount; nodeIdx++) {
+      if (!completionFrames[nodeIdx]) continue;
+
+      for (const sourceIdx in completionFrames[nodeIdx]) {
+        completionFrame = Math.max(
+          completionFrame,
+          completionFrames[nodeIdx][sourceIdx]
+        );
+      }
+    }
+
+    // Final animation to show completion
+    completionFrame += 60; // Add margin
+    nodes.forEach((node, idx) => {
+      // Skip the source node in one-to-all mode as it's already highlighted
+      if (isOneToAll && idx === sourceNodeOption) return;
+
+      this.animation.animate(node, "fill", [
+        { frame: completionFrame, value: colors.steelBlue },
+        { frame: completionFrame + interval / 2, value: colors.limeGreen },
+        { frame: completionFrame + interval, value: colors.steelBlue },
+      ]);
+    });
+
+    // Add a summary text at the end showing completion
+    const summaryText = this.animation.createShape("text", {
+      x: width / 2,
+      y: height - 100,
+      fill: colors.steelBlue,
+      text: `${title} Complete`,
+      fontSize: 24,
+      opacity: 0,
+    });
+
+    console.info(datas.length);
+
+    this.animation.animate(summaryText, "opacity", [
+      { frame: completionFrame, value: 0 },
+      { frame: completionFrame + 30, value: 1 },
+    ]);
+
+    this.animation.reset();
+    this.animation.play(true);
   }
 }
