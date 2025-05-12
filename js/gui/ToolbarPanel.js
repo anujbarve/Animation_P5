@@ -355,7 +355,9 @@ class ToolbarPanel {
       personalizedAllToAllCommunicationRing: () =>
         this.personalizedAllToAllCommunicationRing(),
       personalizedAllToAllHyperCube: () => this.personalizedAllToAllHyperCube(),
-      personalizedAllToAllMesh: () => this.personalizedAllToAllMesh(0),
+      personalizedAllToAllMesh: () => this.personalizedAllToAllMesh(),
+      circularShiftMesh: () => this.circularShiftMesh(),
+      circularShiftHyperCube: () => this.circularShiftHyperCube(),
     };
 
     this.templatesFolder
@@ -408,6 +410,14 @@ class ToolbarPanel {
     this.templatesFolder
       .add(templates, "personalizedAllToAllMesh")
       .name("Mesh All to All Personalized");
+
+    this.templatesFolder
+      .add(templates, "circularShiftMesh")
+      .name("Mesh Circular Shift");
+
+    this.templatesFolder
+      .add(templates, "circularShiftHyperCube")
+      .name("HyperCube Circular Shift");
 
     this.templatesFolder.open();
   }
@@ -2524,7 +2534,7 @@ class ToolbarPanel {
         x: x + 50,
         y: y + 50,
         height: 50,
-        width: 100,
+        width: 250,
         fill: colors.goldenRod,
         name: `data ${index}`,
         cornerRadius: 10,
@@ -2573,136 +2583,129 @@ class ToolbarPanel {
     const numNodes = nodes.length;
     const dimensions = 3; // 3D hypercube
 
-    // Initialize according to the PREFIX SUMS HCUBE algorithm
-    const nodeValues = Array.from({ length: numNodes }, (_, i) => i); // Each node's initial value is its ID
-    const results = [...nodeValues]; // Step 3: result := my_number
-    const messages = [...nodeValues]; // Step 4: msg := result
-
-    // Record the communication steps
+    // Initialize state arrays
+    let results = Array(numNodes)
+      .fill(0)
+      .map((_, i) => String(i));
+    let messages = Array(numNodes)
+      .fill(0)
+      .map((_, i) => String(i));
     const communicationSteps = [];
 
-    // Step 5: for i := 0 to d-1 do
+    // Main algorithm implementation
     for (let dim = 0; dim < dimensions; dim++) {
-      const stepExchanges = [];
+      const stepSize = 1 << dim; // 1, 2, 4 for each dimension
+      const prevResults = [...results];
+      const prevMessages = [...messages];
 
-      // For each node in this dimension
       for (let nodeId = 0; nodeId < numNodes; nodeId++) {
-        // Step 6: partner := my_id XOR 2^i
-        const partnerId = nodeId ^ (1 << dim);
+        const partnerId = nodeId ^ stepSize;
 
-        // Ensure we record each exchange only once
-        if (nodeId < partnerId) {
-          stepExchanges.push([nodeId, partnerId]);
+        if (partnerId > nodeId) {
+          // Record pre-exchange state
+          communicationSteps.push({
+            step: dim,
+            phase: "pre",
+            nodeId,
+            partnerId,
+            nodeResult: prevResults[nodeId],
+            nodeMsg: prevMessages[nodeId],
+            partnerResult: prevResults[partnerId],
+            partnerMsg: prevMessages[partnerId],
+          });
+
+          // Exchange and update messages
+          messages[
+            nodeId
+          ] = `${prevMessages[nodeId]}+${prevMessages[partnerId]}`;
+          messages[
+            partnerId
+          ] = `${prevMessages[partnerId]}+${prevMessages[nodeId]}`;
+
+          // Update results (only higher numbered node accumulates)
+          results[
+            partnerId
+          ] = `${prevResults[partnerId]}+${prevMessages[nodeId]}`;
+          results[nodeId] = prevResults[nodeId]; // Lower node's result unchanged
+
+          // Record post-exchange state
+          communicationSteps.push({
+            step: dim,
+            phase: "post",
+            nodeId,
+            partnerId,
+            nodeResult: results[nodeId],
+            nodeMsg: messages[nodeId],
+            partnerResult: results[partnerId],
+            partnerMsg: messages[partnerId],
+          });
         }
       }
-
-      // Process all exchanges in this dimension
-      stepExchanges.forEach(([a, b]) => {
-        // Step 7-8: Send msg to partner and receive from partner
-        const msgA = messages[a];
-        const msgB = messages[b];
-
-        // Step 9: msg := msg + number
-        messages[a] += msgB;
-        messages[b] += msgA;
-
-        // Step 10: if (partner < my_id) then result := result + number
-        if (b < a) results[a] += msgB;
-        if (a < b) results[b] += msgA;
-
-        // Record both directions of communication for animation
-        communicationSteps.push({
-          step: dim,
-          sender: a,
-          receiver: b,
-          msgSent: msgA,
-          resultA: results[a],
-          msgA: messages[a],
-        });
-
-        communicationSteps.push({
-          step: dim,
-          sender: b,
-          receiver: a,
-          msgSent: msgB,
-          resultB: results[b],
-          msgB: messages[b],
-        });
-      });
     }
 
-    // Now animate each data block according to the algorithm
+    // Animate each node
     data.forEach((dataItem, nodeId) => {
       const xKeyframes = [];
       const yKeyframes = [];
       const textKeyframes = [];
 
-      // Initial position and value - show [result](msg)
+      // Initial state
       xKeyframes.push({ frame: 0, value: nodes[nodeId].x + 50 });
       yKeyframes.push({ frame: 0, value: nodes[nodeId].y + 50 });
       textKeyframes.push({ frame: 0, value: `[${nodeId}](${nodeId})` });
 
-      let currentResult = nodeId;
-      let currentMsg = nodeId;
+      let currentState = {
+        result: String(nodeId),
+        msg: String(nodeId),
+      };
 
-      // Filter steps relevant to this node
-      const relevantSteps = communicationSteps.filter(
-        (step) => step.sender === nodeId || step.receiver === nodeId
-      );
+      // Process each communication step
+      communicationSteps.forEach((step) => {
+        if (step.nodeId === nodeId || step.partnerId === nodeId) {
+          const frameTime =
+            (step.step * 2 + (step.phase === "post" ? 1 : 0)) * interval;
+          const isNode = step.nodeId === nodeId;
+          const partner = isNode ? step.partnerId : step.nodeId;
 
-      // Process each step
-      relevantSteps.forEach((step) => {
-        const frameTime = (step.step + 1) * interval;
-        const partner = step.sender === nodeId ? step.receiver : step.sender;
+          // Move towards partner
+          xKeyframes.push({
+            frame: frameTime,
+            value: nodes[partner].x + 50,
+          });
+          yKeyframes.push({
+            frame: frameTime,
+            value: nodes[partner].y + 50,
+          });
 
-        // Move towards partner visually
-        xKeyframes.push({
-          frame: frameTime,
-          value: nodes[partner].x + 50,
-        });
-
-        yKeyframes.push({
-          frame: frameTime,
-          value: nodes[partner].y + 50,
-        });
-
-        // Update the node's data display
-        if (step.sender === nodeId) {
-          // This node is sending
-          if (step.hasOwnProperty("resultA")) {
-            currentResult = step.resultA;
-            currentMsg = step.msgA;
+          // Update state
+          if (step.phase === "post") {
+            currentState = {
+              result: isNode ? step.nodeResult : step.partnerResult,
+              msg: isNode ? step.nodeMsg : step.partnerMsg,
+            };
           }
-        } else {
-          // This node is receiving
-          if (step.hasOwnProperty("resultB")) {
-            currentResult = step.resultB;
-            currentMsg = step.msgB;
-          }
+
+          // Update text display
+          textKeyframes.push({
+            frame: frameTime,
+            value: `[${currentState.result}](${currentState.msg})`,
+          });
         }
-
-        // Update text to show [result](msg)
-        textKeyframes.push({
-          frame: frameTime,
-          value: `[${currentResult}](${currentMsg})`,
-        });
       });
 
       // Return to original position
-      const lastFrame = dimensions * interval + interval;
+      const lastFrame = dimensions * 2 * interval;
       xKeyframes.push({
         frame: lastFrame,
         value: nodes[nodeId].x + 50,
       });
-
       yKeyframes.push({
         frame: lastFrame,
         value: nodes[nodeId].y + 50,
       });
-
       textKeyframes.push({
         frame: lastFrame,
-        value: `[${currentResult}](${currentMsg})`,
+        value: `[${currentState.result}](${currentState.msg})`,
       });
 
       // Apply animation
@@ -2714,7 +2717,7 @@ class ToolbarPanel {
     });
 
     this.animation.reset();
-    this.animation.play(true);
+    this.animation.play();
   }
 
   hyperCubeScatter() {
@@ -3905,8 +3908,6 @@ class ToolbarPanel {
     const interval = 120;
     const nodeCount = 9; // 3x3 mesh has 9 nodes
 
-
-
     // Determine mode: all-to-all or one-to-all
     const isOneToAll = sourceNodeOption >= 0 && sourceNodeOption < nodeCount;
 
@@ -3950,18 +3951,17 @@ class ToolbarPanel {
 
     // Node positions for 4x4 mesh
     // Node positions for 3x3 mesh
-const nodeGrid = [
-  [100, 500], // 0
-  [100, 300], // 1
-  [100, 100], // 2
-  [300, 500], // 3
-  [300, 300], // 4
-  [300, 100], // 5
-  [500, 500], // 6
-  [500, 300], // 7
-  [500, 100], // 8
-];
-
+    const nodeGrid = [
+      [100, 500], // 0
+      [100, 300], // 1
+      [100, 100], // 2
+      [300, 500], // 3
+      [300, 300], // 4
+      [300, 100], // 5
+      [500, 500], // 6
+      [500, 300], // 7
+      [500, 100], // 8
+    ];
 
     // Create all nodes
     const nodes = nodeGrid.map(([x, y], index) => {
@@ -3980,30 +3980,30 @@ const nodeGrid = [
 
     // Define mesh connections for routing
     const meshConnections = [];
-const rows = 3;
-const cols = 3;
-for (let i = 0; i < nodeCount; i++) {
-  meshConnections[i] = [];
-}
-
-// Add horizontal and vertical connections in the mesh
-for (let r = 0; r < rows; r++) {
-  for (let c = 0; c < cols; c++) {
-    const nodeIdx = r * cols + c;
-
-    // Connect to right neighbor if not on rightmost edge
-    if (c < cols - 1) {
-      meshConnections[nodeIdx].push(nodeIdx + 1);
-      meshConnections[nodeIdx + 1].push(nodeIdx);
+    const rows = 3;
+    const cols = 3;
+    for (let i = 0; i < nodeCount; i++) {
+      meshConnections[i] = [];
     }
 
-    // Connect to bottom neighbor if not on bottom edge
-    if (r < rows - 1) {
-      meshConnections[nodeIdx].push(nodeIdx + cols);
-      meshConnections[nodeIdx + cols].push(nodeIdx);
+    // Add horizontal and vertical connections in the mesh
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const nodeIdx = r * cols + c;
+
+        // Connect to right neighbor if not on rightmost edge
+        if (c < cols - 1) {
+          meshConnections[nodeIdx].push(nodeIdx + 1);
+          meshConnections[nodeIdx + 1].push(nodeIdx);
+        }
+
+        // Connect to bottom neighbor if not on bottom edge
+        if (r < rows - 1) {
+          meshConnections[nodeIdx].push(nodeIdx + cols);
+          meshConnections[nodeIdx + cols].push(nodeIdx);
+        }
+      }
     }
-  }
-}
 
     // Create data rectangles
     const data = nodeGrid.map(([x, y], index) => {
@@ -4043,25 +4043,24 @@ for (let r = 0; r < rows; r++) {
     };
 
     // Define flow connections between mesh nodes
-   // Define flow connections between mesh nodes
-const flowPaths = [
-  // Horizontal connections (left to right)
-  [0, 3, "right", "left"],
-  [3, 6, "right", "left"],
-  [1, 4, "right", "left"],
-  [4, 7, "right", "left"],
-  [2, 5, "right", "left"],
-  [5, 8, "right", "left"],
+    // Define flow connections between mesh nodes
+    const flowPaths = [
+      // Horizontal connections (left to right)
+      [0, 3, "right", "left"],
+      [3, 6, "right", "left"],
+      [1, 4, "right", "left"],
+      [4, 7, "right", "left"],
+      [2, 5, "right", "left"],
+      [5, 8, "right", "left"],
 
-  // Vertical connections (top to bottom)
-  [0, 1, "top", "bottom"],
-  [1, 2, "top", "bottom"],
-  [3, 4, "top", "bottom"],
-  [4, 5, "top", "bottom"],
-  [6, 7, "top", "bottom"],
-  [7, 8, "top", "bottom"],
-];
-
+      // Vertical connections (top to bottom)
+      [0, 1, "top", "bottom"],
+      [1, 2, "top", "bottom"],
+      [3, 4, "top", "bottom"],
+      [4, 5, "top", "bottom"],
+      [6, 7, "top", "bottom"],
+      [7, 8, "top", "bottom"],
+    ];
 
     // Create all the flow paths
     const flows = flowPaths.map(([startIdx, endIdx, startConn, endConn]) => {
@@ -4273,6 +4272,786 @@ const flowPaths = [
       { frame: completionFrame, value: 0 },
       { frame: completionFrame + 30, value: 1 },
     ]);
+
+    this.animation.reset();
+    this.animation.play(true);
+  }
+
+  circularShiftMesh() {
+    const colors = {
+      skyBlue: [135, 206, 235],
+      coral: [255, 127, 80],
+      limeGreen: [50, 205, 50],
+      goldenRod: [218, 165, 32],
+      steelBlue: [70, 130, 180],
+    };
+
+    const duration = 20;
+    const fps = 60;
+    const interval = 60;
+
+    this.animation.clearAll();
+    this.animation.setDuration(duration);
+    this.animation.setFPS(fps);
+    this.engine.setCanvasSize(1900, 1000);
+
+    // Node coordinates for 4x4 mesh (bottom-left to top-right)
+    const nodeGrid = [
+      [300, 700], // 0
+      [500, 700], // 1
+      [700, 700], // 2
+      [900, 700], // 3
+      [300, 500], // 4
+      [500, 500], // 5
+      [700, 500], // 6
+      [900, 500], // 7
+      [300, 300], // 8
+      [500, 300], // 9
+      [700, 300], // 10
+      [900, 300], // 11
+      [300, 100], // 12
+      [500, 100], // 13
+      [700, 100], // 14
+      [900, 100], // 15
+    ];
+
+    // Create nodes
+    const nodes = nodeGrid.map(([x, y], index) => {
+      return this.animation.createShape("circle", {
+        x,
+        y,
+        size: 100,
+        fill: colors.steelBlue,
+        name: `node ${index}`,
+        text: `${index}`,
+        fontSize: 24,
+        textColor: [255, 255, 255],
+      });
+    });
+
+    // Create data packets
+    const data = nodeGrid.map(([x, y], index) => {
+      return this.animation.createShape("rectangle", {
+        x: x,
+        y: y + 20,
+        height: 40,
+        width: 100,
+        fill: colors.goldenRod,
+        name: `data ${index}`,
+        cornerRadius: 10,
+        text: `${index}`,
+        fontSize: 18,
+        textColor: [0, 0, 0],
+      });
+    });
+
+    const flowDefaults = {
+      pathStyle: "bezier",
+      curveIntensity: 0,
+      arrowEnd: false,
+      arrowSize: 8,
+      stroke: colors.steelBlue,
+      strokeWeight: 2,
+      flowParticles: 8,
+      particleSize: 6,
+      fill: colors.steelBlue,
+      animationSpeed: 2,
+    };
+
+    // Create horizontal and vertical flows
+    const flowPaths = [
+      // Horizontal connections
+      ...Array.from({ length: 4 }, (_, row) =>
+        Array.from({ length: 3 }, (_, col) => {
+          const index = row * 4 + col;
+          return [index, index + 1, "right", "left"];
+        })
+      ).flat(),
+
+      // Vertical connections
+      ...Array.from({ length: 3 }, (_, row) =>
+        Array.from({ length: 4 }, (_, col) => {
+          const index = row * 4 + col;
+          return [index, index + 4, "top", "bottom"];
+        })
+      ).flat(),
+    ];
+
+    // Create flows
+    const flows = flowPaths.map(([startIdx, endIdx, startConn, endConn]) => {
+      return this.animation.createShape("flowpath", {
+        ...flowDefaults,
+        startShape: nodes[startIdx],
+        endShape: nodes[endIdx],
+        startConnection: startConn,
+        endConnection: endConn,
+      });
+    });
+
+    // Initial row-wise shifts
+    let frameOffset = 0;
+    for (let row = 0; row < 4; row++) {
+      for (let col = 0; col < 4; col++) {
+        const index = row * 4 + col;
+        const targetIndex = row * 4 + ((col + 1) % 4);
+
+        this.animation.animate(data[index], "x", [
+          { frame: frameOffset, value: nodes[index].x },
+          { frame: frameOffset + interval, value: nodes[targetIndex].x },
+        ]);
+
+        this.animation.animate(data[index], "y", [
+          { frame: frameOffset, value: nodes[index].y + 20 },
+          { frame: frameOffset + interval, value: nodes[targetIndex].y + 20 },
+        ]);
+      }
+      frameOffset += interval;
+    }
+
+    // Compensation for backward row shifts
+    frameOffset += interval;
+    for (let col = 0; col < 4; col++) {
+      for (let row = 0; row < 4; row++) {
+        const index = row * 4 + col;
+        const sourceData = (index + 12) % 16;
+
+        this.animation.animate(data[sourceData], "x", [
+          { frame: frameOffset, value: nodes[sourceData].x },
+          { frame: frameOffset + interval, value: nodes[index].x },
+        ]);
+
+        this.animation.animate(data[sourceData], "y", [
+          { frame: frameOffset, value: nodes[sourceData].y + 20 },
+          { frame: frameOffset + interval, value: nodes[index].y + 20 },
+        ]);
+      }
+      frameOffset += interval;
+    }
+
+    // Column-wise shifts
+    frameOffset += interval;
+    for (let col = 0; col < 4; col++) {
+      for (let row = 0; row < 4; row++) {
+        const index = row * 4 + col;
+        const targetIndex = ((row + 1) % 4) * 4 + col;
+
+        this.animation.animate(data[index], "x", [
+          { frame: frameOffset, value: nodes[index].x },
+          { frame: frameOffset + interval, value: nodes[targetIndex].x },
+        ]);
+
+        this.animation.animate(data[index], "y", [
+          { frame: frameOffset, value: nodes[index].y + 20 },
+          { frame: frameOffset + interval, value: nodes[targetIndex].y + 20 },
+        ]);
+      }
+      frameOffset += interval;
+    }
+
+    this.animation.reset();
+    this.animation.play();
+  }
+
+  circularShiftHyperCube() {
+    const duration = 20;
+    const fps = 60;
+    const height = 1000;
+    const width = 1900;
+    const interval = 2 * fps;
+
+    const colors = {
+      skyBlue: [135, 206, 235],
+      goldenRod: [218, 165, 32],
+      steelBlue: [70, 130, 180],
+    };
+
+    this.animation.clearAll();
+    this.animation.setDuration(duration);
+    this.animation.setFPS(fps);
+    this.engine.setCanvasSize(width, height);
+
+    // Node positions for hypercube (matching the reference layout)
+    const nodeGrid = [
+      [100, 700, "node 0"],
+      [500, 700, "node 1"],
+      [100, 300, "node 2"],
+      [500, 300, "node 3"],
+      [300, 500, "node 4"],
+      [700, 500, "node 5"],
+      [300, 100, "node 6"],
+      [700, 100, "node 7"],
+    ];
+
+    // Create nodes
+    const nodes = nodeGrid.map(([x, y, name]) => {
+      return this.animation.createShape("circle", {
+        x,
+        y,
+        size: 80,
+        fill: colors.steelBlue,
+        name,
+      });
+    });
+
+    // Create data packets
+    const data = nodeGrid.map(([x, y], index) => {
+      return this.animation.createShape("rectangle", {
+        x: x + 50,
+        y: y + 50,
+        height: 50,
+        width: 100,
+        fill: colors.goldenRod,
+        name: `data ${index}`,
+        cornerRadius: 10,
+        text: `${index}`,
+      });
+    });
+
+    // Flow path settings
+    const flowDefaults = {
+      pathStyle: "bezier",
+      curveIntensity: 0,
+      arrowEnd: false,
+      arrowSize: 8,
+      stroke: colors.steelBlue,
+      strokeWeight: 3,
+      flowParticles: 8,
+      particleSize: 3,
+      fill: colors.steelBlue,
+      animationSpeed: 1,
+      lineStyle: "dashed",
+    };
+
+    // Hypercube connections
+    const flowPaths = [
+      [0, 2],
+      [0, 4],
+      [0, 1],
+      [1, 3],
+      [1, 5],
+      [2, 6],
+      [2, 3],
+      [3, 7],
+      [5, 7],
+      [5, 4],
+      [6, 4],
+      [6, 7],
+    ];
+
+    // Create flow paths
+    flowPaths.forEach(([startIdx, endIdx]) => {
+      this.animation.createShape("flowpath", {
+        ...flowDefaults,
+        startShape: nodes[startIdx],
+        endShape: nodes[endIdx],
+        startConnection: "center",
+        endConnection: "center",
+      });
+    });
+
+    this.animation.animateMultiple(data[0], {
+      x: [
+        {
+          frame: 0,
+          value: data[0].x,
+        },
+        {
+          frame: interval,
+          value: data[4].x,
+        },
+        {
+          frame: interval * 2,
+          value: data[6].x,
+        },
+        {
+          frame: interval * 3,
+          value: data[2].x,
+        },
+      ],
+      y: [
+        {
+          frame: 0,
+          value: data[0].y,
+        },
+        {
+          frame: interval,
+          value: data[4].y,
+        },
+        {
+          frame: interval * 2,
+          value: data[6].y,
+        },
+        {
+          frame: interval * 3,
+          value: data[2].y,
+        },
+      ],
+    });
+
+    this.animation.animateMultiple(data[4], {
+      x: [
+        {
+          frame: 0,
+          value: data[4].x,
+        },
+        {
+          frame: interval,
+          value: data[6].x,
+        },
+        {
+          frame: interval * 2,
+          value: data[2].x,
+        },
+        {
+          frame: interval * 3,
+          value: data[0].x,
+        },
+      ],
+      y: [
+        {
+          frame: 0,
+          value: data[4].y,
+        },
+        {
+          frame: interval,
+          value: data[6].y,
+        },
+        {
+          frame: interval * 2,
+          value: data[2].y,
+        },
+        {
+          frame: interval * 3,
+          value: data[0].y,
+        },
+      ],
+    });
+
+    this.animation.animateMultiple(data[6], {
+      x: [
+        {
+          frame: 0,
+          value: data[6].x,
+        },
+        {
+          frame: interval,
+          value: data[2].x,
+        },
+        {
+          frame: interval * 2,
+          value: data[0].x,
+        },
+        {
+          frame: interval * 3,
+          value: data[4].x,
+        },
+      ],
+      y: [
+        {
+          frame: 0,
+          value: data[6].y,
+        },
+        {
+          frame: interval,
+          value: data[2].y,
+        },
+        {
+          frame: interval * 2,
+          value: data[0].y,
+        },
+        {
+          frame: interval * 3,
+          value: data[4].y,
+        },
+      ],
+    });
+
+    this.animation.animateMultiple(data[2], {
+      x: [
+        {
+          frame: 0,
+          value: data[2].x,
+        },
+        {
+          frame: interval,
+          value: data[0].x,
+        },
+        {
+          frame: interval * 2,
+          value: data[4].x,
+        },
+        {
+          frame: interval * 3,
+          value: data[6].x,
+        },
+      ],
+      y: [
+        {
+          frame: 0,
+          value: data[2].y,
+        },
+        {
+          frame: interval,
+          value: data[0].y,
+        },
+        {
+          frame: interval * 2,
+          value: data[4].y,
+        },
+        {
+          frame: interval * 3,
+          value: data[6].y,
+        },
+      ],
+    });
+
+    ///
+
+    this.animation.animateMultiple(data[1], {
+      x: [
+        {
+          frame: 0,
+          value: data[1].x,
+        },
+        {
+          frame: interval,
+          value: data[5].x,
+        },
+        {
+          frame: interval * 2,
+          value: data[7].x,
+        },
+        {
+          frame: interval * 3,
+          value: data[3].x,
+        },
+      ],
+      y: [
+        {
+          frame: 0,
+          value: data[1].y,
+        },
+        {
+          frame: interval,
+          value: data[5].y,
+        },
+        {
+          frame: interval * 2,
+          value: data[7].y,
+        },
+        {
+          frame: interval * 3,
+          value: data[3].y,
+        },
+      ],
+    });
+
+    this.animation.animateMultiple(data[5], {
+      x: [
+        {
+          frame: 0,
+          value: data[5].x,
+        },
+        {
+          frame: interval,
+          value: data[7].x,
+        },
+        {
+          frame: interval * 2,
+          value: data[3].x,
+        },
+        {
+          frame: interval * 3,
+          value: data[1].x,
+        },
+      ],
+      y: [
+        {
+          frame: 0,
+          value: data[5].y,
+        },
+        {
+          frame: interval,
+          value: data[7].y,
+        },
+        {
+          frame: interval * 2,
+          value: data[3].y,
+        },
+        {
+          frame: interval * 3,
+          value: data[1].y,
+        },
+      ],
+    });
+
+    this.animation.animateMultiple(data[7], {
+      x: [
+        {
+          frame: 0,
+          value: data[7].x,
+        },
+        {
+          frame: interval,
+          value: data[3].x,
+        },
+        {
+          frame: interval * 2,
+          value: data[1].x,
+        },
+        {
+          frame: interval * 3,
+          value: data[5].x,
+        },
+      ],
+      y: [
+        {
+          frame: 0,
+          value: data[7].y,
+        },
+        {
+          frame: interval,
+          value: data[3].y,
+        },
+        {
+          frame: interval * 2,
+          value: data[1].y,
+        },
+        {
+          frame: interval * 3,
+          value: data[5].y,
+        },
+      ],
+    });
+
+    this.animation.animateMultiple(data[3], {
+      x: [
+        {
+          frame: 0,
+          value: data[3].x,
+        },
+        {
+          frame: interval,
+          value: data[1].x,
+        },
+        {
+          frame: interval * 2,
+          value: data[5].x,
+        },
+        {
+          frame: interval * 3,
+          value: data[7].x,
+        },
+      ],
+      y: [
+        {
+          frame: 0,
+          value: data[3].y,
+        },
+        {
+          frame: interval,
+          value: data[1].y,
+        },
+        {
+          frame: interval * 2,
+          value: data[5].y,
+        },
+        {
+          frame: interval * 3,
+          value: data[7].y,
+        },
+      ],
+    });
+
+    ///
+
+    this.animation.animateMultiple(data[7], {
+      x: [
+        {
+          frame: interval * 4,
+          value: nodes[5].x + 50,
+        },
+        {
+          frame: interval * 5,
+          value: nodes[4].x + 50,
+        },
+      ],
+      y: [
+        {
+          frame: interval * 4,
+          value: nodes[5].y + 50,
+        },
+        {
+          frame: interval * 5,
+          value: nodes[4].y + 50,
+        },
+      ],
+    });
+
+    this.animation.animateMultiple(data[6], {
+      x: [
+        {
+          frame: interval * 4,
+          value: nodes[4].x + 50,
+        },
+        {
+          frame: interval * 5,
+          value: nodes[5].x + 50,
+        },
+      ],
+      y: [
+        {
+          frame: interval * 4,
+          value: nodes[4].y + 50,
+        },
+        {
+          frame: interval * 5,
+          value: nodes[5].y + 50,
+        },
+      ],
+    });
+
+
+    this.animation.animateMultiple(data[3], {
+      x: [
+        {
+          frame: interval * 4,
+          value: nodes[7].x + 50,
+        },
+        {
+          frame: interval * 5,
+          value: nodes[6].x + 50,
+        },
+      ],
+      y: [
+        {
+          frame: interval * 4,
+          value: nodes[7].y + 50,
+        },
+        {
+          frame: interval * 5,
+          value: nodes[6].y + 50,
+        },
+      ],
+    });
+
+    this.animation.animateMultiple(data[2], {
+      x: [
+        {
+          frame: interval * 4,
+          value: nodes[6].x + 50,
+        },
+        {
+          frame: interval * 5,
+          value: nodes[7].x + 50,
+        },
+      ],
+      y: [
+        {
+          frame: interval * 4,
+          value: nodes[6].y + 50,
+        },
+        {
+          frame: interval * 5,
+          value: nodes[7].y + 50,
+        },
+      ],
+    });
+
+
+    this.animation.animateMultiple(data[1], {
+      x: [
+        {
+          frame: interval * 4,
+          value: nodes[3].x + 50,
+        },
+        {
+          frame: interval * 5,
+          value: nodes[2].x + 50,
+        },
+      ],
+      y: [
+        {
+          frame: interval * 4,
+          value: nodes[3].y + 50,
+        },
+        {
+          frame: interval * 5,
+          value: nodes[2].y + 50,
+        },
+      ],
+    });
+
+    this.animation.animateMultiple(data[0], {
+      x: [
+        {
+          frame: interval * 4,
+          value: nodes[2].x + 50,
+        },
+        {
+          frame: interval * 5,
+          value: nodes[3].x + 50,
+        },
+      ],
+      y: [
+        {
+          frame: interval * 4,
+          value: nodes[2].y + 50,
+        },
+        {
+          frame: interval * 5,
+          value: nodes[3].y + 50,
+        },
+      ],
+    }); 
+
+
+
+    this.animation.animateMultiple(data[4], {
+      x: [
+        {
+          frame: interval * 4,
+          value: nodes[0].x + 50,
+        },
+        {
+          frame: interval * 5,
+          value: nodes[1].x + 50,
+        },
+      ],
+      y: [
+        {
+          frame: interval * 4,
+          value: nodes[0].y + 50,
+        },
+        {
+          frame: interval * 5,
+          value: nodes[1].y + 50,
+        },
+      ],
+    });
+
+    this.animation.animateMultiple(data[5], {
+      x: [
+        {
+          frame: interval * 4,
+          value: nodes[1].x + 50,
+        },
+        {
+          frame: interval * 5,
+          value: nodes[0].x + 50,
+        },
+      ],
+      y: [
+        {
+          frame: interval * 4,
+          value: nodes[1].y + 50,
+        },
+        {
+          frame: interval * 5,
+          value: nodes[0].y + 50,
+        },
+      ],
+    }); 
 
     this.animation.reset();
     this.animation.play(true);
